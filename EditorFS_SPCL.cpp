@@ -291,13 +291,13 @@ void CEditorFS_SPCL::OnChangeData()
 		m_Name.GetWindowText(t);
 		GetDocument()->m_EditorFS_Subsystem.Name=t;
 		m_CenterX.GetWindowText(t);
-		GetDocument()->m_EditorFS_Subsystem.Center.x=atof(t);
+		GetDocument()->m_EditorFS_Subsystem.Center.x=(float)atof(t);
 		m_CenterY.GetWindowText(t);
-		GetDocument()->m_EditorFS_Subsystem.Center.y=atof(t);
+		GetDocument()->m_EditorFS_Subsystem.Center.y=(float)atof(t);
 		m_CenterZ.GetWindowText(t);
-		GetDocument()->m_EditorFS_Subsystem.Center.z=atof(t);
+		GetDocument()->m_EditorFS_Subsystem.Center.z=(float)atof(t);
 		m_Radius.GetWindowText(t);
-		GetDocument()->m_EditorFS_Subsystem.Radius=atof(t);
+		GetDocument()->m_EditorFS_Subsystem.Radius=(float)atof(t);
 		if(m_Properties.GetCurSel()==1)
 			GetDocument()->m_EditorFS_Subsystem.Properties="";
 		else

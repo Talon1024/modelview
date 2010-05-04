@@ -101,7 +101,7 @@ void CGamePaneFS::Init()
 	int vert,poly,txtr,sobj;
 	char tstr[256];
 
-	for(int i=0; i<6; i++)
+	for(unsigned int i=0; i<6; i++)
 	{
 		if(pDoc->m_FS_PMinfo.n_detail >= i+1)
 		{
@@ -151,7 +151,6 @@ void CGamePaneFS::Init()
 
 void CGamePaneFS::FillTab()
 {
-	unsigned int m;
 	int i;
 	CMODVIEW32Doc *pDoc=GetDocument();
 	CMODVIEW32View *view=GetMainView();
@@ -174,7 +173,7 @@ void CGamePaneFS::FillTab()
 		lbox->AddString("<All textures>");
 		if(pDoc->m_FS_BitmapData.count > 0)
 		{
-			for(m=pDoc->m_FS_PofDataL[0];m<pDoc->m_FS_PofDataH[0]+1;m++)
+			for(unsigned long m=pDoc->m_FS_PofDataL[0];m<pDoc->m_FS_PofDataH[0]+1;m++)
 				lbox->AddString(pDoc->m_FS_BitmapData.pic[m].name);
 			lbox->SetCurSel(0);
 		}
@@ -184,9 +183,9 @@ void CGamePaneFS::FillTab()
 		lbox->ResetContent();
 		lbox->AddString("<All submodels>");
 		
-		for(m=0;m<pDoc->m_FS_NumSOBJ;m++)
+		for(int m=0;m<pDoc->m_FS_NumSOBJ;m++)
 		{
-			if(pDoc->m_FS_SOBJ[m].detail==(long)view->m_Detaillevel)
+			if(pDoc->m_FS_SOBJ[m].detail==view->m_Detaillevel)
 			{
 				CString tstr;
 				tstr.Format("#%i: %s",num_sobj,pDoc->m_FS_SOBJ[m].submodel_name);
@@ -255,31 +254,30 @@ void CGamePaneFS::FillTab()
 void CGamePaneFS::GetPolyInfo(int detaillevel, int *vert, int *poly, int *txtr, int *sobj)
 {
 	CMODVIEW32Doc *pDoc=GetDocument();
-	unsigned int m;
 
 	int num_vert=0;
-	for(m=0;m<pDoc->m_FS_Model.Vcount;m++)
+	for(unsigned long m=0;m<pDoc->m_FS_Model.Vcount;m++)
 	{
 		if(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.VSobj[m]].detail==(long)detaillevel)
 			num_vert++;
 	}
 
 	int num_poly=0;
-	for(m=0;m<pDoc->m_FS_Model.Pcount;m++)
+	for(unsigned long m=0;m<pDoc->m_FS_Model.Pcount;m++)
 	{
 		if(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[m].Sobj].detail==(long)detaillevel)
 			num_poly++;
 	}
 
 	int num_txtr=0;
-	for(m=0;m<pDoc->m_FS_BitmapData.count;m++)
+	for(unsigned long m=0;m<pDoc->m_FS_BitmapData.count;m++)
 	{
 		if(pDoc->m_FS_BitmapData.pic[m].valid==1)
 			num_txtr++;
 	}
 
 	int num_sobj=0;
-	for(m=0;m<pDoc->m_FS_NumSOBJ;m++)
+	for(int m=0;m<pDoc->m_FS_NumSOBJ;m++)
 	{
 		if(pDoc->m_FS_SOBJ[m].detail==(long)detaillevel)
 			num_sobj++;

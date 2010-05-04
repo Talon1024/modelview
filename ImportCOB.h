@@ -36,7 +36,7 @@ private:
 	void Dump4Data(FS_VPNT Normal, FS_VPNT Point, FS_VPNT Min, FS_VPNT Max);
 	void Dump5Data(FS_VPNT Min, FS_VPNT Max);
 	void split(FS_VPNT Min, FS_VPNT Max,unsigned long SobjNum);
-	void sobj(unsigned long SobjNum);
+	void sobj(int SobjNum);
 	void shld();
 	void pinf();
 
