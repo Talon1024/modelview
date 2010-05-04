@@ -1,0 +1,94 @@
+File
+ Open
+  Descent 2 (DESCENT2.HAM)
+  Descent 2 Vertigo Series V-HAM (D2X.HOG)
+  -
+  Descent 3 (D3.HOG)
+  Descent 3 Mercanary
+  -
+  FreeSpace 1 (FREESPACE.VP)
+  FreeSpace 1 Silent Threat (MDSK.VP)
+  -
+  FreeSpace 2 (SPARKY_FS2.VP)
+  -
+  Other...
+ -
+ Options & Configuration
+ -
+ Exit
+View
+ Render Mode
+  Textured                          Ctrl+1
+  Surface                           Ctrl+2
+  Wireframe                         Ctrl+3
+ Show Shield                        Ctrl+S
+ Show Truster                       Ctrl+T
+ -
+ Background
+  8 Colors
+ -
+ Display Toolbar                    
+ Display Browser                    Ctrl+B
+ Display Details                    Ctrl+I
+Model
+ Detail
+  7 Details                         0-6
+ -
+ Reload                             F5
+ -
+ Next                               N
+ Preview                            P
+ -
+ Spin                               S
+ -
+ Left                               Left
+ Right                              Right
+ Up                                 Up
+ Down                               Down
+ -
+ Zoom in                            +
+ Zoom out                           -
+ -
+ Details...                         Alt+Return
+Help
+ Check for new version
+ About
+
+
+Open:
+ Descent 1 V1.0 model files (*.POF)
+ Descent 1 V1.0 model files in HOG (*.HOG)
+ Descent 1 V1.4+ model files (*.PIG)
+ Descent 2 model files (*.POL)
+ Descent 2 model files in HAM/V-HAM (*.HAM)
+ Descent 2 replacement model files (*.HXM)
+ Descent 2 replacement model files in HOG (*.HOG)
+ Descent 3 model files (*.OOF)
+ Descent 3 model files in HOG (*.HOG)
+ FreeSpace 1 model files (*.POF)
+ FreeSpace 1 model files in VP (*.VP)
+ FreeSpace 2 model files (*.POF)
+ FreeSpace 2 model files in VP (*.VP)
+ All files (*.*)
+
+
+DialogBar:
+ Descent 2:
+  5 modes (5 group buttons)
+  <Show gunpoints>
+ Descent 3:
+  Enable Animation (e.g. Virus)
+  Positions Slider 
+  Submodels Highlighting Slider
+  Show Doorbox Option
+ FreeSpace:
+  Detail mode (6 group buttons)
+  Trust button
+  Shield button
+
+
+Details:
+ Descent 3:
+  Submodels Listview
+ FreeSpace:
+  Polygons per Detail mode ListView
