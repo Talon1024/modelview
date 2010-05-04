@@ -325,10 +325,6 @@
     <CustomBuild Include="MODVIEW32.reg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

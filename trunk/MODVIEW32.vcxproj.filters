@@ -542,9 +542,5 @@
     </CustomBuild>
     <CustomBuild Include="D2Pal.dat" />
     <CustomBuild Include="MODVIEW32.reg" />
-    <CustomBuild Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>
