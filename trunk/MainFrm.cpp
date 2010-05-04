@@ -785,8 +785,8 @@ void CMainFrame::OnModelZoomout()
 	m_ZoomLevel = GetCurrentView()->m_xScaling;
 }
 
-#define PANESPEED 30.0
-#define PANEDIV 3.0
+#define PANESPEED 30.0f
+#define PANEDIV 3.0f
 
 float CMainFrame::CalcPaneStep()
 {
@@ -795,7 +795,7 @@ float CMainFrame::CalcPaneStep()
 	case GAME_D2:	return GetDocument()->m_D2_Model.MaxXYZ/PANEDIV;
 	case GAME_D3:	return GetDocument()->m_D3_Display.MaxXYZ/PANEDIV;
 	case GAME_FS:	return GetDocument()->m_FS_Model.MaxXYZ/PANEDIV;
-	default:		return (float)PANESPEED;
+	default:		return PANESPEED;
 	}
 }
 
@@ -2070,8 +2070,8 @@ void CMainFrame::LoadEditor()
 		}
 		fvp.Seek(GetDocument()->m_CurrentFile_Offset,CFile::begin);
 		unsigned char *buffer=new unsigned char[GetDocument()->m_CurrentFile_Size];
-		fvp.Read(buffer,GetDocument()->m_CurrentFile_Size);
-		fpof.Write(buffer,GetDocument()->m_CurrentFile_Size);
+		fvp.Read(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
+		fpof.Write(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
 		delete(buffer);
 		fvp.Close();
 		fpof.Close();

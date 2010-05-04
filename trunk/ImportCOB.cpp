@@ -128,7 +128,7 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 	unsigned short Polhname;
 	unsigned short Polhn_string;
 	char Polhstring[100];
-	unsigned long position;
+	unsigned long long position;
 	short identifier;
 	POLH_DATA Polhdata;
 	unsigned short Grouname;
@@ -1631,7 +1631,7 @@ void CImportCOB::split(FS_VPNT Min, FS_VPNT Max,unsigned long SobjNum)
 //
 // SOBJ Setup
 //
-void CImportCOB::sobj(unsigned long SobjNum)
+void CImportCOB::sobj(int SobjNum)
 {
 	unsigned long i;
 	FS_VPNT test1,test2;
@@ -2056,7 +2056,6 @@ void CImportCOB::shld(void)
 //*************************************************************
 void CImportCOB::pinf(void)
 {
-	unsigned long i;
 	unsigned long SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
@@ -2072,7 +2071,7 @@ void CImportCOB::pinf(void)
 	CString Version;
 	Version.Format("MODELVIEW32 COB2FS engine-Based on %s by Garry Knudson",COB2FS_VERSION);
 
-	for(i=0;i<Version.GetLength();i++)
+	for(int i=0;i<Version.GetLength();i++)
 	{
 		wc(walker+OutputLength)=Version.GetAt(i);
 		OutputLength+=1;

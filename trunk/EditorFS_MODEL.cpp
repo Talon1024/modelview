@@ -342,11 +342,11 @@ void CEditorFS_MODEL::OnChangeData()
 		if(curl>=0)
 		{
 			m_Lights_Position_X.GetWindowText(t);
-			GetDocument()->m_EditorFS_Model.light_location[curl].x=atof(t);
+			GetDocument()->m_EditorFS_Model.light_location[curl].x=(float)atof(t);
 			m_Lights_Position_Y.GetWindowText(t);
-			GetDocument()->m_EditorFS_Model.light_location[curl].y=atof(t);
+			GetDocument()->m_EditorFS_Model.light_location[curl].y=(float)atof(t);
 			m_Lights_Position_Z.GetWindowText(t);
-			GetDocument()->m_EditorFS_Model.light_location[curl].z=atof(t);
+			GetDocument()->m_EditorFS_Model.light_location[curl].z=(float)atof(t);
 			m_Lights_Type.GetWindowText(t);
 			GetDocument()->m_EditorFS_Model.light_type[curl]=atoi(t);
 
@@ -365,33 +365,33 @@ void CEditorFS_MODEL::OnChangeData()
 		m_Mass.GetWindowText(t);
 		GetDocument()->m_EditorFS_Model.mass=atof(t);
 		m_MassCenter_X.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.mass_center.x=atof(t);
+		GetDocument()->m_EditorFS_Model.mass_center.x=(float)atof(t);
 		m_MassCenter_Y.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.mass_center.y=atof(t);
+		GetDocument()->m_EditorFS_Model.mass_center.y=(float)atof(t);
 		m_MassCenter_Z.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.mass_center.z=atof(t);
+		GetDocument()->m_EditorFS_Model.mass_center.z=(float)atof(t);
 
 		//AutoCenter
 		m_ACenPoint_X.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.ACenPoint.x=atof(t);
+		GetDocument()->m_EditorFS_Model.ACenPoint.x=(float)atof(t);
 		m_ACenPoint_Y.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.ACenPoint.y=atof(t);
+		GetDocument()->m_EditorFS_Model.ACenPoint.y=(float)atof(t);
 		m_ACenPoint_Z.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.ACenPoint.z=atof(t);
+		GetDocument()->m_EditorFS_Model.ACenPoint.z=(float)atof(t);
 
 		//Eye Point
 		m_Eye_Position_X.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.eye_point_sobj_offset.x=atof(t);
+		GetDocument()->m_EditorFS_Model.eye_point_sobj_offset.x=(float)atof(t);
 		m_Eye_Position_Y.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.eye_point_sobj_offset.y=atof(t);
+		GetDocument()->m_EditorFS_Model.eye_point_sobj_offset.y=(float)atof(t);
 		m_Eye_Position_Z.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.eye_point_sobj_offset.z=atof(t);
+		GetDocument()->m_EditorFS_Model.eye_point_sobj_offset.z=(float)atof(t);
 		m_Eye_Normal_X.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.eye_point_normal.x=atof(t);
+		GetDocument()->m_EditorFS_Model.eye_point_normal.x=(float)atof(t);
 		m_Eye_Normal_Y.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.eye_point_normal.y=atof(t);
+		GetDocument()->m_EditorFS_Model.eye_point_normal.y=(float)atof(t);
 		m_Eye_Normal_Z.GetWindowText(t);
-		GetDocument()->m_EditorFS_Model.eye_point_normal.z=atof(t);
+		GetDocument()->m_EditorFS_Model.eye_point_normal.z=(float)atof(t);
 
 		GetMainView()->InvalidateRect(NULL);
 	}

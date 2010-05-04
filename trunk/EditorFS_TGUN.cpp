@@ -445,22 +445,22 @@ void CEditorFS_TGUN::OnChangeData()
 		GetMainView()->m_EditorFS_HighLight_Segment_2=m_SObj_Parent_Phys.GetCurSel();
 		CString t;
 		m_Normal_X.GetWindowText(t);
-		GetDocument()->m_EditorFS_Turret.turret_normal.x=atof(t);
+		GetDocument()->m_EditorFS_Turret.turret_normal.x=(float)atof(t);
 		m_Normal_Y.GetWindowText(t);
-		GetDocument()->m_EditorFS_Turret.turret_normal.y=atof(t);
+		GetDocument()->m_EditorFS_Turret.turret_normal.y=(float)atof(t);
 		m_Normal_Z.GetWindowText(t);
-		GetDocument()->m_EditorFS_Turret.turret_normal.z=atof(t);
+		GetDocument()->m_EditorFS_Turret.turret_normal.z=(float)atof(t);
 
 		//Read firing point data
 		if(GetDocument()->m_EditorFS_Turret.num_firing_points>0)
 		{
 			int f=GetCurrentFiringPointSelection();
 			m_FiringPoint_X.GetWindowText(t);
-			GetDocument()->m_EditorFS_Turret.firing_point[f].x=atof(t);
+			GetDocument()->m_EditorFS_Turret.firing_point[f].x=(float)atof(t);
 			m_FiringPoint_Y.GetWindowText(t);
-			GetDocument()->m_EditorFS_Turret.firing_point[f].y=atof(t);
+			GetDocument()->m_EditorFS_Turret.firing_point[f].y=(float)atof(t);
 			m_FiringPoint_Z.GetWindowText(t);
-			GetDocument()->m_EditorFS_Turret.firing_point[f].z=atof(t);
+			GetDocument()->m_EditorFS_Turret.firing_point[f].z=(float)atof(t);
 			//Update listview right away
 			t.Format("%.4f",GetDocument()->m_EditorFS_Turret.firing_point[f].x);
 			m_FiringPoints_List.SetItemText(f,1,t);

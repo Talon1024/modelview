@@ -425,17 +425,17 @@ void CEditorFS_GPNT::OnChangeData()
 		{
 			int f=GetCurrentFiringPointSelection();
 			m_FiringPoint_PosX.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.point[f].x=atof(t);
+			GetDocument()->m_EditorFS_RealGun.point[f].x=(float)atof(t);
 			m_FiringPoint_PosY.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.point[f].y=atof(t);
+			GetDocument()->m_EditorFS_RealGun.point[f].y=(float)atof(t);
 			m_FiringPoint_PosZ.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.point[f].z=atof(t);
+			GetDocument()->m_EditorFS_RealGun.point[f].z=(float)atof(t);
 			m_FiringPoint_NormX.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.normal[f].x=atof(t);
+			GetDocument()->m_EditorFS_RealGun.normal[f].x=(float)atof(t);
 			m_FiringPoint_NormY.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.normal[f].y=atof(t);
+			GetDocument()->m_EditorFS_RealGun.normal[f].y=(float)atof(t);
 			m_FiringPoint_NormZ.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.normal[f].z=atof(t);
+			GetDocument()->m_EditorFS_RealGun.normal[f].z=(float)atof(t);
 			//Update listview right away
 			t.Format("%.4f",GetDocument()->m_EditorFS_RealGun.point[f].x);
 			m_FiringPoints_List.SetItemText(f,1,t);

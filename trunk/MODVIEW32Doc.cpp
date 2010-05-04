@@ -534,7 +534,7 @@ void CMODVIEW32Doc::Serialize(CArchive& ar)
 		char *data=new char[32768];
 		CFile *poff=ar.GetFile();
 		poff->SeekToBegin();
-		poff->Read(data,poff->GetLength());
+		poff->Read(data, (UINT)poff->GetLength());
 
 		char *poffile,*pofoffset,*poftitle,*pofafter;
 
@@ -736,7 +736,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 
 	if(m_FS_BitmapData.count>0)
 	{
-		for(int i=m_FS_PofDataL[ActivePM];i<(m_FS_PofDataH[ActivePM]+1);i++)
+		for(unsigned long i=m_FS_PofDataL[ActivePM];i<(m_FS_PofDataH[ActivePM]+1);i++)
 		{
 			BOOL unknownfiletype=TRUE;
 			m_FS_BitmapData.pic[i].valid=1;
@@ -760,7 +760,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_UNKNOWN;
 
 			//Count polygons using the texture
-			for(int j=0;j<m_FS_Model.Pcount;j++)
+			for(unsigned long j=0;j<m_FS_Model.Pcount;j++)
 			{	// type 3 polygons
 				if((m_FS_Model.Poly[j].Ptype==3) && (m_FS_Model.Poly[j].Colors==i)) //&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel)
 					m_Textures[m_TexturesNum].Used++;
@@ -811,7 +811,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//PCX Search process #2: Current .VP file
 			if(unknownfiletype && m_FS_CurrVP_Loaded)
 			{
-				int j=0;
+				unsigned long j=0;
 				while((j<m_FS_CurrVP_Header.dirnumber)&(strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
 					j++;
 
@@ -870,7 +870,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//PCX Search process #4: Main .VP file
 			if(unknownfiletype && m_FS_MainVP_Loaded)
 			{
-				int j=0;
+				unsigned long j=0;
 				while((j<m_FS_MainVP_Header.dirnumber)&(strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
 					j++;
 
@@ -915,7 +915,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//ANI Search process #2: Current .VP
 			if(unknownfiletype && m_FS_CurrVP_Loaded)
 			{
-				int j=0;
+				unsigned long j=0;
 				while((j<m_FS_CurrVP_Header.dirnumber)&(strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
 					j++;
 				if(j<m_FS_CurrVP_Header.dirnumber)
@@ -968,7 +968,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//ANI Search process #4: Main .VP file
 			if(unknownfiletype && m_FS_MainVP_Loaded)
 			{
-				int j=0;
+				unsigned long j=0;
 				while((j<m_FS_MainVP_Header.dirnumber)&(strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
 					j++;
 				if(j<m_FS_MainVP_Header.dirnumber)
@@ -1034,7 +1034,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 					m_Textures[m_TexturesNum].Width=xreal;
 					m_Textures[m_TexturesNum].Height=yreal;
 
-					int j;
+					unsigned long j;
 					j=2; while(j<xreal) j*=2; xsize=j;
 					j=2; while(j<yreal) j*=2; ysize=j;
 
@@ -1110,15 +1110,15 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 	
 					unsigned char runcount=0;
 					unsigned char runvalue=0;
-					int runoffset=0;
-					for(j=0;j<yreal;j++)
+					unsigned long runoffset=0;
+					for(unsigned long j=0;j<yreal;j++)
 					{
 						unsigned long offset;
 						if(bFastload)
 							offset=(j>>YScale)*(xsize>>XScale);
 						else
 							offset=j*xreal;
-						for(int k=0;k<(xreal+(xreal&1));k++)
+						for(unsigned long k=0;k<(xreal+(xreal&1));k++)
 						{
 							if(runcount>0)
 								runcount--;
@@ -1150,7 +1150,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 						if(bFastload)
 						{
 							unsigned long offset=(j>>YScale)*(xsize>>XScale) + (xreal>>XScale);
-							for(int k=xreal;k<xsize;k++)
+							for(unsigned long k=xreal;k<xsize;k++)
 							{	// fill out the extra
 								if((k&XScaleTest)==0)
 								{
@@ -1168,7 +1168,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 						for(j=yreal;j<ysize;j++)
 						{			// fill out the extra
 							unsigned long offset=(j>>YScale)*(xsize>>XScale);
-							for(int k=0;k<xsize;k++)
+							for(unsigned long k=0;k<xsize;k++)
 							{
 								if((k&XScaleTest)==0)
 								{
@@ -1208,7 +1208,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 					m_Textures[m_TexturesNum].Width=xreal;
 					m_Textures[m_TexturesNum].Height=yreal;
 
-					int j;
+					unsigned long j;
 					j=2; while(j<xreal) j*=2; xsize=j;
 					j=2; while(j<yreal) j*=2; ysize=j;
 
@@ -1270,7 +1270,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 					int runoffset=0;
 					for(j=0;j<yreal;j++)
 					{
-						for(int k=0;k<xreal;k++)
+						for(unsigned long k=0;k<xreal;k++)
 						{
 							if(runcount>0)
 								runcount--;
@@ -1296,7 +1296,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 							runoffset++;
 #endif
 						}
-						for(int k=xreal;k<xsize;k++)
+						for(unsigned long k=xreal;k<xsize;k++)
 						{	//fill out the extra
 							if(((j&YScaleTest)+(k&XScaleTest))==0)
 							{
@@ -1309,9 +1309,9 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 							}
 						}
 					}               
-					for(int j=yreal;j<ysize;j++)
+					for(unsigned long j=yreal;j<ysize;j++)
 					{			// fill out the extra
-						for(int k=0;k<xsize;k++)
+						for(unsigned long k=0;k<xsize;k++)
 						{
 							if(((j&YScaleTest)+(k&XScaleTest))==0)
 							{
@@ -1488,7 +1488,7 @@ float read_float(CFile *fp)
 	return value;
 }
 
-int cfseek(CFile *fp,long offset,int whence)
+ULONGLONG cfseek(CFile *fp,long offset,int whence)
 {
 //  printf("%#08lx\n",ftell(fp));
 	return fp->Seek(offset,whence);
@@ -1537,8 +1537,8 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 	}
 	fp->Seek(m_CurrentFile_Offset, SEEK_SET);
 
-	unsigned long len,next_chunk;
-	unsigned long temp,pos_start; 
+	unsigned long long len,next_chunk;
+	unsigned long long temp,pos_start; 
 	unsigned long version;
 	int StartByte;
 	unsigned long id=read_INT32(fp);
@@ -1608,7 +1608,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 					return ERROR_FS_TOOMANYSOBJS;
 				}
 
-				for(int i=0;i<m_FS_PMinfo.n_models;i++)
+				for(unsigned long i=0;i<m_FS_PMinfo.n_models;i++)
 				{
 					m_FS_SOBJ[i].real_offset.x=0;
 					m_FS_SOBJ[i].real_offset.y=0;
@@ -1629,30 +1629,30 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 				LOGTEXT("Number of submodels: %i\nRadius: %.2f\nNumber of detail versions: %i\n",m_FS_PMinfo.n_models,m_FS_Model.radius,m_FS_PMinfo.n_detail);
 				LOGDOIT;
 
-				for(int j=0;j<m_FS_PMinfo.n_detail;j++)
+				for(unsigned long j=0;j<m_FS_PMinfo.n_detail;j++)
 					m_FS_PMinfo.detail[j]=read_INT32(fp);
 				m_FS_PMinfo.n_debris=read_INT32(fp);
-				for(int j=0;j<m_FS_PMinfo.n_debris;j++)
+				for(unsigned long j=0;j<m_FS_PMinfo.n_debris;j++)
 					m_FS_PMinfo.debris[j]=read_INT32(fp);
 
 				//Mass
 				if(m_FileVersion>=1903)
 				{
-					float scale=1.0;
+					double scale=1.0;
 					m_FS_ModelInfo.mass=read_float(fp);
 					m_FS_ModelInfo.mass_center=read_VECTOR(fp);
 					if(m_FileVersion<2009)
 					{
 						//vol_mass -> area_mass conversion
-						float vol_mass=m_FS_ModelInfo.mass;
-						float areamass=4.65*pow(m_FS_ModelInfo.mass,2/3);
+						double vol_mass=m_FS_ModelInfo.mass;
+						double areamass=4.65*pow(m_FS_ModelInfo.mass,2/3);
 						scale=vol_mass/areamass;
 						m_FS_ModelInfo.mass=areamass;
 					}
 					for(int j1=0;j1<3;j1++)
 					{
 						for(int j2=0;j2<3;j2++)
-							m_FS_ModelInfo.moment_inertia[j2][j1]=read_float(fp)*scale;
+							m_FS_ModelInfo.moment_inertia[j2][j1]=(float)read_float(fp)*scale;
 					}
 				} else {
 					m_FS_ModelInfo.mass=1.0;
@@ -1832,11 +1832,11 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 				m_FS_SOBJ[m_FS_NumSOBJ].geometric_center=read_VECTOR(fp);	 //center
 				m_FS_SOBJ[m_FS_NumSOBJ].bounding_box_min_point=read_VECTOR(fp);	 //objmin
 				m_FS_SOBJ[m_FS_NumSOBJ].bounding_box_max_point=read_VECTOR(fp);	 //objmax
-				int dummy1=fp->GetPosition();
+				ULONGLONG dummy1=fp->GetPosition();
 				m_FS_SOBJ[m_FS_NumSOBJ].submodel_name=read_STRING(fp);
-				int dummy2=fp->GetPosition();
+				ULONGLONG dummy2=fp->GetPosition();
 				m_FS_SOBJ[m_FS_NumSOBJ].properties=read_STRING13(fp);
-				int dummy3=fp->GetPosition();
+				ULONGLONG dummy3=fp->GetPosition();
 				m_FS_SOBJ[m_FS_NumSOBJ].movement_type=read_INT32(fp);
 				m_FS_SOBJ[m_FS_NumSOBJ].movement_axis=read_INT32(fp);
 				m_FS_SOBJ[m_FS_NumSOBJ].reserved=read_INT32(fp); ASSERT(m_FS_SOBJ[m_FS_NumSOBJ].reserved==0);	   //reserved (always 0)
@@ -1856,7 +1856,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 				m_Blocks[m_Blocks_Num-1].desc="Submodel \""+m_FS_SOBJ[m_FS_NumSOBJ].submodel_name+"\"";
 				m_FS_NumSOBJ++;
 				
-				int dummy=fp->GetPosition();
+				ULONGLONG dummy=fp->GetPosition();
 				ASSERT(fp->GetPosition()==next_chunk);
 				break;
 			}
@@ -1981,7 +1981,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 					m_FS_Subsystems[i].Radius=read_float(fp);
 					LOGTEXT("Subsystem #%i: %s, properties: %s\n",i,m_FS_Subsystems[i].Name,m_FS_Subsystems[i].Properties); LOGDOIT;
 				}
-				int dummy=fp->GetPosition();
+				ULONGLONG dummy=fp->GetPosition();
 				ASSERT(fp->GetPosition()==next_chunk);
 			}
 			break;
@@ -2199,22 +2199,22 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 
 void CMODVIEW32Doc::FS_PreparePOF()
 {
-	unsigned long i,j;
+	//unsigned long i,j;
 
 	m_ModelLoaded=TRUE;
 	
 	//Enumerate submodels and assign them to their detail mode
-	for(i=0;i<m_FS_NumSOBJ;i++)
+	for(int i=0;i<m_FS_NumSOBJ;i++)
 		m_FS_SOBJ[i].detail=-1;
-	for(i=0;i<m_FS_PMinfo.n_detail;i++)
+	for(unsigned long i=0;i<m_FS_PMinfo.n_detail;i++)
 		m_FS_SOBJ[m_FS_PMinfo.detail[i]].detail=i;
-	for(i=0;i<m_FS_PMinfo.n_debris;i++)
+	for(unsigned long i=0;i<m_FS_PMinfo.n_debris;i++)
 		m_FS_SOBJ[m_FS_PMinfo.debris[i]].detail=9;
-	for(i=0;i<m_FS_NumSOBJ;i++)
+	for(int i=0;i<m_FS_NumSOBJ;i++)
 	{
 		if(m_FS_SOBJ[i].submodel_parent!=-1)
 		{
-			j=i;
+			int j=i;
 			while(m_FS_SOBJ[j].submodel_parent!=-1)
 				j=m_FS_SOBJ[j].submodel_parent;
 			m_FS_SOBJ[i].detail=m_FS_SOBJ[j].detail;
@@ -2222,12 +2222,12 @@ void CMODVIEW32Doc::FS_PreparePOF()
 	}
 
 	//Prepare everything else
-	for(i=0;i<MAX_FS_SOBJ;i++)
+	for(int i=0;i<MAX_FS_SOBJ;i++)
 	{
 		m_FS_PofDataL[i]=0xFFFFFFFF;
 		m_FS_PofDataH[i]=0;
 	}
-	for(i=0;i<m_FS_Model.Pcount;i++)
+	for(unsigned long i=0;i<m_FS_Model.Pcount;i++)
 	{
 		if(m_FS_Model.Poly[i].Ptype==3)
 		{
@@ -2245,17 +2245,17 @@ void CMODVIEW32Doc::FS_PreparePOF()
 	m_NumSubmodels=0;
 
 	int detaillevel=0; 
-	for(i=0;i<m_FS_Model.Vcount;i++)
+	for(unsigned long i=0;i<m_FS_Model.Vcount;i++)
 	{
-		if(m_FS_SOBJ[m_FS_Model.VSobj[i]].detail==(long)detaillevel)
+		if(m_FS_SOBJ[m_FS_Model.VSobj[i]].detail==detaillevel)
 			m_NumVertices++;
 	}
-	for(i=0;i<m_FS_Model.Pcount;i++)
+	for(unsigned long i=0;i<m_FS_Model.Pcount;i++)
 	{
-		if(m_FS_SOBJ[m_FS_Model.Poly[i].Sobj].detail==(long)detaillevel)
+		if(m_FS_SOBJ[m_FS_Model.Poly[i].Sobj].detail==detaillevel)
 			m_NumPolygons++;
 	}
-	for(i=m_FS_PofDataL[0];i<(m_FS_PofDataH[0]+1);i++)
+	for(unsigned long i=m_FS_PofDataL[0];i<(m_FS_PofDataH[0]+1);i++)
 	{
 		if(i<m_FS_BitmapData.count)
 		{
@@ -2264,9 +2264,9 @@ void CMODVIEW32Doc::FS_PreparePOF()
 			m_NumTextures++;
 		}
 	}
-	for(i=0;i<m_FS_NumSOBJ;i++)
+	for(int i=0;i<m_FS_NumSOBJ;i++)
 	{
-		if(m_FS_SOBJ[i].detail==(long)detaillevel)
+		if(m_FS_SOBJ[i].detail==detaillevel)
 			m_NumSubmodels++;
 	}
 
@@ -2741,10 +2741,10 @@ void CMODVIEW32Doc::D3_ReadD3HOG()
 //Read OOF file
 ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 {
-	unsigned long id,len,next_chunk,btemp;
+	unsigned long long id,len,next_chunk,btemp;
 	DWORD ooflength;
-	unsigned long i,j;
-	unsigned long version;
+	unsigned long long i,j;
+	unsigned long long version;
 	float ftemp;
 	char *pid;
 	int OffsetStart;
@@ -2780,7 +2780,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 		return ERROR_D3_INVALIDOOFHEADER;
 	}
 	version=read_INT32(fp);
-	m_FileVersion=version;
+	m_FileVersion=(int)version;
 
 	LOGTEXT("File %s at offset %i\n",fp->GetFilePath(),OffsetStart); LOGDOIT;
 	LOGTEXT("File version %i\n",version); LOGDOIT;
@@ -2794,7 +2794,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 		pid=(char *)&id;
 		m_Blocks_Num++;
 		m_Blocks[m_Blocks_Num-1].name.Format("%c%c%c%c",*pid,*(pid+1),*(pid+2),*(pid+3));
-		m_Blocks[m_Blocks_Num-1].offset=fp->GetPosition()-OffsetStart;
+		m_Blocks[m_Blocks_Num-1].offset=(int)fp->GetPosition()-OffsetStart;
 		m_Blocks[m_Blocks_Num-1].size=len;
 		m_Blocks[m_Blocks_Num-1].desc="??? <Unknown>";
 
@@ -3243,7 +3243,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",len,MAX_D3_PINF);
 					return ERROR_D3_PINFTEXTTOOLONG;
 				}
-				fp->Read(&m_D3_Model.PINF, len);
+				fp->Read(&m_D3_Model.PINF, (UINT)len);
 				m_D3_Model.PINF[len]=0;
 				LOGTEXT("--------------------------------------------------\nPINF --> OOF compiler information (not used):\n"); LOGDOIT;
 				LOGTEXT("%s",m_D3_Model.PINF); LOGDOIT;
@@ -6098,7 +6098,7 @@ unsigned char * CMODVIEW32Doc::EditorFS_GenerateTextures()
 	memcpy(buffer+ptr,&size,4); ptr+=4;
 
 	memcpy(buffer+ptr,&m_FS_BitmapData.count,4); ptr+=4;
-	for(int i=0;i<m_FS_BitmapData.count;i++)
+	for(unsigned long i=0;i<m_FS_BitmapData.count;i++)
 	{
 		int slen,si; unsigned char ch; CString tmp;
 		tmp=m_FS_BitmapData.pic[i].name;
@@ -6143,10 +6143,10 @@ unsigned char * CMODVIEW32Doc::EditorFS_GenerateModelHeader()
 	memcpy(buffer+ptr,&m_FS_Model._maxbox.y,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_Model._maxbox.z,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_PMinfo.n_detail,4); ptr+=4;
-	for(int i=0;i<m_FS_PMinfo.n_detail;i++)
+	for(unsigned long i=0;i<m_FS_PMinfo.n_detail;i++)
 	{	memcpy(buffer+ptr,&m_FS_PMinfo.detail[i],4); ptr+=4;	}
 	memcpy(buffer+ptr,&m_FS_PMinfo.n_debris,4); ptr+=4;
-	for(int i=0;i<m_FS_PMinfo.n_debris;i++)
+	for(unsigned long i=0;i<m_FS_PMinfo.n_debris;i++)
 	{	memcpy(buffer+ptr,&m_FS_PMinfo.debris[i],4); ptr+=4;	}
 	memcpy(buffer+ptr,&m_FS_ModelInfo.mass,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_ModelInfo.mass_center.x,4); ptr+=4;
@@ -6182,12 +6182,12 @@ unsigned char * CMODVIEW32Doc::EditorFS_GenerateShields()
 	int size=0;
 	memcpy(buffer+ptr,&size,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_Model.shields.Vcount,4); ptr+=4;
-	for(int vert=0;vert<m_FS_Model.shields.Vcount;vert++)
+	for(unsigned long vert=0;vert<m_FS_Model.shields.Vcount;vert++)
 	{	memcpy(buffer+ptr,&m_FS_Model.shields.Vpoint[vert][0],4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Vpoint[vert][1],4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Vpoint[vert][2],4); ptr+=4;	}
 	memcpy(buffer+ptr,&m_FS_Model.shields.Fcount,4); ptr+=4;
-	for(int face=0;face<m_FS_Model.shields.Fcount;face++)
+	for(unsigned long face=0;face<m_FS_Model.shields.Fcount;face++)
 	{	memcpy(buffer+ptr,&m_FS_Model.shields.Face[face].Normal.x,4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Face[face].Normal.y,4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Face[face].Normal.z,4); ptr+=4;

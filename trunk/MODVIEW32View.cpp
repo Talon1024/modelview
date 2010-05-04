@@ -755,7 +755,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 				gunpnt.z+=pDoc->m_FS_SOBJ[GetDocument()->m_EditorFS_Turret.sobj_parent].offset.z;
 			}
 
-			float mult=1;
+			int mult=1;
 			if(m_EditorFS_TGUN_FiringPoint!=i)
 				glRGB(FS_GUN_CROSSCOLOR_R,FS_GUN_CROSSCOLOR_G,FS_GUN_CROSSCOLOR_B);
 			else
@@ -788,7 +788,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			FS_VPNT gunpnt=GetDocument()->m_EditorFS_RealGun.point[i];
 			FS_VPNT gunnrm=GetDocument()->m_EditorFS_RealGun.normal[i];
 		
-			float mult=1;
+			int mult=1;
 			if(m_EditorFS_GPNT_FiringPoint!=i)
 				glRGB(FS_GUN_CROSSCOLOR_R,FS_GUN_CROSSCOLOR_G,FS_GUN_CROSSCOLOR_B);
 			else
@@ -858,7 +858,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 		//Lights
 		int mult;
-		for(i=0;i<GetDocument()->m_EditorFS_Model.num_lights;i++)
+		for(int i=0;i<GetDocument()->m_EditorFS_Model.num_lights;i++)
 		{
 			glDisable(GL_TEXTURE_2D);
 			if(i==m_EditorFS_MODEL_CurLight)
@@ -883,7 +883,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 	//Segments stuff
 	ASSERT(pDoc->m_FS_NumSOBJ<MAX_FS_SOBJ);
-	for (i=0;i<pDoc->m_FS_NumSOBJ;i++)
+	for (int i=0;i<pDoc->m_FS_NumSOBJ;i++)
 	{
 		int showthissubmodel=0;
 		if(m_ShowSegments && ((pDoc->m_FS_SOBJ[i].detail==(long)m_Detaillevel) &&((m_DisplaySubmodel==-1) || ((int)i==FS_CalcRealSubmodelNumber(m_DisplaySubmodel)))))
@@ -1108,7 +1108,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 					{
 						glRGB(255,255,255);
 						glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-for(int xv=0;xv<pDoc->m_FS_BitmapData.count;xv++)
+for(unsigned long xv=0;xv<pDoc->m_FS_BitmapData.count;xv++)
 {
 TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
 }

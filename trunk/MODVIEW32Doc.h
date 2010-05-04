@@ -229,7 +229,7 @@ typedef struct TEXTUREINFO
 	int Used;
 	CString InFilename;
 	int InOffset;
-	int InSize;
+	ULONGLONG InSize;
 	BOOL Valid;
 	CString Error;
 	unsigned long PaletteLong[256]; //Unused if TEXTUREINFOFLAG_TEXTUREIS24BIT is set in Flags
@@ -357,7 +357,7 @@ public:
 
 	//Descent 2 attributes
 	int			m_D2_Robots_Num;
-	int			m_D2_MO_RobotInfo[MAX_D2_ROBOT_TYPES];
+	ULONGLONG	m_D2_MO_RobotInfo[MAX_D2_ROBOT_TYPES];
 	int			m_D2_Models_Num;
 	char		m_D2_CurrHAXM_Filename[MAX_FILENAMELEN];
 	D2_MODEL		m_D2_Model;
@@ -506,7 +506,7 @@ public:
 	void OnFileSave2();
 	BOOL SaveModified2();
 	CString m_CurrentFile_FileName;
-	int m_CurrentFile_Size;
+	ULONGLONG m_CurrentFile_Size;
 	int m_CurrentFile_Offset;
 	CString m_CurFile;
 	CString m_ModelType_Desc;
