@@ -894,24 +894,24 @@ void CCoolControlsManager::CCMEdit::DrawControl( HDC hDC, const RECT& rc )
          if ( ( dwStyle & UDS_ALIGNRIGHT || dwStyle & UDS_ALIGNLEFT ) &&
               SendMessage( hWnd, UDM_GETBUDDY, 0, 0L ) == (LONG)m_hWnd )
          {         
-            RECT rc;
-            GetWindowRect( hWnd, &rc );
+            RECT rcb;
+            GetWindowRect( hWnd, &rcb );
             const int nEdge = GetSystemMetrics( SM_CXEDGE );
             if ( dwStyle & UDS_ALIGNRIGHT )
-               rect.right += ( rc.right - rc.left ) - nEdge;
+               rect.right += ( rcb.right - rcb.left ) - nEdge;
             else // UDS_ALIGNLEFT
-               rect.left -= ( rc.right - rc.left ) - nEdge;
+               rect.left -= ( rcb.right - rcb.left ) - nEdge;
 
-            HDC hDC = GetDC( hWnd );   // We must draw the lines onto spin control DC
+            HDC hDCb = GetDC( hWnd );   // We must draw the lines onto spin control DC
 
             COLORREF clr = GetSysColor( m_nState & dsHoverMask ? COLOR_3DDKSHADOW : COLOR_3DHIGHLIGHT );
             if ( !IsWindowEnabled( m_hWnd ) )
                clr = GetSysColor( COLOR_3DFACE );
-            FillSolidRect( hDC, 1, 1, rc.right - rc.left - nEdge - 1, 1, clr );
+            FillSolidRect( hDCb, 1, 1, rcb.right - rcb.left - nEdge - 1, 1, clr );
             if ( dwStyle & UDS_ALIGNLEFT )
-               FillSolidRect( hDC, 1, 1, 1, rc.bottom - rc.top - nEdge - 1, clr );
+               FillSolidRect( hDCb, 1, 1, 1, rcb.bottom - rcb.top - nEdge - 1, clr );
 
-            ReleaseDC( hWnd, hDC );
+            ReleaseDC( hWnd, hDCb );
          }
       }
    }

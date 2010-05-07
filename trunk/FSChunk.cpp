@@ -39,7 +39,7 @@ BOOL CFSChunk::ReadChunk(CFile *f,BOOL resetpos)
 {
 	ClearChunk();
 
-	int pos=f->GetPosition();
+	int pos = (int) f->GetPosition();
 	if(resetpos)
 		f->Seek(pos-8,SEEK_SET);	//Go back 8 steps first
 

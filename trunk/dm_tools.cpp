@@ -16,8 +16,8 @@ void DoAbout()
 	{
 		LPFNDLLFUNC1 lpDllEntryPoint = GetProcAddress(hLib,_T("DoAbout"));
 		(lpDllEntryPoint)();
+		FreeLibrary(hLib);
 	}
-	FreeLibrary(hLib);
 }
 
 int DoDMVC()
@@ -28,8 +28,9 @@ int DoDMVC()
 	{
 		LPFNDLLFUNC1 lpDllEntryPoint = GetProcAddress(hLib,_T("DoDMVC"));
 		(lpDllEntryPoint)();
+		FreeLibrary(hLib);
 	}
-	FreeLibrary(hLib);
+
 	return FALSE;
 }
 
@@ -41,6 +42,6 @@ void DoGamesConfig()
 	{
 		LPFNDLLFUNC1 lpDllEntryPoint = GetProcAddress(hLib,_T("DoConfigGames"));
 		(lpDllEntryPoint)();
+		FreeLibrary(hLib);
 	}
-	FreeLibrary(hLib);
 }
