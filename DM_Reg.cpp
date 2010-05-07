@@ -130,18 +130,26 @@ BOOL _WriteHKLM(CString path,CString key,CString value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[8192];
-	memset(&kvalue,0,8192);
-	strcpy_s(kvalue,value);
-    long valuesize=value.GetLength()+1;
-	CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-	long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-	if(ret==ERROR_SUCCESS)
-		ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
-	if(ret==ERROR_SUCCESS)
-		ret=RegCloseKey(hkey);
-	delete sizedata;
-	delete res;
-	return ret==ERROR_SUCCESS;
+	
+	try {
+		memset(&kvalue,0,8192);
+		strcpy_s(kvalue,value);
+		long valuesize=value.GetLength()+1;
+		CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+		long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+		if(ret==ERROR_SUCCESS)
+			ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
+		if(ret==ERROR_SUCCESS)
+			ret=RegCloseKey(hkey);
+		delete sizedata;
+		delete res;
+		return ret==ERROR_SUCCESS;
+	} catch (char* str) {
+		if (sizedata != NULL)
+			delete sizedata;
+		if (res != NULL)
+			delete res;
+	}
 }
 
 BOOL _WriteHKLM(CString path,CString key,int value)
@@ -150,18 +158,26 @@ BOOL _WriteHKLM(CString path,CString key,int value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[4];
-	memset(&kvalue,0,4);
-	memcpy(kvalue,&value,4);
-    long valuesize=4;
-	CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-	long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-	if(ret==ERROR_SUCCESS)
-		ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
-	if(ret==ERROR_SUCCESS)
-		ret=RegCloseKey(hkey);
-	delete sizedata;
-	delete res;
-	return ret==ERROR_SUCCESS;
+	try {
+		memset(&kvalue,0,4);
+		memcpy(kvalue,&value,4);
+		long valuesize=4;
+		CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+		long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+		if(ret==ERROR_SUCCESS)
+			ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
+		if(ret==ERROR_SUCCESS)
+			ret=RegCloseKey(hkey);
+		delete sizedata;
+		delete res;
+		return ret==ERROR_SUCCESS;
+	}
+	catch (char* str) {
+		if (sizedata != NULL)
+			delete sizedata;
+		if (res != NULL)
+			delete res;
+	}
 }
 
 BOOL DMReg_WriteHKCU(CString key,CString value)
@@ -170,19 +186,27 @@ BOOL DMReg_WriteHKCU(CString key,CString value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[8192];
-	memset(&kvalue,0,8192);
-	strcpy_s(kvalue,value);
-    long valuesize=value.GetLength()+1;
-	CString path="\\Descent Manager MODELVIEW32\\Settings";
-	CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-	long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-	if(ret==ERROR_SUCCESS)
-		ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
-	if(ret==ERROR_SUCCESS)
-		ret=RegCloseKey(hkey);
-	delete sizedata;
-	delete res;
-	return ret==ERROR_SUCCESS;
+	try {
+		memset(&kvalue,0,8192);
+		strcpy_s(kvalue,value);
+	    long valuesize=value.GetLength()+1;
+		CString path="\\Descent Manager MODELVIEW32\\Settings";
+		CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+		if(ret==ERROR_SUCCESS)
+			ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
+		if(ret==ERROR_SUCCESS)
+			ret=RegCloseKey(hkey);
+		delete sizedata;
+		delete res;
+		return ret==ERROR_SUCCESS; 
+	} 
+	catch (char* str) {
+		if (sizedata != NULL)
+			delete sizedata;
+		if (res != NULL)
+			delete res;
+	}
 }
 
 BOOL DMReg_WriteHKCU(CString key,int value)
@@ -191,19 +215,27 @@ BOOL DMReg_WriteHKCU(CString key,int value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[4];
-	memset(&kvalue,0,4);
-	memcpy(kvalue,&value,4);
-    long valuesize=4;
-	CString path="\\Descent Manager MODELVIEW32\\Settings";
-	CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-	long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-	if(ret==ERROR_SUCCESS)
-		ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
-	if(ret==ERROR_SUCCESS)
-		ret=RegCloseKey(hkey);
-	delete sizedata;
-	delete res;
-	return ret==ERROR_SUCCESS;
+	try {
+		memset(&kvalue,0,4);
+		memcpy(kvalue,&value,4);
+	    long valuesize=4;
+		CString path="\\Descent Manager MODELVIEW32\\Settings";
+		CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+		if(ret==ERROR_SUCCESS)
+			ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
+		if(ret==ERROR_SUCCESS)
+			ret=RegCloseKey(hkey);
+		delete sizedata;
+		delete res;
+		return ret==ERROR_SUCCESS;
+	} 
+	catch (char* str) {
+		if (sizedata != NULL)
+			delete sizedata;
+		if (res != NULL)
+			delete res;
+	}
 }
 
 
@@ -285,7 +317,7 @@ void _Init_RegisterModule()
 	CString version;
 	CString date;
 	CString coder;
-	int build;
+	int buildb;
 	CString _moduldat=path+"dm_modul.dat";
 	if(_FileExists(_moduldat))
 	{
@@ -301,10 +333,10 @@ void _Init_RegisterModule()
 			CString _build=version.Mid(pos+6);
 			_build.TrimRight();
 			_build.TrimRight(")");
-			build=atoi(_build);
+			buildb=atoi(_build);
 		}
 		else
-			build=0;
+			buildb=0;
 	}
 
 	//Write everything into the registry
@@ -313,13 +345,13 @@ void _Init_RegisterModule()
 	_WriteHKLM(keyname,"EXE",exe);
 	_WriteHKLM(keyname,"EXEName",exename);
 	_WriteHKLM(keyname,"Version",version);
-	_WriteHKLM(keyname,"Build",build);
+	_WriteHKLM(keyname,"Build",buildb);
 	_WriteHKLM(keyname,"Date",date);
 	_WriteHKLM(keyname,"Coder",coder);
 
 	_exepath=path;
 	_version=version;
-	_build=build;
+	_build=buildb;
 }
 
 

@@ -24,7 +24,7 @@
 #define MAX_FS_TURRETS_BANKS	128
 #define MAX_FS_REALGUNS_SLOTS	128
 #define MAX_FS_FILESINVP 8000
-#define MAX_FS_POFFILESINVP 200
+#define MAX_FS_POFFILESINVP 400
 #define MAX_FS_SUBSYSTEMS 1024
 
 //typedef signed char    char;

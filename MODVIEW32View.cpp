@@ -621,7 +621,6 @@ void CMODVIEW32View::D3_SetPosition(unsigned long pos)
 void CMODVIEW32View::FS_BuildScene(void)
 {
 	BOOL ValidTexture;
-	unsigned long i,j,k;
 	float v[35][3];
 	float n[35][3];
 	float uv[35][2];
@@ -918,7 +917,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 			FS_BuildWireCube(boxpnt1,boxpnt2);
 			glBegin(GL_LINES);
-			for (j=0;j<24;j++)
+			for (int j=0;j<24;j++)
 				glVertex3fv(FS_WireCube[j]);
 			glEnd();
 			glPopMatrix();
@@ -959,19 +958,19 @@ void CMODVIEW32View::FS_BuildScene(void)
 		glBegin(GL_TRIANGLES);
 
 		ASSERT(pDoc->m_FS_Model.shields.Fcount<MAX_FS_SHIELDFACES);
-		for (j=0;j<pDoc->m_FS_Model.shields.Fcount;j++)
+		for (unsigned long j=0;j<pDoc->m_FS_Model.shields.Fcount;j++)
 		{
 			normal[0]=pDoc->m_FS_Model.shields.Face[j].Normal.x;
 			normal[1]=pDoc->m_FS_Model.shields.Face[j].Normal.y;
 			normal[2]=pDoc->m_FS_Model.shields.Face[j].Normal.z;
-			for (i=0;i<3;i++)
+			for (int i=0;i<3;i++)
 			{
 				v[i][0]=pDoc->m_FS_Model.shields.Vpoint[pDoc->m_FS_Model.shields.Face[j].Vface[i]][0];
 				v[i][1]=pDoc->m_FS_Model.shields.Vpoint[pDoc->m_FS_Model.shields.Face[j].Vface[i]][1];
 				v[i][2]=pDoc->m_FS_Model.shields.Vpoint[pDoc->m_FS_Model.shields.Face[j].Vface[i]][2];
 			}
 			glNormal3fv(normal);
-			for (i=0;i<3;i++)
+			for (int i=0;i<3;i++)
 				glVertex3fv(v[i]);
 		}
 		glEnd();
@@ -1036,7 +1035,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 	ASSERT(pDoc->m_FS_Model.Pcount<MAX_FS_POLYGONS);
 	ASSERT(pDoc->m_FS_Model.Vcount<MAX_FS_VERTICES);
 	ASSERT(pDoc->m_FS_Model.Ncount<MAX_FS_NORMALS);
-	for(j=0;j<pDoc->m_FS_Model.Pcount;j++)
+	for(unsigned long j=0;j<pDoc->m_FS_Model.Pcount;j++)
 	{			   // type 2 polygons
 		if((pDoc->m_FS_Model.Poly[j].Ptype==2)&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel))
 		{
@@ -1057,7 +1056,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			normal[2]=pDoc->m_FS_Model.Poly[j].Normal.z;
 
 			ASSERT(pDoc->m_FS_Model.Poly[j].Corners<35);
-			for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+			for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 			{
 				v[i][0]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].x;
 				v[i][1]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].y;
@@ -1065,7 +1064,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			}
 			if(m_RenderSmooth)
 			{
-				for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+				for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 				{
 					n[i][0]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].x;
 					n[i][1]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].y;
@@ -1074,7 +1073,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			} else
 				glNormal3fv(normal);
 
-			for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+			for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 			{
 				if(m_RenderSmooth)
 					glNormal3fv(n[i]);
@@ -1094,7 +1093,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 	else
 		glDisable(GL_TEXTURE_2D);
 
-	for(k=pDoc->m_FS_PofDataL[m_Detaillevel]; k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1) ;k++)
+	for(unsigned long k=pDoc->m_FS_PofDataL[m_Detaillevel]; k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1) ;k++)
 	{
 		if((m_DisplayTexture==-1) | (m_DisplayTexture==(int)(k-pDoc->m_FS_PofDataL[m_Detaillevel])))
 		{
@@ -1108,10 +1107,9 @@ void CMODVIEW32View::FS_BuildScene(void)
 					{
 						glRGB(255,255,255);
 						glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-for(unsigned long xv=0;xv<pDoc->m_FS_BitmapData.count;xv++)
-{
-TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
-}
+						for(unsigned long xv=0;xv<pDoc->m_FS_BitmapData.count;xv++) {
+							TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
+						}
 //TRACE("%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.count,k,pDoc->m_FS_LoadPCX[k]);
 						glCallList(pDoc->m_FS_ModelTexture[pDoc->m_FS_LoadPCX[k]]);
 					} else
@@ -1122,7 +1120,7 @@ TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_
 
 			if(ValidTexture)
 			{
-				for(j=0;j<pDoc->m_FS_Model.Pcount;j++)
+				for(unsigned long j=0;j<pDoc->m_FS_Model.Pcount;j++)
 				{			   // type 3 polygons
 					if((pDoc->m_FS_Model.Poly[j].Ptype==3)
 						&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel)
@@ -1140,7 +1138,7 @@ TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_
 							normal[1]=pDoc->m_FS_Model.Poly[j].Normal.y;
 							normal[2]=pDoc->m_FS_Model.Poly[j].Normal.z;
 
-							for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+							for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 							{
 								v[i][0]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].x;
 								v[i][1]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].y;
@@ -1148,7 +1146,7 @@ TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_
 							}
 							if(m_RenderSmooth)
 							{
-								for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									n[i][0]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].x;
 									n[i][1]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].y;
@@ -1158,7 +1156,7 @@ TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_
 
 							if(m_ShowThruster)
 							{
-								for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									uv[i][0]=pDoc->m_FS_Model.Poly[j].U[i] *
 											((float)pDoc->m_FS_BitmapData.pic[k].xreal/(float)pDoc->m_FS_BitmapData.pic[k].xsize);
@@ -1166,7 +1164,7 @@ TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_
 											((float)pDoc->m_FS_BitmapData.pic[k].yreal/(float)pDoc->m_FS_BitmapData.pic[k].ysize);
 								}
 							} else {
-								for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									uv[i][0]=pDoc->m_FS_Model.Poly[j].U[i];
 									uv[i][1]=pDoc->m_FS_Model.Poly[j].V[i];
@@ -1174,7 +1172,7 @@ TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_
 							}
 							if (!m_RenderSmooth)
 								glNormal3fv(normal);
-							for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+							for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 							{
 								if (m_RenderSmooth)
 									glNormal3fv(n[i]);

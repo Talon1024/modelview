@@ -582,7 +582,7 @@ void CMODVIEW32Doc::Serialize(CArchive& ar)
 		m_FS_CurrVP_Filename=poffile;
 		viewFrame->ExplorerOpenSubFile(poftitle);
 		
-		delete(data);
+		delete[] data;
 	}
 	if(!supportedfiletype)
 	{
@@ -684,7 +684,7 @@ void CMODVIEW32Doc::ExplorerAddChild(CString filename, int ModelNum/*=-1*/)
 	char *x=new char[filename.GetLength()+1];
 	strcpy(x,filename);
 	ExplorerAddChild(x,ModelNum);
-	delete(x);
+	delete[] x;
 }
 
 void CMODVIEW32Doc::ExplorerGoTop()
@@ -1034,9 +1034,9 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 					m_Textures[m_TexturesNum].Width=xreal;
 					m_Textures[m_TexturesNum].Height=yreal;
 
-					unsigned long j;
-					j=2; while(j<xreal) j*=2; xsize=j;
-					j=2; while(j<yreal) j*=2; ysize=j;
+					unsigned long k;
+					k=2; while(k<xreal) k*=2; xsize=k;
+					k=2; while(k<yreal) k*=2; ysize=k;
 
 					//Palette
 					if(header.Version==5)
@@ -1046,7 +1046,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 						f.Read(&byte1,1);
 						if(byte1==0x0C)
 						{
-							for(j=0;j<256;j++)
+							for(int j=0;j<256;j++)
 							{
 								f.Read(&m_Textures[m_TexturesNum].Palette[0][j],1); //Red
 								f.Read(&m_Textures[m_TexturesNum].Palette[1][j],1); //Green
@@ -1074,17 +1074,18 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 						x_clusterize4+=4-(xreal%4);
 
 					m_Textures[m_TexturesNum].Flags=TEXTUREINFOFLAG_TEXTURELOADED;
-					CMemoryException e;
+					
 					unsigned char *tmpbuffer;
-					TRY
+					try {
 						m_Textures[m_TexturesNum].Bitmap=new unsigned char[x_clusterize4*yreal];
 						tmpbuffer=new unsigned char[x_clusterize2*yreal];
-					CATCH(CMemoryException,e)
+					}
+					catch (CMemoryException e) {
 						m_Textures[m_TexturesNum].Valid=FALSE;
 						m_Textures[m_TexturesNum].Error="Out of Memory";
 						m_FS_BitmapData.pic[m_TexturesNum].valid=0;
 						break;
-					END_CATCH
+					}
 #endif
 
 					//Bitmap
@@ -1141,11 +1142,11 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 						}	
 					}
 #ifdef _WITHTXVIEW
-					for(j=0;j<yreal;j++)
+					for(unsigned long j=0;j<yreal;j++)
 						memcpy(&m_Textures[m_TexturesNum].Bitmap[j*x_clusterize4],&tmpbuffer[j*x_clusterize2],xreal);
 					delete(tmpbuffer);
 #endif
-					for(j=0;j<yreal;j++)
+					for(unsigned long j=0;j<yreal;j++)
 					{
 						if(bFastload)
 						{
@@ -1165,7 +1166,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 
 					if(bFastload)
 					{
-						for(j=yreal;j<ysize;j++)
+						for(unsigned long j=yreal;j<ysize;j++)
 						{			// fill out the extra
 							unsigned long offset=(j>>YScale)*(xsize>>XScale);
 							for(unsigned long k=0;k<xsize;k++)
@@ -2160,7 +2161,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 		default:
 			{
 				char outputbuf[256];
-				sprintf(outputbuf,"%i <%c%c%c%c> %d\n",pos_start,*pid,*(pid+1),*(pid+2),*(pid+3),m_FS_NumSOBJ);
+				sprintf(outputbuf,"%i <%c%c%c%c> %d\n",(int)pos_start,*pid,*(pid+1),*(pid+2),*(pid+3),m_FS_NumSOBJ);
 				TRACE(outputbuf);
 			}
 			break;
@@ -2743,7 +2744,6 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 {
 	unsigned long long id,len,next_chunk,btemp;
 	DWORD ooflength;
-	unsigned long long i,j;
 	unsigned long long version;
 	float ftemp;
 	char *pid;
@@ -2814,7 +2814,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",m_D3_TotalTexture,MAX_D3_TEXTURE);
 					return ERROR_D3_TOOMANYTEXTURES;
 				}
-				for(i=0;i<m_D3_TotalTexture;i++)
+				for(unsigned long i=0;i<m_D3_TotalTexture;i++)
 				{
 					m_D3_Display.Used_texture[i]=FALSE;
 					charcount=read_INT32(fp);    
@@ -2824,7 +2824,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_ErrorDetails.Format("Is: %i, Should be <=%i",charcount,36);
 						return ERROR_D3_INVALIDTEXTURENAME;
 					}
-					for(j=0;j<charcount;j++)
+					for(unsigned long j=0;j<charcount;j++)
 					{
 						data=read_INT8(fp);
 						m_D3_TextureList[i][j]=data;
@@ -2870,9 +2870,9 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 				ftemp=read_float(fp);	   //unknown5
 				ftemp=read_float(fp);	   //unknown6
 
-				i=read_INT32(fp);		   //subobj name
+				long i = read_INT32(fp);		   //subobj name
 				StrTotal=0;
-				for(j=0;j<i;j++)
+				for(long j=0;j<i;j++)
 				{
 					input_char=read_INT8(fp);
 					m_D3_Model.Name[m_D3_Model.Scount][StrTotal++]=input_char;
@@ -2882,7 +2882,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 				i=read_INT32(fp);		   //subobj properites
 				StrTotal=0;
-				for(j=0;j<i;j++)
+				for(long j=0;j<i;j++)
 				{
 					input_char=read_INT8(fp);
 					m_D3_Model.Prop[m_D3_Model.Scount][StrTotal++]=input_char;
@@ -2959,7 +2959,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_D3_Display.Used_texture[m_D3_Model.Poly[m_D3_Model.Pcount].Color]=TRUE;
 					}
 
-					for(j=0;j<n_pnts;j++)
+					for(unsigned long j=0;j<n_pnts;j++)
 					{
 						m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]=read_INT32(fp);	   //index
 						m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]+=Vstart;     

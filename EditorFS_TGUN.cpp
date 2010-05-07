@@ -613,9 +613,9 @@ void CEditorFS_TGUN::DoDeleteItem()
 	if(MessageBox("Are you sure you want to delete this item?","Confirmation",MB_YESNO)!=IDYES)
 		return;
 
-	int m_CurrentItem=m_List.GetCurSel();
-	for(int i=m_CurrentItem+1;i<GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Num;i++)
-		GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i-1]=GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i];
+	int m_CurrentItem = m_List.GetCurSel();
+	for(int i = m_CurrentItem + 1; i < GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Num; i++)
+		GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i-1] = GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i];
 	GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Num--;
 
 	//Remove from list

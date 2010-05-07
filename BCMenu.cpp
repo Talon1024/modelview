@@ -1,7 +1,7 @@
 //*************************************************************************
 // BCMenu.cpp : implementation file
-// Version : 3.034
-// Date : May 2002
+// Version : 3.036
+// Date : June 2005
 // Author : Brent Corkum
 // Email :  corkum@rocscience.com
 // Latest Version : http://www.rocscience.com/~corkum/BCMenu.html
@@ -44,7 +44,7 @@ static char THIS_FILE[] = __FILE__;
 
 static CPINFO CPInfo;
 // how the menu's are drawn in win9x/NT/2000
-UINT BCMenu::original_drawmode=BCMENU_DRAWMODE_XP;
+UINT BCMenu::original_drawmode=BCMENU_DRAWMODE_ORIGINAL;
 BOOL BCMenu::original_select_disabled=TRUE;
 // how the menu's are drawn in winXP
 UINT BCMenu::xp_drawmode=BCMENU_DRAWMODE_XP;
@@ -154,8 +154,6 @@ BCMenu::BCMenu()
 {
 	m_bDynIcons = FALSE;     // O.S. - no dynamic icons by default
 	disable_old_style=FALSE;
-	m_iconX = 20;            //  //HHCHANGE Icon sizes default to 16 x 16
-	m_iconY = 20;            //  //HHCHANGE ...
 	m_selectcheck = -1;
 	m_unselectcheck = -1;
 	checkmaps=NULL;
@@ -165,8 +163,6 @@ BCMenu::BCMenu()
 	m_bitmapBackgroundFlag=FALSE;
 	GetCPInfo(CP_ACP,&CPInfo);
 	m_loadmenu=FALSE;
-	original_drawmode=1-AfxGetApp()->GetProfileInt("Settings","DisableXPMenuStyle",0); //HHCHANGE 
-	xp_drawmode=1-AfxGetApp()->GetProfileInt("Settings","DisableXPMenuStyle",0); //HHCHANGE 
 }
 
 
@@ -1383,7 +1379,6 @@ BOOL BCMenu::ModifyODMenuW(wchar_t *lpstrText,wchar_t *OptionText,
 	BCMenuData *mdata;
 	
 	// Find the old BCMenuData structure:
-	CString junk=OptionText;
 	mdata=FindMenuOption(OptionText);
 	if(mdata){
 		if(lpstrText)
@@ -1407,6 +1402,60 @@ BOOL BCMenu::ModifyODMenuW(wchar_t *lpstrText,wchar_t *OptionText,
 	}
 	return(FALSE);
 }
+
+BOOL BCMenu::SetImageForPopupFromToolbarA (const char *strPopUpText, UINT toolbarID, UINT command_id_to_extract_icon_from)
+{
+	USES_CONVERSION;
+	return SetImageForPopupFromToolbarW(A2W(strPopUpText),toolbarID,command_id_to_extract_icon_from);
+}
+BOOL BCMenu::SetImageForPopupFromToolbarW (wchar_t *strPopUpText, UINT toolbarID, UINT command_id_to_extract_icon_from)
+{
+	CWnd* pWnd = AfxGetMainWnd();
+	if (pWnd == NULL)pWnd = CWnd::GetDesktopWindow();
+
+	CToolBar bar;
+	bar.Create(pWnd);
+
+	if(bar.LoadToolBar(toolbarID)){
+		BCMenuData *mdata = FindMenuOption(strPopUpText);
+		if (mdata != NULL)
+		{
+			if (mdata->bitmap != NULL){
+				mdata->bitmap->DeleteImageList();
+				delete mdata->bitmap;
+				mdata->bitmap=NULL;
+			}
+			CImageList imglist;
+			imglist.Create(m_iconX,m_iconY,ILC_COLORDDB|ILC_MASK,1,1);
+
+			if(AddBitmapToImageList (&imglist, toolbarID)){
+				int ind = bar.CommandToIndex (command_id_to_extract_icon_from);
+				if (ind < 0) { return FALSE; }
+				
+				UINT dummyID, dummyStyle;
+				int image_index;
+				bar.GetButtonInfo (ind, dummyID, dummyStyle, image_index);
+				ASSERT (dummyID == command_id_to_extract_icon_from);
+				
+				mdata->bitmap = new CImageList;
+				mdata->bitmap->Create(m_iconX,m_iconY,ILC_COLORDDB|ILC_MASK,0,1);
+				mdata->bitmap->Add (imglist.ExtractIcon (image_index));
+
+				mdata->menuIconNormal = toolbarID;
+				mdata->xoffset = 0;
+				
+				return TRUE;
+			}
+			else{
+				mdata->menuIconNormal = -1;
+				mdata->xoffset = -1;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
 
 BCMenuData *BCMenu::NewODMenu(UINT pos,UINT nFlags,UINT nID,CString string)
 {
@@ -1972,10 +2021,10 @@ void BCMenu::SynchronizeMenu(void)
 	CTypedPtrArray<CPtrArray, BCMenuData*> temp;
 	BCMenuData *mdata;
 	CString string;
-	UINT submenu,nID=0,state,j;
+	UINT submenu,nID=0,state;
 	
 	InitializeMenuList(0);
-	for(j=0;j<GetMenuItemCount();++j){
+	for(int j=0;j<GetMenuItemCount();++j){
 		mdata=NULL;
 		state=GetMenuState(j,MF_BYPOSITION);
 		if(state&MF_POPUP){
@@ -2445,7 +2494,7 @@ BOOL BCMenu::DrawXPCheckmark(CDC *dc, const CRect& rc, HBITMAP hbmCheck,COLORREF
 	brushin.DeleteObject();
 	dc->Draw3dRect (rc,colorout,colorout);
 
-	if (!hbmCheck)DrawCheckMark(dc,rc.left+dx,rc.top+dy,GetSysColor(COLOR_MENUTEXT),TRUE);
+	if (!hbmCheck)DrawCheckMark(dc,rc.left+dx,rc.top+dy,GetSysColor(COLOR_MENUTEXT));
 	else DrawRadioDot(dc,rc.left+dx,rc.top+dy,GetSysColor(COLOR_MENUTEXT));
 	return TRUE;
 }
@@ -2531,20 +2580,28 @@ BOOL BCMenu::GetDisableOldStyle(void)
 
 WORD BCMenu::NumBitmapColors(LPBITMAPINFOHEADER lpBitmap)
 {
-	if ( lpBitmap->biClrUsed != 0)
-		return (WORD)lpBitmap->biClrUsed;
-	
-	switch (lpBitmap->biBitCount){
-		case 1:
-			return 2;
-		case 4:
-			return 16;
-		case 8:
-			return 256;
-		default:
-			return 0;
+	WORD returnval = 0;
+
+	if ( lpBitmap->biClrUsed != 0){
+		returnval=(WORD)lpBitmap->biClrUsed;
 	}
-	return 0;
+	else{
+		switch (lpBitmap->biBitCount){
+			case 1:
+				returnval=2;
+				break;
+			case 4:
+				returnval=16;
+				break;
+			case 8:
+				returnval=256;
+				break;
+			default:
+				returnval=0;
+				break;
+		}
+	}
+	return returnval;
 }
 
 HBITMAP BCMenu::LoadSysColorBitmap(int nResourceId)
@@ -2607,7 +2664,7 @@ BOOL BCMenu::RemoveMenu(UINT uiId,UINT nFlags)
 				int num = pSubMenu->GetMenuItemCount();
 				for(int i=num-1;i>=0;--i)pSubMenu->RemoveMenu(i,MF_BYPOSITION);
 				for(int i=m_MenuList.GetUpperBound();i>=0;i--){
-					if(m_MenuList[i]->nID == (UINT) pSubMenu->m_hMenu){
+					if(m_MenuList[i]->nID==(UINT)pSubMenu->m_hMenu){
 						delete m_MenuList.GetAt(i);
 						m_MenuList.RemoveAt(i);
 						break;
@@ -3158,4 +3215,104 @@ int BCMenu::AddToGlobalImageList(CImageList *il,int xoffset,int nID)
 		::DestroyIcon(hIcon);
 	}
 	return(loc);
+}
+
+bool BCMenu::AppendMenu (BCMenu* pMenuToAdd, bool add_separator /*= true*/, int num_items_to_remove_at_end /*= 0*/)
+{
+	// Appends a new menu to the end of existing menu.
+	//
+	// If 'add_separator' is true, adds separator before appending another menu.
+	// separator will not be added if the original menu is empty or if the last
+	// item already is a separator.
+	//
+	// If 'num_items_to_remove_at_end' is greater than 0, removes a specified
+	// number of menu option from the end of original menu before appending
+	// new menu. Removal of items is done before adding a separator (add_separator flag)
+
+	// Original code from http://www.codeproject.com/menu/mergemenu.asp
+	// Posted by Oskar Wieland on Nov 16, 2001
+	//
+	// Modified and added to BCMenu by Damir Valiulin on 2004-12-10:
+	//   * Modified to account for BCMenu's owner-drawn stuff.
+	//   * Made adding a separator optional
+	//   * Added an option to remove a few items from original menu before appending
+	//   * Removed bTopLevel stuff because I didn't test it.
+
+	// Sanity checks
+	if (pMenuToAdd == NULL || !pMenuToAdd->IsKindOf (RUNTIME_CLASS(BCMenu))){
+		ASSERT(FALSE);
+		return false;
+	}
+
+	// Anything to add?
+	int iMenuAddItemCount = pMenuToAdd->GetMenuItemCount();
+	if( iMenuAddItemCount == 0 )
+		return true;
+
+	// Delete last few items from the menu if specified
+	if (num_items_to_remove_at_end > 0){
+		int original_num_menu_items = GetMenuItemCount();
+		if (original_num_menu_items >= num_items_to_remove_at_end)
+		{
+			int first_delete_item = original_num_menu_items - 1;
+			int last_delete_item = original_num_menu_items - num_items_to_remove_at_end;
+			for (int i=first_delete_item; i>=last_delete_item; i--){
+				if (!DeleteMenu (i, MF_BYPOSITION)){
+					ASSERT(FALSE); // Something went wrong, but not so critical to abort everything. Just stop deleting items.
+					break;
+				}
+			}
+		}else{
+			ASSERT(FALSE); // Number of items to delete is greater than existing number of menu items!
+		}
+	}
+
+	// Append a separator if existing menu has any items already and last item is not separator
+	if (add_separator && GetMenuItemCount() > 0){
+		if (MF_SEPARATOR != (MF_SEPARATOR & GetMenuState (GetMenuItemCount()-1, MF_BYPOSITION))){
+			AppendMenu(MF_SEPARATOR);
+		}
+	}
+
+	// Iterate through the top level of menu to add
+	for (int iLoop = 0; iLoop < iMenuAddItemCount; iLoop++ )
+	{
+		// Get the menu string from the add menu
+		CString sMenuAddString;
+		pMenuToAdd->GetMenuText( iLoop, sMenuAddString, MF_BYPOSITION );
+
+		// Try to get the sub-menu of the current menu item
+		BCMenu* pSubMenu = (BCMenu*)pMenuToAdd->GetSubMenu(iLoop);
+
+		// Check if we have a sub menu
+		if (!pSubMenu)
+		{
+			// Normal menu item
+
+			// Read the source and append at the destination
+			UINT nState = pMenuToAdd->GetMenuState( iLoop, MF_BYPOSITION );
+			UINT nItemID = pMenuToAdd->GetMenuItemID( iLoop );
+
+			if (!AppendMenu( nState, nItemID, sMenuAddString )){
+				ASSERT(FALSE); //TRACE( "MergeMenu: AppendMenu failed!\n" );
+				return false;
+			}
+		}
+		else
+		{
+			// Create a new pop-up menu and insert sub-menu's items into it
+			BCMenu* pNewPopupMenu = AppendODPopupMenu (sMenuAddString);
+			if (pNewPopupMenu == NULL){
+				ASSERT(FALSE); //TRACE( "MergeMenu: CreatePopupMenu failed!\n" );
+				return false;
+			}
+
+			// Add items to new pop-up recursively
+			if (! pNewPopupMenu->AppendMenu (pSubMenu, false, 0)){
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
