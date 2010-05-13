@@ -459,6 +459,8 @@ void CMainFrame::ExplorerClear()
 void CMainFrame::ExplorerAddRoot(char *text)
 {
 	CTreeCtrl *p=ExplorerCtrl();
+	CExplorer *e=ExplorerPane();
+
 	m_ExplorerLastRoot=p->InsertItem(text);
 	ExplorerPane()->m_NumModelsListed=0;
 	ExplorerPane()->m_RootName=text;
@@ -466,9 +468,6 @@ void CMainFrame::ExplorerAddRoot(char *text)
 	int curgame=GetDocument()->m_Game;
 	if(curgame==GAME_D3 || curgame==GAME_FS)
 	{
-		CExplorer *e=ExplorerPane();
-		CTreeCtrl *p=ExplorerCtrl();
-
 		CString gamecaption;
 		if(GetDocument()->m_Game==GAME_D3)
 			gamecaption="Descent3";
@@ -1645,7 +1644,7 @@ void CMainFrame::LoadOptions()
 
 void CMainFrame::InitToolbars()
 {
-	DWORD style;
+	DWORD style = NULL;
 	DWORD ctrlstyle;
 
 #define DEFAULTSTYLE WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC
@@ -2069,7 +2068,7 @@ void CMainFrame::LoadEditor()
 			return;
 		}
 		fvp.Seek(GetDocument()->m_CurrentFile_Offset,CFile::begin);
-		unsigned char *buffer=new unsigned char[GetDocument()->m_CurrentFile_Size];
+		unsigned char *buffer=new unsigned char[(unsigned int) GetDocument()->m_CurrentFile_Size];
 		fvp.Read(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
 		fpof.Write(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
 		delete[] buffer;

@@ -1647,7 +1647,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 						//vol_mass -> area_mass conversion
 						double vol_mass=m_FS_ModelInfo.mass;
 						double areamass=4.65*pow(m_FS_ModelInfo.mass,2/3);
-						scale=(float)vol_mass/areamass;
+						scale=(float) (vol_mass/areamass);
 						m_FS_ModelInfo.mass=areamass;
 					}
 					for(int j1=0;j1<3;j1++)
@@ -3652,9 +3652,9 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 				m_Textures[m_TexturesNum].Bitmap=new unsigned char[size];
 				int temp,revtemp;
 				byte *r,*g,*b;
-				for(int i=0;i<size/4;i++)
+				for(int j=0;j<size/4;j++)
 				{
-					temp=RGBAtexture[i];
+					temp=RGBAtexture[j];
 					r=(byte *)(&temp)+2;
 					g=(byte *)(&temp)+1;
 					b=(byte *)(&temp);
@@ -4180,7 +4180,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_ModelLoadnr_to_ID[i]=i;
-				m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetPolyModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dataPolyModel, sizeof(D2_POLYMODEL));
 				m_D2_PolygonModels[i].sizeModelData=m_D2_PolygonModels[i].dataPolyModel.model_data_size;
 				/*int j=polygon_model.simpler_model;
@@ -4193,18 +4193,18 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			}
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
-				m_D2_PolygonModels[i].offsetModelData=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetModelData=(int) fp->GetPosition();
 				//m_D2_MO_ModelData[i]=model_data_cpos[i];
 				cfseek(fp,m_D2_PolygonModels[i].sizeModelData,SEEK_CUR);
 			}
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
-				m_D2_PolygonModels[i].offsetDyingModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetDyingModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dying_modelnum,sizeof(UINT32));
 			}
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
-				m_D2_PolygonModels[i].offsetDestroyedModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetDestroyedModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].destroyed_modelnum,sizeof(UINT32));
 			}
 			n_gagues=read_UINTW(fp);                 // read gagues
@@ -4256,7 +4256,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_ModelLoadnr_to_ID[i]=i+D2_VHAM_IDFIRSTMODEL;
-				m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetPolyModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dataPolyModel, sizeof(D2_POLYMODEL));
 				m_D2_PolygonModels[i].sizeModelData=m_D2_PolygonModels[i].dataPolyModel.model_data_size;
 
@@ -4278,18 +4278,18 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			}
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
-				m_D2_PolygonModels[i].offsetModelData=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetModelData=(int) fp->GetPosition();
 				cfseek(fp,m_D2_PolygonModels[i].sizeModelData,SEEK_CUR);
 			}
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
-				m_D2_PolygonModels[i].offsetDyingModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetDyingModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dying_modelnum,sizeof(UINT32));
 				//cfseek(fp,sizeof(UINT32),SEEK_CUR);
 			}
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
-				m_D2_PolygonModels[i].offsetDestroyedModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetDestroyedModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].destroyed_modelnum,sizeof(UINT32));
 				//cfseek(fp,sizeof(UINT32),SEEK_CUR);
 			}
@@ -4341,14 +4341,14 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_ModelLoadnr_to_ID[i]=read_UINTW(fp);
-				m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetPolyModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dataPolyModel, sizeof(D2_POLYMODEL));
 				m_D2_PolygonModels[i].sizeModelData=m_D2_PolygonModels[i].dataPolyModel.model_data_size;
-				m_D2_PolygonModels[i].offsetModelData=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetModelData=(int) fp->GetPosition();
 				cfseek(fp,m_D2_PolygonModels[i].sizeModelData,SEEK_CUR);
-				m_D2_PolygonModels[i].offsetDyingModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetDyingModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dying_modelnum,sizeof(UINT32));
-				m_D2_PolygonModels[i].offsetDestroyedModel=fp->GetPosition();
+				m_D2_PolygonModels[i].offsetDestroyedModel=(int) fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].destroyed_modelnum,sizeof(UINT32));
 			}
 			n_object_bitmaps=read_UINTW(fp);             // read object bitmaps
@@ -4380,14 +4380,14 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			//model_count=n_polygon_models;
 			int i=0;
 			m_D2_ModelLoadnr_to_ID[i]=read_UINTW(fp);
-			m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
+			m_D2_PolygonModels[i].offsetPolyModel=(int) fp->GetPosition();
 			fp->Read(&m_D2_PolygonModels[i].dataPolyModel, sizeof(D2_POLYMODEL));
 			m_D2_PolygonModels[i].sizeModelData=m_D2_PolygonModels[i].dataPolyModel.model_data_size;
-			m_D2_PolygonModels[i].offsetModelData=fp->GetPosition();
+			m_D2_PolygonModels[i].offsetModelData=(int) fp->GetPosition();
 			cfseek(fp,m_D2_PolygonModels[i].sizeModelData,SEEK_CUR);
-			m_D2_PolygonModels[i].offsetDyingModel=fp->GetPosition();
+			m_D2_PolygonModels[i].offsetDyingModel=(int) fp->GetPosition();
 			fp->Read(&m_D2_PolygonModels[i].dying_modelnum,sizeof(UINT32));
-			m_D2_PolygonModels[i].offsetDestroyedModel=fp->GetPosition();
+			m_D2_PolygonModels[i].offsetDestroyedModel=(int) fp->GetPosition();
 			fp->Read(&m_D2_PolygonModels[i].destroyed_modelnum,sizeof(UINT32));
 		}
 	/*	 // how about a pog file?
@@ -5621,7 +5621,7 @@ int _2048isize(int x)
 
 void _2048imove(CFile *fp)
 {
-	fp->Seek(_2048isize(fp->GetPosition()),CFile::begin);
+	fp->Seek(_2048isize((int) fp->GetPosition()),CFile::begin);
 }
 
 void CMODVIEW32Doc::RF_InitVPP(CFile *fp, VPP_HEADER *vpp_header, VPP_LOAD **vpp_load, BOOL fillexplorer)

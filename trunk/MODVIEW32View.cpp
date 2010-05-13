@@ -995,14 +995,14 @@ void CMODVIEW32View::FS_BuildScene(void)
 				for(int j=0;j<pDoc->m_FS_Model.thrusters[i].num_glows;j++)
 				{
 					FS_VPNT p=pDoc->m_FS_Model.thrusters[i].glow_pos[j];
-					FS_VPNT n=pDoc->m_FS_Model.thrusters[i].glow_norm[j];
+					FS_VPNT m=pDoc->m_FS_Model.thrusters[i].glow_norm[j];
 					float r=pDoc->m_FS_Model.thrusters[i].glow_radius[j];
 
 					//EditorFS
 					if(m_FS_DisplayThruster==i)
 					{
 						p=pDoc->m_EditorFS_FUEL.glow_pos[j];
-						n=pDoc->m_EditorFS_FUEL.glow_norm[j];
+						m=pDoc->m_EditorFS_FUEL.glow_norm[j];
 						r=pDoc->m_EditorFS_FUEL.glow_radius[j];
 					}
 
@@ -1013,15 +1013,15 @@ void CMODVIEW32View::FS_BuildScene(void)
 					glVertex3f(p.x,p.y-r,p.z);
 					glVertex3f(p.x,p.y+r,p.z);
 					glVertex3f(p.x,p.y,p.z);
-					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
+					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
 					glVertex3f(p.x-r,p.y,p.z);
-					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
+					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
 					glVertex3f(p.x+r,p.y,p.z);
-					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
+					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
 					glVertex3f(p.x,p.y-r,p.z);
-					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
+					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
 					glVertex3f(p.x,p.y+r,p.z);
-					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
+					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
 					glEnd();
 				}
 			}
