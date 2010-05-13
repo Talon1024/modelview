@@ -1097,7 +1097,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 	ASSERT (m_Detaillevel < 200);
 	if (m_Detaillevel >= 200) 
 		return; //Sanity check
-	for(unsigned int k=pDoc->m_FS_PofDataL[m_Detaillevel]; (k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1)) || (k >= 60) ;k++)
+	for(unsigned int k=pDoc->m_FS_PofDataL[m_Detaillevel]; (k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1)) && (k < MAX_FS_TEXTURE) ;k++)
 	{
 		if((m_DisplayTexture==-1) | (m_DisplayTexture==(int)(k-pDoc->m_FS_PofDataL[m_Detaillevel])))
 		{
@@ -1115,8 +1115,8 @@ void CMODVIEW32View::FS_BuildScene(void)
 							TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
 						}
 //TRACE("%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.count,k,pDoc->m_FS_LoadPCX[k]);
-						ASSERT (pDoc->m_FS_LoadPCX[k] < 60);
-						if (pDoc->m_FS_LoadPCX[k] >= 60) return; //More sanity checking
+						ASSERT (pDoc->m_FS_LoadPCX[k] < MAX_FS_TEXTURE);
+						if (pDoc->m_FS_LoadPCX[k] >= MAX_FS_TEXTURE) return; //More sanity checking
 						glCallList(pDoc->m_FS_ModelTexture[pDoc->m_FS_LoadPCX[k]]);
 					} else
 						glRGB(192,192,192);
