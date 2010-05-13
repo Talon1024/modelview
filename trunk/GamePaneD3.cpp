@@ -87,15 +87,15 @@ void CGamePaneD3::Init()
 	char *temp=new char[256];
 	CString sep=" ";
 	ctrl=(CStatic *)GetDlgItem(IDC_D3_VERTICIES);
-	ctrl->SetWindowText(sep+itoa(pDoc->m_D3_Model.Vcount,temp,10));
+	ctrl->SetWindowText(sep+_itoa(pDoc->m_D3_Model.Vcount,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D3_POLYGONS);
-	ctrl->SetWindowText(sep+itoa(pDoc->m_D3_Model.Pcount,temp,10));
+	ctrl->SetWindowText(sep+_itoa(pDoc->m_D3_Model.Pcount,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D3_TEXTURES);
-	ctrl->SetWindowText(sep+itoa(pDoc->m_D3_TotalTexture,temp,10));
+	ctrl->SetWindowText(sep+_itoa(pDoc->m_D3_TotalTexture,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D3_SOBJ);
-	ctrl->SetWindowText(sep+itoa(pDoc->m_D3_Model.Scount,temp,10));
+	ctrl->SetWindowText(sep+_itoa(pDoc->m_D3_Model.Scount,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D3_GUNS);
-	ctrl->SetWindowText(sep+itoa(pDoc->m_Guns.Num,temp,10));
+	ctrl->SetWindowText(sep+_itoa(pDoc->m_Guns.Num,temp,10));
 
 	CTabCtrl *ts=(CTabCtrl *)GetDlgItem(IDC_D3_DISPLAY);
 	if(ts->GetItemCount()==0)
@@ -109,7 +109,7 @@ void CGamePaneD3::Init()
 	CListBox *lbox=(CListBox *)GetDlgItem(IDC_D3_POSITIONS);
 	lbox->ResetContent();
 	lbox->AddString("<default>");
-	for(unsigned long i=0;i<pDoc->m_D3_Display.TotalKey;i++)
+	for(unsigned int i=0;i<pDoc->m_D3_Display.TotalKey;i++)
 	{
 		sprintf(temp,"Position #%i",i);
 		lbox->AddString(temp);
@@ -117,12 +117,12 @@ void CGamePaneD3::Init()
 	lbox->SetCurSel(0);
 
 
-	delete(temp);
+	delete[] temp;
 }
 
 void CGamePaneD3::FillTab()
 {
-	unsigned long i;
+	unsigned int i;
 	CMODVIEW32Doc *pDoc=GetDocument();
 	CMODVIEW32View *view=GetMainView();
 

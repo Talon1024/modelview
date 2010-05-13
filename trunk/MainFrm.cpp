@@ -624,7 +624,7 @@ int CMainFrame::ExplorerOpenSubFile(char *fname)
 			t->SelectItem(k);
 		}
 	}
-	delete(pathname);
+	delete[] pathname;
 	return 0;
 }
 
@@ -1194,7 +1194,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 			OutputDebugString("D3\n");
 			if((pView->m_D3_Rotate)&(pDoc->m_D3_Display.PartsRotate))
 			{
-				for(unsigned long i=0;i<pDoc->m_D3_Model.Scount;i++)
+				for(unsigned int i=0;i<pDoc->m_D3_Model.Scount;i++)
 				{
 					if(pDoc->m_D3_Display.Rotate[i])
 						pDoc->m_D3_Rstep[i] = (float)((const int)(pDoc->m_D3_Rstep[i] + (18.0/pDoc->m_D3_Display.Rspeed[i]))%360);
@@ -1640,7 +1640,7 @@ void CMainFrame::LoadOptions()
 	m_SwapMouseButtons=*(options+2);
 	m_ExplorerIndex=*(options+3);
 	m_QuickRendering=*(options+5);
-	delete(options);
+	delete[] options;
 }
 
 void CMainFrame::InitToolbars()
@@ -2072,7 +2072,7 @@ void CMainFrame::LoadEditor()
 		unsigned char *buffer=new unsigned char[GetDocument()->m_CurrentFile_Size];
 		fvp.Read(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
 		fpof.Write(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
-		delete(buffer);
+		delete[] buffer;
 		fvp.Close();
 		fpof.Close();
 		GetDocument()->m_FS_CurrVP_Loaded=FALSE;

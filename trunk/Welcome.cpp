@@ -234,7 +234,7 @@ void CWelcome::OnEdit()
 		char *temp=new char[MAX_FILENAMELEN];
 		WritePrivateProfileString(game_diniheader,game_dinikey,dlg.GetPathName(),Odlg.GetDescentINI(temp));
 		m_Games.SetItemText(nItem,1,dlg.GetPathName());
-		delete(temp);
+		delete[] temp;
 	}
 }
 
@@ -293,6 +293,6 @@ void CWelcome::OnDelete()
 		char *temp=new char[MAX_FILENAMELEN];
 		WritePrivateProfileString(game_diniheader,game_dinikey,"",Odlg.GetDescentINI(temp));
 		m_Games.SetItemText(nItem,1,"");
-		delete(temp);
+		delete[] temp;
 	}
 }

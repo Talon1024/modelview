@@ -4,7 +4,7 @@
 //
 //
 
-#define MAX_D3_TEXTURE	35
+#define MAX_D3_TEXTURE	60
 #define MAX_D3_SOBJ	60
 #define MAX_D3_ANI		15000
 #define MAX_D3_PNT		10
@@ -51,13 +51,13 @@ typedef struct D3_posangle
 
 typedef struct pinfo_d3
 {
-	unsigned long Corners;
-	unsigned long Color;
+	unsigned int Corners;
+	unsigned int Color;
 	unsigned char Red,Green,Blue;
-	unsigned long Type;
-	unsigned long Sobj;
+	unsigned int Type;
+	unsigned int Sobj;
 	D3_VPNT Normal;
-	unsigned long Vp[25];
+	unsigned int Vp[25];
 	float U[25];
 	float V[25];
 } D3_PINFO;
@@ -68,62 +68,62 @@ typedef struct D3_MODEL
 	D3_VPNT _minbox;
 	D3_VPNT _maxbox;
 
-	unsigned long Vcount;
+	unsigned int Vcount;
 	D3_VPNT Vpoint[MAX_D3_VECT];
 	D3_VPNT Vnormal[MAX_D3_VECT];
 	float Valpha[MAX_D3_VECT];
 	unsigned short VSobj[MAX_D3_VECT];
-	unsigned long Pcount;
+	unsigned int Pcount;
 	D3_PINFO Poly[MAX_D3_POLY];
 
-	unsigned long Scount;
+	unsigned int Scount;
 	long Sparent[MAX_D3_SOBJ];
 	D3_VPNT Soffset[MAX_D3_SOBJ];
 	char Name[MAX_D3_SOBJ][50];
 	char Prop[MAX_D3_SOBJ][50];
 
-	unsigned long pindex[MAX_D3_SOBJ];
-	unsigned long pknum[MAX_D3_SOBJ];
-	unsigned long pkey[MAX_D3_ANI];
+	unsigned int pindex[MAX_D3_SOBJ];
+	unsigned int pknum[MAX_D3_SOBJ];
+	unsigned int pkey[MAX_D3_ANI];
 	D3_VPNT pani[MAX_D3_ANI];
 
-	unsigned long rindex[MAX_D3_SOBJ];
-	unsigned long rknum[MAX_D3_SOBJ];
-	unsigned long rkey[MAX_D3_ANI];
+	unsigned int rindex[MAX_D3_SOBJ];
+	unsigned int rknum[MAX_D3_SOBJ];
+	unsigned int rkey[MAX_D3_ANI];
 	D3_VPNT rani[MAX_D3_ANI];
-	unsigned long rangle[MAX_D3_ANI];
+	unsigned int rangle[MAX_D3_ANI];
 	
-	unsigned long ATCHnum;
-	unsigned long ATCHsobj[MAX_D3_PNT];
+	unsigned int ATCHnum;
+	unsigned int ATCHsobj[MAX_D3_PNT];
 	D3_VPNT ATCHpos[MAX_D3_PNT];
 	D3_VPNT ATCHnorm[MAX_D3_PNT];
 	
-	unsigned long NATHnum;
-	unsigned long NATHsobj[MAX_D3_PNT];
+	unsigned int NATHnum;
+	unsigned int NATHsobj[MAX_D3_PNT];
 	D3_VPNT NATHpos[MAX_D3_PNT];
 	D3_VPNT NATHnorm[MAX_D3_PNT];
 	
-	unsigned long GRNDnum;
-	unsigned long GRNDsobj[MAX_D3_PNT];
+	unsigned int GRNDnum;
+	unsigned int GRNDsobj[MAX_D3_PNT];
 	D3_VPNT GRNDpos[MAX_D3_PNT];
 	D3_VPNT GRNDnorm[MAX_D3_PNT];
 
-	unsigned long GPNTnum;
-	unsigned long GPNTsobj[MAX_D3_PNT];
+	unsigned int GPNTnum;
+	unsigned int GPNTsobj[MAX_D3_PNT];
 	D3_VPNT GPNTpos[MAX_D3_PNT];
 	D3_VPNT GPNTnorm[MAX_D3_PNT];
 	
-	unsigned long SPCLnum;
+	unsigned int SPCLnum;
 	char SPCLname[MAX_D3_PNT][50];
 	char SPCLprop[MAX_D3_PNT][50];
 	D3_VPNT SPCLpos[MAX_D3_PNT];
 	float SPCLrad[MAX_D3_PNT];
 	
-	unsigned long WBATnum;
-	unsigned long WBATnumgun[MAX_D3_PNT];
-	unsigned long WBATgun[MAX_D3_PNT][MAX_D3_PNT];
-	unsigned long WBATnumeye[MAX_D3_PNT];
-	unsigned long WBATeye[MAX_D3_PNT][MAX_D3_PNT];
+	unsigned int WBATnum;
+	unsigned int WBATnumgun[MAX_D3_PNT];
+	unsigned int WBATgun[MAX_D3_PNT][MAX_D3_PNT];
+	unsigned int WBATnumeye[MAX_D3_PNT];
+	unsigned int WBATeye[MAX_D3_PNT][MAX_D3_PNT];
 	
 	char PINF[MAX_D3_PINF];
 } D3_MODELtag;
@@ -144,9 +144,9 @@ typedef struct D3_DISPLAY
 	float Gset[MAX_D3_SOBJ][4];
 	BOOL Fov[MAX_D3_SOBJ];
 
-	unsigned long TotalKey;
+	unsigned int TotalKey;
 	BOOL pr_key[MAX_D3_ANI];
-	unsigned long pr_active[MAX_D3_ANI];
+	unsigned int pr_active[MAX_D3_ANI];
 
 	BOOL TextureFlag[MAX_D3_TEXTURE];
 	BOOL ClearFlag[MAX_D3_TEXTURE];
@@ -157,37 +157,37 @@ typedef struct D3_DISPLAY
 typedef struct D3_DISPLAYPOLY
 {
 	unsigned char flag,red,green,blue;
-	unsigned long startpnt, numpnt;
+	unsigned int startpnt, numpnt;
 } D3_DISPLAYPOLYtag;
 
 typedef struct D3_DISPLAYSOBJ
 {
-	unsigned long startpoly, numpoly;
+	unsigned int startpoly, numpoly;
 } D3_DISPLAYSOBJtag;
 
 #pragma pack(1)
 
 typedef struct
 {
-	unsigned long signature;
-	unsigned long dirnumber;
-	unsigned long diroffset;
+	unsigned int signature;
+	unsigned int dirnumber;
+	unsigned int diroffset;
 	unsigned char fill[56];
 } HOG2_HEADER;
 
 typedef struct
 {
 	char filename[36];
-	unsigned long unknown;
-	unsigned long size;
-	unsigned long timestamp;
+	unsigned int unknown;
+	unsigned int size;
+	unsigned int timestamp;
 } HOG2_INFO;
 
 typedef struct
 {
 	char filename[36];
-	unsigned long size;
-	unsigned long offset;
+	unsigned int size;
+	unsigned int offset;
 } HOG2_LOAD;
 
 typedef struct
@@ -224,7 +224,7 @@ typedef struct
 
 typedef struct
 {
-	unsigned long number;
+	unsigned int number;
 	char name[30];
 } D3_DATALIST;
 

@@ -702,13 +702,13 @@ void CMODVIEW32Doc::ExplorerGoTop()
 // FreeSpace stuff
 ////////////////////////////////////////////////////////////////////////////////////////
 
-ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOOL bFastload)
+ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL bFastload)
 {
-	unsigned long xsize,ysize;
-	unsigned long xreal,yreal;         
+	unsigned int xsize,ysize;
+	unsigned int xreal,yreal;         
 	unsigned char XScale,YScale;
 	GLint MaxTextureSize[4];
-	unsigned long MaxSize;
+	unsigned int MaxSize;
 
 	ASSERT(m_Game==GAME_FS);
 
@@ -736,7 +736,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 
 	if(m_FS_BitmapData.count>0)
 	{
-		for(unsigned long i=m_FS_PofDataL[ActivePM];i<(m_FS_PofDataH[ActivePM]+1);i++)
+		for(unsigned int i=m_FS_PofDataL[ActivePM];i<(m_FS_PofDataH[ActivePM]+1);i++)
 		{
 			BOOL unknownfiletype=TRUE;
 			m_FS_BitmapData.pic[i].valid=1;
@@ -760,7 +760,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_UNKNOWN;
 
 			//Count polygons using the texture
-			for(unsigned long j=0;j<m_FS_Model.Pcount;j++)
+			for(unsigned int j=0;j<m_FS_Model.Pcount;j++)
 			{	// type 3 polygons
 				if((m_FS_Model.Poly[j].Ptype==3) && (m_FS_Model.Poly[j].Colors==i)) //&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel)
 					m_Textures[m_TexturesNum].Used++;
@@ -811,7 +811,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//PCX Search process #2: Current .VP file
 			if(unknownfiletype && m_FS_CurrVP_Loaded)
 			{
-				unsigned long j=0;
+				unsigned int j=0;
 				while((j<m_FS_CurrVP_Header.dirnumber)&(strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
 					j++;
 
@@ -870,7 +870,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//PCX Search process #4: Main .VP file
 			if(unknownfiletype && m_FS_MainVP_Loaded)
 			{
-				unsigned long j=0;
+				unsigned int j=0;
 				while((j<m_FS_MainVP_Header.dirnumber)&(strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
 					j++;
 
@@ -915,7 +915,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//ANI Search process #2: Current .VP
 			if(unknownfiletype && m_FS_CurrVP_Loaded)
 			{
-				unsigned long j=0;
+				unsigned int j=0;
 				while((j<m_FS_CurrVP_Header.dirnumber)&(strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
 					j++;
 				if(j<m_FS_CurrVP_Header.dirnumber)
@@ -968,7 +968,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 			//ANI Search process #4: Main .VP file
 			if(unknownfiletype && m_FS_MainVP_Loaded)
 			{
-				unsigned long j=0;
+				unsigned int j=0;
 				while((j<m_FS_MainVP_Header.dirnumber)&(strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
 					j++;
 				if(j<m_FS_MainVP_Header.dirnumber)
@@ -1034,9 +1034,9 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 					m_Textures[m_TexturesNum].Width=xreal;
 					m_Textures[m_TexturesNum].Height=yreal;
 
-					unsigned long k;
-					k=2; while(k<xreal) k*=2; xsize=k;
-					k=2; while(k<yreal) k*=2; ysize=k;
+					unsigned int kb;
+					kb=2; while(kb<xreal) kb*=2; xsize=kb;
+					kb=2; while(kb<yreal) kb*=2; ysize=kb;
 
 					//Palette
 					if(header.Version==5)
@@ -1111,15 +1111,15 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 	
 					unsigned char runcount=0;
 					unsigned char runvalue=0;
-					unsigned long runoffset=0;
-					for(unsigned long j=0;j<yreal;j++)
+					unsigned int runoffset=0;
+					for(unsigned int j=0;j<yreal;j++)
 					{
-						unsigned long offset;
+						unsigned int offset;
 						if(bFastload)
 							offset=(j>>YScale)*(xsize>>XScale);
 						else
 							offset=j*xreal;
-						for(unsigned long k=0;k<(xreal+(xreal&1));k++)
+						for(unsigned int k=0;k<(xreal+(xreal&1));k++)
 						{
 							if(runcount>0)
 								runcount--;
@@ -1142,16 +1142,16 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 						}	
 					}
 #ifdef _WITHTXVIEW
-					for(unsigned long j=0;j<yreal;j++)
+					for(unsigned int j=0;j<yreal;j++)
 						memcpy(&m_Textures[m_TexturesNum].Bitmap[j*x_clusterize4],&tmpbuffer[j*x_clusterize2],xreal);
 					delete(tmpbuffer);
 #endif
-					for(unsigned long j=0;j<yreal;j++)
+					for(unsigned int j=0;j<yreal;j++)
 					{
 						if(bFastload)
 						{
-							unsigned long offset=(j>>YScale)*(xsize>>XScale) + (xreal>>XScale);
-							for(unsigned long k=xreal;k<xsize;k++)
+							unsigned int offset=(j>>YScale)*(xsize>>XScale) + (xreal>>XScale);
+							for(unsigned int k=xreal;k<xsize;k++)
 							{	// fill out the extra
 								if((k&XScaleTest)==0)
 								{
@@ -1166,10 +1166,10 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 
 					if(bFastload)
 					{
-						for(unsigned long j=yreal;j<ysize;j++)
+						for(unsigned int j=yreal;j<ysize;j++)
 						{			// fill out the extra
-							unsigned long offset=(j>>YScale)*(xsize>>XScale);
-							for(unsigned long k=0;k<xsize;k++)
+							unsigned int offset=(j>>YScale)*(xsize>>XScale);
+							for(unsigned int k=0;k<xsize;k++)
 							{
 								if((k&XScaleTest)==0)
 								{
@@ -1209,12 +1209,12 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 					m_Textures[m_TexturesNum].Width=xreal;
 					m_Textures[m_TexturesNum].Height=yreal;
 
-					unsigned long j;
-					j=2; while(j<xreal) j*=2; xsize=j;
-					j=2; while(j<yreal) j*=2; ysize=j;
+					unsigned int jb;
+					jb=2; while(jb<xreal) jb*=2; xsize=jb;
+					jb=2; while(jb<yreal) jb*=2; ysize=jb;
 
 					//Palette
-					for(j=0;j<256;j++)
+					for(int j=0;j<256;j++)
 					{
 						m_Textures[m_TexturesNum].Palette[0][j]=header.palette[j*3+0]; //Red
 						m_Textures[m_TexturesNum].Palette[1][j]=header.palette[j*3+1]; //Green
@@ -1259,7 +1259,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 
 					unsigned char byte1;
 					unsigned short byte2;
-					unsigned long byte4;
+					unsigned int byte4;
 					f.Read(&byte2,2);
 					f.Read(&byte4,4);
 					f.Read(&byte4,4);
@@ -1269,9 +1269,9 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 					unsigned char runcount=0;
 					unsigned char runvalue=0;
 					int runoffset=0;
-					for(j=0;j<yreal;j++)
+					for(unsigned int j=0;j<yreal;j++)
 					{
-						for(unsigned long k=0;k<xreal;k++)
+						for(unsigned int k=0;k<xreal;k++)
 						{
 							if(runcount>0)
 								runcount--;
@@ -1285,7 +1285,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 							}
 							if(((j&YScaleTest)+(k&XScaleTest))==0)
 							{
-								unsigned long offset;
+								unsigned int offset;
 								if(bFastload)
 									offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
 								else
@@ -1297,11 +1297,11 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 							runoffset++;
 #endif
 						}
-						for(unsigned long k=xreal;k<xsize;k++)
+						for(unsigned int k=xreal;k<xsize;k++)
 						{	//fill out the extra
 							if(((j&YScaleTest)+(k&XScaleTest))==0)
 							{
-								unsigned long offset;
+								unsigned int offset;
 								if(bFastload)
 									offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
 								else
@@ -1310,13 +1310,13 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOO
 							}
 						}
 					}               
-					for(unsigned long j=yreal;j<ysize;j++)
+					for(unsigned int j=yreal;j<ysize;j++)
 					{			// fill out the extra
-						for(unsigned long k=0;k<xsize;k++)
+						for(unsigned int k=0;k<xsize;k++)
 						{
 							if(((j&YScaleTest)+(k&XScaleTest))==0)
 							{
-								unsigned long offset;
+								unsigned int offset;
 								if(bFastload)
 									offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
 								else
@@ -1498,7 +1498,7 @@ ULONGLONG cfseek(CFile *fp,long offset,int whence)
 
 #define wc(walker)  (*((unsigned char *) (walker)))
 #define ws(walker)  (*((unsigned short *) (walker)))
-#define wi(walker)  (*((unsigned long *) (walker)))
+#define wi(walker)  (*((unsigned int *) (walker)))
 #define wf(walker)  (*((float *) (walker)))
 #define v(walker)  (*((FS_VPNT *) (walker)))
 #define wp(walker) ((unsigned short *) (walker))
@@ -1538,11 +1538,11 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 	}
 	fp->Seek(m_CurrentFile_Offset, SEEK_SET);
 
-	unsigned long long len,next_chunk;
-	unsigned long long temp,pos_start; 
-	unsigned long version;
+	unsigned int long len,next_chunk;
+	unsigned int long temp,pos_start; 
+	unsigned int version;
 	int StartByte;
-	unsigned long id=read_INT32(fp);
+	unsigned int id=read_INT32(fp);
 	if(id!=0x4f505350)
 	{
 		m_ErrorString=ERROR_FS_INVALIDPOFHEADER_TEXT;
@@ -1561,8 +1561,8 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 	{
 		id=read_INT32(fp);
 		len=read_INT32(fp);
-		next_chunk=fp->GetPosition() + len;
-		pos_start=fp->GetPosition();
+		next_chunk = (unsigned long) fp->GetPosition() + len;
+		pos_start = (unsigned long) fp->GetPosition();
 
 		pid=(char *)&id;
 		m_Blocks_Num++;
@@ -1609,7 +1609,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 					return ERROR_FS_TOOMANYSOBJS;
 				}
 
-				for(unsigned long i=0;i<m_FS_PMinfo.n_models;i++)
+				for(unsigned int i=0;i<m_FS_PMinfo.n_models;i++)
 				{
 					m_FS_SOBJ[i].real_offset.x=0;
 					m_FS_SOBJ[i].real_offset.y=0;
@@ -1630,16 +1630,16 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 				LOGTEXT("Number of submodels: %i\nRadius: %.2f\nNumber of detail versions: %i\n",m_FS_PMinfo.n_models,m_FS_Model.radius,m_FS_PMinfo.n_detail);
 				LOGDOIT;
 
-				for(unsigned long j=0;j<m_FS_PMinfo.n_detail;j++)
+				for(unsigned int j=0;j<m_FS_PMinfo.n_detail;j++)
 					m_FS_PMinfo.detail[j]=read_INT32(fp);
 				m_FS_PMinfo.n_debris=read_INT32(fp);
-				for(unsigned long j=0;j<m_FS_PMinfo.n_debris;j++)
+				for(unsigned int j=0;j<m_FS_PMinfo.n_debris;j++)
 					m_FS_PMinfo.debris[j]=read_INT32(fp);
 
 				//Mass
 				if(m_FileVersion>=1903)
 				{
-					double scale=1.0;
+					float scale=1.0f;
 					m_FS_ModelInfo.mass=read_float(fp);
 					m_FS_ModelInfo.mass_center=read_VECTOR(fp);
 					if(m_FileVersion<2009)
@@ -1647,7 +1647,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 						//vol_mass -> area_mass conversion
 						double vol_mass=m_FS_ModelInfo.mass;
 						double areamass=4.65*pow(m_FS_ModelInfo.mass,2/3);
-						scale=vol_mass/areamass;
+						scale=(float)vol_mass/areamass;
 						m_FS_ModelInfo.mass=areamass;
 					}
 					for(int j1=0;j1<3;j1++)
@@ -1720,8 +1720,8 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 				m_Blocks[m_Blocks_Num-1].desc="Texture reference list";
 				m_EditorFS_ChunkTXTR.ReadChunk(fp,TRUE);
 
-				unsigned long charcount;
-				unsigned long i,j;
+				unsigned int charcount;
+				unsigned int i,j;
 				char inputbuf[30];
 
 				m_FS_BitmapData.count=read_INT32(fp);
@@ -1753,7 +1753,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 				m_Blocks[m_Blocks_Num-1].desc="Shield data";
 				m_EditorFS_ChunkSHLD.ReadChunk(fp,TRUE);
 
-				unsigned long i;
+				unsigned int i;
 
 				//Shield vertices
 				m_FS_Model.shields.Vcount=read_INT32(fp);
@@ -2168,7 +2168,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 
 		}
 
-		temp=fp->GetPosition();
+		temp = (unsigned int) fp->GetPosition();
 		if(temp>next_chunk)
 		{
 			ASSERT(FALSE);
@@ -2200,16 +2200,16 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 
 void CMODVIEW32Doc::FS_PreparePOF()
 {
-	//unsigned long i,j;
+	//unsigned int i,j;
 
 	m_ModelLoaded=TRUE;
 	
 	//Enumerate submodels and assign them to their detail mode
 	for(int i=0;i<m_FS_NumSOBJ;i++)
 		m_FS_SOBJ[i].detail=-1;
-	for(unsigned long i=0;i<m_FS_PMinfo.n_detail;i++)
+	for(unsigned int i=0;i<m_FS_PMinfo.n_detail;i++)
 		m_FS_SOBJ[m_FS_PMinfo.detail[i]].detail=i;
-	for(unsigned long i=0;i<m_FS_PMinfo.n_debris;i++)
+	for(unsigned int i=0;i<m_FS_PMinfo.n_debris;i++)
 		m_FS_SOBJ[m_FS_PMinfo.debris[i]].detail=9;
 	for(int i=0;i<m_FS_NumSOBJ;i++)
 	{
@@ -2228,7 +2228,7 @@ void CMODVIEW32Doc::FS_PreparePOF()
 		m_FS_PofDataL[i]=0xFFFFFFFF;
 		m_FS_PofDataH[i]=0;
 	}
-	for(unsigned long i=0;i<m_FS_Model.Pcount;i++)
+	for(unsigned int i=0;i<m_FS_Model.Pcount;i++)
 	{
 		if(m_FS_Model.Poly[i].Ptype==3)
 		{
@@ -2239,24 +2239,24 @@ void CMODVIEW32Doc::FS_PreparePOF()
 		}
 	}
 	//Count elements
-	m_NumFilesize=m_CurrentFile_Size; //HHTOTESTm_FS_CurrVP_Dir[m_FS_CurrVP_PofList[VpNum]].size;
+	m_NumFilesize=(unsigned int) m_CurrentFile_Size; //HHTOTESTm_FS_CurrVP_Dir[m_FS_CurrVP_PofList[VpNum]].size;
 	m_NumVertices=0;
 	m_NumPolygons=0;
 	m_NumTextures=0;
 	m_NumSubmodels=0;
 
 	int detaillevel=0; 
-	for(unsigned long i=0;i<m_FS_Model.Vcount;i++)
+	for(unsigned int i=0;i<m_FS_Model.Vcount;i++)
 	{
 		if(m_FS_SOBJ[m_FS_Model.VSobj[i]].detail==detaillevel)
 			m_NumVertices++;
 	}
-	for(unsigned long i=0;i<m_FS_Model.Pcount;i++)
+	for(unsigned int i=0;i<m_FS_Model.Pcount;i++)
 	{
 		if(m_FS_SOBJ[m_FS_Model.Poly[i].Sobj].detail==detaillevel)
 			m_NumPolygons++;
 	}
-	for(unsigned long i=m_FS_PofDataL[0];i<(m_FS_PofDataH[0]+1);i++)
+	for(unsigned int i=m_FS_PofDataL[0];i<(m_FS_PofDataH[0]+1);i++)
 	{
 		if(i<m_FS_BitmapData.count)
 		{
@@ -2290,7 +2290,7 @@ void CMODVIEW32Doc::FS_PreparePOF()
 ERRORCODE CMODVIEW32Doc::FS_Walk(void *StartAt, int module, int StartByte)
 {
 	unsigned char *walker=(unsigned char *)StartAt;
-	unsigned long i,j;
+	unsigned int i,j;
 	ERRORCODE ret;
 
 	while(wi(walker) !=D_EOF)
@@ -2302,10 +2302,10 @@ ERRORCODE CMODVIEW32Doc::FS_Walk(void *StartAt, int module, int StartByte)
 
 		case D_DEFPOINTS:
 			{			// 01
-				unsigned long size=wi(walker+4);	  //block size
+				unsigned int size=wi(walker+4);	  //block size
 				unsigned char n_vn[MAX_FS_SUBMODEL_POINTS];
-				unsigned long n=wi(walker+8);		//vertices
-				unsigned long p=wi(walker+12);	//normals
+				unsigned int n=wi(walker+8);		//vertices
+				unsigned int p=wi(walker+12);	//normals
 				unsigned char *stepper=walker;
 				stepper+=wi(walker+16);	 //offset   
 				if(n>MAX_FS_SUBMODEL_POINTS)
@@ -2349,7 +2349,7 @@ ERRORCODE CMODVIEW32Doc::FS_Walk(void *StartAt, int module, int StartByte)
 			}
 
 		case D_FLATPOLY:   {			// 02
-				unsigned long n=wi(walker+36);
+				unsigned int n=wi(walker+36);
 				if(n>20)
 				{
 					m_ErrorString=ERROR_FS_TOOMANYPOINTSINPOLY_TEXT;
@@ -2381,7 +2381,7 @@ ERRORCODE CMODVIEW32Doc::FS_Walk(void *StartAt, int module, int StartByte)
 			}
 
 		case D_TMAPPOLY:   {			// 03
-				unsigned long n=wi(walker+36);
+				unsigned int n=wi(walker+36);
 				if(n>20)
 				{
 					m_ErrorString=ERROR_FS_TOOMANYPOINTSINPOLY_TEXT;
@@ -2449,7 +2449,7 @@ ERRORCODE CMODVIEW32Doc::FS_Walk(void *StartAt, int module, int StartByte)
 
 ERRORCODE CMODVIEW32Doc::FS_InitVP(CFile *fp,VP_HEADER *vp_header,VP_INFO *vp_info,BOOL fillexplorer)
 {
-	unsigned long i;   
+	unsigned int i;   
 	char *pntptr;
 	ERRORCODE errret=ERROR_GEN_NOERROR;
 
@@ -2542,8 +2542,8 @@ ERRORCODE CMODVIEW32Doc::FS_LoadVPContent(CString filename)
 {
 	int VpPof=-1;
 	char *pntptr;
-	unsigned long i;   
-	unsigned long VpPofNum=0;
+	unsigned int i;   
+	unsigned int VpPofNum=0;
 
 	m_TexturesNum=-1;
 	m_ModelJustLoaded=TRUE;
@@ -2742,9 +2742,9 @@ void CMODVIEW32Doc::D3_ReadD3HOG()
 //Read OOF file
 ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 {
-	unsigned long long id,len,next_chunk,btemp;
+	unsigned int long id,len,next_chunk,btemp;
 	DWORD ooflength;
-	unsigned long long version;
+	unsigned int long version;
 	float ftemp;
 	char *pid;
 	int OffsetStart;
@@ -2763,7 +2763,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 	{
 		//Plain OOF file
 		fp->Seek(0L, SEEK_END);
-		ooflength=fp->GetPosition();
+		ooflength=(DWORD)fp->GetPosition();
 		OffsetStart=0;
 	} else {
 		//Inside a HOG
@@ -2789,7 +2789,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 	{
 		id=read_INT32(fp);
 		len=read_INT32(fp);
-		next_chunk=fp->GetPosition() + len;
+		next_chunk = (unsigned long) fp->GetPosition() + len;
 
 		pid=(char *)&id;
 		m_Blocks_Num++;
@@ -2803,8 +2803,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 		
 		case ID_TXTR: {		//Texture filename list
 				m_Blocks[m_Blocks_Num-1].desc="Texture information";
-				unsigned long charcount;
-				unsigned long i,j;
+				unsigned int charcount;
 				unsigned char data;
 
 				m_D3_TotalTexture=read_INT32(fp);
@@ -2814,7 +2813,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",m_D3_TotalTexture,MAX_D3_TEXTURE);
 					return ERROR_D3_TOOMANYTEXTURES;
 				}
-				for(unsigned long i=0;i<m_D3_TotalTexture;i++)
+				for(unsigned int i=0;i<m_D3_TotalTexture;i++)
 				{
 					m_D3_Display.Used_texture[i]=FALSE;
 					charcount=read_INT32(fp);    
@@ -2824,7 +2823,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_ErrorDetails.Format("Is: %i, Should be <=%i",charcount,36);
 						return ERROR_D3_INVALIDTEXTURENAME;
 					}
-					for(unsigned long j=0;j<charcount;j++)
+					for(unsigned int j=0;j<charcount;j++)
 					{
 						data=read_INT8(fp);
 						m_D3_TextureList[i][j]=data;
@@ -2844,9 +2843,9 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 			}
 
 		case ID_SOBJ: {		//Subobject header
-				unsigned long n_verts,n_faces,n_txtr,n_pnts;
+				unsigned int n_verts,n_faces,n_txtr,n_pnts;
 				char input_char;
-				unsigned long Vstart,StrTotal;
+				unsigned int Vstart,StrTotal;
 
 				Vstart=m_D3_Model.Vcount;
 
@@ -2870,9 +2869,9 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 				ftemp=read_float(fp);	   //unknown5
 				ftemp=read_float(fp);	   //unknown6
 
-				long i = read_INT32(fp);		   //subobj name
+				long subobj_name = read_INT32(fp);		   //subobj name
 				StrTotal=0;
-				for(long j=0;j<i;j++)
+				for(long j=0;j<subobj_name;j++)
 				{
 					input_char=read_INT8(fp);
 					m_D3_Model.Name[m_D3_Model.Scount][StrTotal++]=input_char;
@@ -2880,9 +2879,9 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 				m_D3_Model.Name[m_D3_Model.Scount][StrTotal]=0;
 				m_Blocks[m_Blocks_Num-1].desc.Format("Subobject \"%s\"",m_D3_Model.Name[m_D3_Model.Scount]);
 
-				i=read_INT32(fp);		   //subobj properites
+				long subobj_property = read_INT32(fp);		   //subobj properites
 				StrTotal=0;
-				for(long j=0;j<i;j++)
+				for(long j=0;j<subobj_property;j++)
 				{
 					input_char=read_INT8(fp);
 					m_D3_Model.Prop[m_D3_Model.Scount][StrTotal++]=input_char;
@@ -2903,17 +2902,17 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						return ERROR_D3_TOOHIGHVCOUNT;
 				}
 				btemp=m_D3_Model.Vcount;		//save Vcount..., use same index for normals and alphas
-				for(i=0;i<n_verts;i++)
+				for(unsigned int i=0;i<n_verts;i++)
 				{	 //vector
 					m_D3_Model.Vpoint[m_D3_Model.Vcount]=read_VECTOR(fp);
 					m_D3_Model.VSobj[m_D3_Model.Vcount]=(unsigned short)m_D3_Model.Scount;
 					m_D3_Model.Vcount++;
 				}
-				for(i=0;i<n_verts;i++) //normal
+				for(unsigned int i=0;i<n_verts;i++) //normal
 					m_D3_Model.Vnormal[btemp+i]=read_VECTOR(fp);
 				if(version==2300)
 				{
-					for(i=0;i<n_verts;i++) //unknown
+					for(unsigned int i=0;i<n_verts;i++) //unknown
 						m_D3_Model.Valpha[btemp+i]=read_float(fp);	  
 				}
 
@@ -2927,7 +2926,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 				m_D3_Display.SpolyNum[m_D3_Model.Scount]=n_faces;
 
-				for(i=0;i<n_faces;i++)
+				for(unsigned int i=0;i<n_faces;i++)
 				{
 					m_D3_Model.Poly[m_D3_Model.Pcount].Sobj=m_D3_Model.Scount;
 					m_D3_Model.Poly[m_D3_Model.Pcount].Normal=read_VECTOR(fp);	   //normal
@@ -2959,7 +2958,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_D3_Display.Used_texture[m_D3_Model.Poly[m_D3_Model.Pcount].Color]=TRUE;
 					}
 
-					for(unsigned long j=0;j<n_pnts;j++)
+					for(unsigned int j=0;j<n_pnts;j++)
 					{
 						m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]=read_INT32(fp);	   //index
 						m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]+=Vstart;     
@@ -2981,10 +2980,10 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 		case ID_PANI:
 			{
 				m_Blocks[m_Blocks_Num-1].desc="Poly animation frames";
-				unsigned long i,j,k_count,total;
+				unsigned int k_count,total;
 
 				total=0;
-				for(i=0;i<m_D3_Model.Scount;i++)
+				for(unsigned int i=0;i<m_D3_Model.Scount;i++)
 				{
 					k_count=read_INT32(fp);
 					m_D3_Model.pknum[i]=k_count;
@@ -2998,7 +2997,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_ErrorDetails.Format("Block \"PANI\" - Is: %i, Should be <=%i",total,MAX_D3_ANI);
 						return ERROR_D3_TOOMANYANINUMBERKEYSTHRUSTERS;
 					}
-					for(j=0;j<k_count;j++)
+					for(unsigned int j=0;j<k_count;j++)
 					{
 						btemp=read_INT32(fp);
 						m_D3_Model.pkey[m_D3_Model.pindex[i] + j]=btemp;
@@ -3006,8 +3005,8 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_D3_Display.pr_key[btemp]=TRUE;
 					}
 				}
-				j=0;
-				for(i=0;i<MAX_D3_ANI;i++)
+				int j=0;
+				for(int i=0;i<MAX_D3_ANI;i++)
 				{
 					if(m_D3_Display.pr_key[i])
 						m_D3_Display.pr_active[j++]=i;
@@ -3018,10 +3017,10 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 		case ID_RANI: {
 				m_Blocks[m_Blocks_Num-1].desc="Rotational animation frames";
-				unsigned long i,j,k_count,total;
+				unsigned int k_count,total;
 
 				total=0;
-				for(i=0;i<m_D3_Model.Scount;i++)
+				for(unsigned int i=0;i<m_D3_Model.Scount;i++)
 				{
 					k_count=read_INT32(fp);
 					m_D3_Model.rknum[i]=k_count;
@@ -3035,7 +3034,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_ErrorDetails.Format("Block \"RANI\" - Is: %i, Should be <=%i",total,MAX_D3_ANI);
 						return ERROR_D3_TOOMANYANINUMBERKEYSTHRUSTERS;
 					}
-					for(j=0;j<k_count;j++)
+					for(unsigned int j=0;j<k_count;j++)
 					{
 						btemp=read_INT32(fp);
 						m_D3_Model.rkey[m_D3_Model.rindex[i] + j]=btemp;
@@ -3044,8 +3043,8 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_D3_Display.pr_key[btemp]=TRUE;
 					}
 				}
-				j=0;
-				for(i=0;i<MAX_D3_ANI;i++)
+				int j=0;
+				for(int i=0;i<MAX_D3_ANI;i++)
 				{
 					if(m_D3_Display.pr_key[i])
 						m_D3_Display.pr_active[j++]=i;
@@ -3057,7 +3056,6 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 		case ID_ATCH: {
 				m_Blocks[m_Blocks_Num-1].desc="Attachment points (used for flags in CTF)";
-				unsigned long i;
 
 				m_D3_Model.ATCHnum=read_INT32(fp);
 				LOGTEXT("ATCH --> %i attachment points\n",m_D3_Model.ATCHnum); LOGDOIT;
@@ -3067,7 +3065,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",m_D3_Model.ATCHnum,MAX_D3_PNT);
 					return ERROR_D3_TOOMANYATCHPOINTS;
 				}
-				for(i=0;i<m_D3_Model.ATCHnum;i++)
+				for(unsigned int i=0;i<m_D3_Model.ATCHnum;i++)
 				{
 					m_D3_Model.ATCHsobj[i]=read_INT32(fp);	  //goes with sobj...
 					m_D3_Model.ATCHpos[i]=read_VECTOR(fp);	  //Position
@@ -3078,7 +3076,6 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 		case ID_NATH: {
 				m_Blocks[m_Blocks_Num-1].desc="Normals for attachment points";
-				unsigned long i;
 
 				m_D3_Model.NATHnum=read_INT32(fp);
 				LOGTEXT("NATH --> %i attachment normals\n",m_D3_Model.NATHnum); LOGDOIT;
@@ -3088,7 +3085,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",m_D3_Model.NATHnum,MAX_D3_PNT);
 					return ERROR_D3_TOOMANYNATHPOINTS;
 				}
-				for(i=0;i<m_D3_Model.NATHnum;i++)
+				for(unsigned int i=0;i<m_D3_Model.NATHnum;i++)
 				{
 					m_D3_Model.NATHsobj[i]=read_INT32(fp);	  //goes with sobj...
 					m_D3_Model.NATHpos[i]=read_VECTOR(fp);	  //Position
@@ -3099,7 +3096,6 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 		case ID_GRND: {
 				m_Blocks[m_Blocks_Num-1].desc="Grounding points";
-				unsigned long i;
 
 				m_D3_Model.GRNDnum=read_INT32(fp);
 				LOGTEXT("GRND --> %i grounding points\n",m_D3_Model.GRNDnum); LOGDOIT;
@@ -3109,7 +3105,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",m_D3_Model.GRNDnum,MAX_D3_PNT);
 					return ERROR_D3_TOOMANYGRNDPOINTS;
 				}
-				for(i=0;i<m_D3_Model.GRNDnum;i++)
+				for(unsigned int i=0;i<m_D3_Model.GRNDnum;i++)
 				{
 					m_D3_Model.GRNDsobj[i]=read_INT32(fp);	  //goes with sobj...
 					m_D3_Model.GRNDpos[i]=read_VECTOR(fp);	  //Position
@@ -3120,7 +3116,6 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 		case ID_GPNT: {
 				m_Blocks[m_Blocks_Num-1].desc="Gun points";
-				unsigned long i;
 
 				m_D3_Model.GPNTnum=read_INT32(fp);
 				LOGTEXT("GPNT --> %i gun points\n",m_D3_Model.ATCHnum); LOGDOIT;
@@ -3139,7 +3134,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Exceeded %i.",MAX_GUNS);
 					return ERROR_GEN_TOOMANYGUNS;
 				}
-				for(i=0;i<m_D3_Model.GPNTnum;i++)
+				for(unsigned int i=0;i<m_D3_Model.GPNTnum;i++)
 				{
 					m_D3_Model.GPNTsobj[i]=read_INT32(fp);	  //goes with sobj...
 					m_D3_Model.GPNTpos[i]=read_VECTOR(fp);	  //Position
@@ -3156,7 +3151,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 		case ID_SPCL: {
 				m_Blocks[m_Blocks_Num-1].desc="Special points";
-				unsigned long i,j,charcount,StrTotal;
+				unsigned int charcount,StrTotal;
 				char input_char;
 
 				m_D3_Model.SPCLnum=read_INT32(fp);
@@ -3167,11 +3162,11 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",m_D3_Model.SPCLnum,MAX_D3_PNT);
 					return ERROR_D3_TOOMANYSPCLPOINTS;
 				}
-				for(i=0;i<m_D3_Model.SPCLnum;i++)
+				for(unsigned int i=0;i<m_D3_Model.SPCLnum;i++)
 				{
 					charcount=read_INT32(fp);
 					StrTotal=0;
-					for(j=0;j<charcount;j++)
+					for(unsigned int j=0;j<charcount;j++)
 					{
 						input_char=read_INT8(fp);
 						m_D3_Model.SPCLname[i][StrTotal++]=input_char;
@@ -3181,7 +3176,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 					charcount=read_INT32(fp);
 					StrTotal=0;
-					for(j=0;j<charcount;j++)
+					for(unsigned int j=0;j<charcount;j++)
 					{
 						input_char=read_INT8(fp);
 						m_D3_Model.SPCLprop[i][StrTotal++]=input_char;
@@ -3201,7 +3196,6 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 		case ID_WBAT: {
 				m_Blocks[m_Blocks_Num-1].desc="Weapon batteries";
-				unsigned long i,j;
 
 				m_D3_Model.WBATnum=read_INT32(fp);
 				LOGTEXT("WBAT --> %i weapon batteries\n",m_D3_Model.WBATnum); LOGDOIT;
@@ -3211,7 +3205,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					m_ErrorDetails.Format("Is: %i, Should be <=%i",m_D3_Model.WBATnum,MAX_D3_PNT);
 					return ERROR_D3_TOOMANYWBATPOINTS;
 				}
-				for(i=0;i<m_D3_Model.WBATnum;i++)
+				for(unsigned int i=0;i<m_D3_Model.WBATnum;i++)
 				{
 					m_D3_Model.WBATnumgun[i]=read_INT32(fp);
 					if(m_D3_Model.WBATnumgun[i]>MAX_D3_PNT)
@@ -3220,7 +3214,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_ErrorDetails.Format("Weapon battery #%i - Is: %i, Should be <=%i",i,m_D3_Model.WBATnumgun[i],MAX_D3_PNT);
 						return ERROR_D3_TOOMANYWBATNUMGUNPOINTS;
 					}
-					for(j=0;j<m_D3_Model.WBATnumgun[i];j++)
+					for(unsigned int j=0;j<m_D3_Model.WBATnumgun[i];j++)
 						m_D3_Model.WBATgun[i][j]=read_INT32(fp);		//gun
 					m_D3_Model.WBATnumeye[i]=read_INT32(fp);
 					if(m_D3_Model.WBATnumeye[i]>MAX_D3_PNT)
@@ -3229,7 +3223,7 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 						m_ErrorDetails.Format("Weapon battery #%i - Is: %i, Should be <=%i",i,m_D3_Model.WBATnumeye[i],MAX_D3_PNT);
 						return ERROR_D3_TOOMANYWBATNUMEYEPOINTS;
 					}
-					for(j=0;j<m_D3_Model.WBATnumeye[i];j++)
+					for(unsigned int j=0;j<m_D3_Model.WBATnumeye[i];j++)
 						m_D3_Model.WBATeye[i][j]=read_INT32(fp);		//eye sobj
 				}
 				break;
@@ -3283,13 +3277,11 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 void CMODVIEW32Doc::D3_LoadOGFData()
 {
-
-	unsigned long i,j,k;
 	FILE *file;
 	unsigned short Color;
 	unsigned char InputChar,runcount;
-	unsigned long Red,Green,Blue;
-	unsigned long RGBAColor;
+	unsigned int Red,Green,Blue;
+	unsigned int RGBAColor;
 
 	OGF_HEADER1 header1;
 	OGF_HEADER2 header2;
@@ -3297,7 +3289,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 	OAF_HEADER1 h1;
 	OAF_HEADER2 h2;
 
-	unsigned long offset;
+	unsigned int offset;
 	char Filename[50];
 	unsigned char FileType;
 
@@ -3305,7 +3297,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 	//Load Main D3 texture set if not yet done
 	D3_ReadD3HOG();
 	
-	for(i=0;i<MAX_FS_TEXTURE;i++)
+	for(int i=0;i<MAX_FS_TEXTURE;i++)
 	{
 		if(m_D3_Display.TextureFlag[i])
 			glDeleteLists(m_D3_ModelTexture[i],1);
@@ -3314,7 +3306,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 	}
 
 
-	for(i=0;i<m_D3_TotalTexture;i++)
+	for(unsigned int i=0;i<m_D3_TotalTexture;i++)
 	{
 		FileType=NEW_FILE;
 
@@ -3364,7 +3356,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			//OGF Search process #2: Current .HOG file
 			if(FileType==NEW_FILE)
 			{
-				j=0;
+				unsigned int j=0;
 				while((j<m_D3_CurrHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_CurrHOG_Dir[j].filename)!=0))
 					j++;
 
@@ -3388,7 +3380,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			//OGF Search process #3: Main .HOG file
 			if((FileType==NEW_FILE)&(m_D3_MainHOG_Loaded))
 			{
-				j=0;
+				unsigned int j=0;
 				while((j<m_D3_MainHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_MainHOG_Dir[j].filename)!=0))
 					j++;
 
@@ -3431,7 +3423,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			//OAF Search process #2: Current .HOG file
 			if(FileType==NEW_FILE)
 			{
-				j=0;
+				unsigned int j=0;
 				while((j<m_D3_CurrHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_CurrHOG_Dir[j].filename)!=0))
 					j++;
 
@@ -3455,7 +3447,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			//OAF Search process #3: Main .HOG file
 			if(FileType==NEW_FILE)
 			{
-				j=0;
+				unsigned int j=0;
 				while((j<m_D3_MainHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_MainHOG_Dir[j].filename)!=0))
 					j++;
 
@@ -3594,14 +3586,14 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 				SetStatusBarText(str);
 			}
 
-			unsigned long RGBAtexture[128*128];
+			unsigned int RGBAtexture[128*128];
 
 			offset=0;
 			runcount=0;
 			int lastpos=ftell(file);
-			for(j=0;j<header2.height;j++)
+			for(unsigned short j=0;j<header2.height;j++)
 			{
-				for(k=0;k<header2.width;k++)
+				for(unsigned short k=0;k<header2.width;k++)
 				{
 					if(runcount>0)
 						runcount--;
@@ -3656,8 +3648,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			m_Textures[m_TexturesNum].Flags=TEXTUREINFOFLAG_TEXTURELOADED | TEXTUREINFOFLAG_TEXTUREIS24BIT;
 			m_Textures[m_TexturesNum].InSize=ftell(file)-lastpos;
 			m_Textures[m_TexturesNum].Error="<ok>";
-			CMemoryException e;
-			TRY
+			try {
 				m_Textures[m_TexturesNum].Bitmap=new unsigned char[size];
 				int temp,revtemp;
 				byte *r,*g,*b;
@@ -3672,11 +3663,11 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 
 					//memcpy(m_Textures[m_TexturesNum].Bitmap,&RGBAtexture,size);
 				}
-			CATCH(CMemoryException,e)
+			} catch (CMemoryException e) {
 				m_Textures[m_TexturesNum].Valid=FALSE;
 				m_Textures[m_TexturesNum].Error="Out of Memory";
 				break;
-			END_CATCH
+			}
 #endif
 
 			fclose(file);
@@ -3717,8 +3708,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 
 ERRORCODE CMODVIEW32Doc::D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD *hog2_load,BOOL fillexplorer)
 {
-	unsigned long i;
-	unsigned long offset;
+	unsigned int offset;
 	HOG2_INFO hog2_info;
 	HOG2_LOAD hog2_ltmp[MAX_D3_FILESINHOG];
 
@@ -3743,7 +3733,7 @@ ERRORCODE CMODVIEW32Doc::D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD
 
 		//Hog2Num=hog2_header->dirnumber;
 	offset=hog2_header->diroffset;
-	for(i=0;i<hog2_header->dirnumber;i++)
+	for(unsigned int i=0;i<hog2_header->dirnumber;i++)
 	{
 		fp->Read(&hog2_info, sizeof(HOG2_INFO));
 		strncpy(hog2_ltmp[i].filename, hog2_info.filename, 36);
@@ -3770,7 +3760,7 @@ ERRORCODE CMODVIEW32Doc::D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD
 		ExplorerAddRoot((char *)&tempfname);
 
 		m_D3_CurrHOG_OofNum=0;
-		for(i=0;i<hog2_header->dirnumber;i++)
+		for(unsigned int i=0;i<hog2_header->dirnumber;i++)
 		{
 			if((pntptr=strrchr(hog2_ltmp[i].filename,'.')) !=NULL)
 			{
@@ -3874,14 +3864,13 @@ ERRORCODE CMODVIEW32Doc::D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD
 ERRORCODE CMODVIEW32Doc::D3_LoadHOGContent(CString filename)
 {
 	int HogOof=-1;
-	char *pntptr;
-	unsigned long i;   
-	unsigned long HogOofNum=0;
+	char *pntptr; 
+	unsigned int HogOofNum=0;
 	
 	m_ModelJustLoaded=TRUE;
 	m_TexturesNum=-1;
 
-	for(i=0;i<m_D3_CurrHOG_Header.dirnumber;i++)
+	for(unsigned int i=0;i<m_D3_CurrHOG_Header.dirnumber;i++)
 	{
 		if((pntptr=strrchr(m_D3_CurrHOG_Dir[i].filename,'.')) !=NULL)
 		{
@@ -3930,7 +3919,7 @@ void CMODVIEW32Doc::D3_CalcDisplay()
 {
 	D3_VPNT Spos[MAX_D3_SOBJ];//,Testpos;
 
-	for(unsigned long i=0;i<m_D3_Model.Scount;i++)
+	for(unsigned int i=0;i<m_D3_Model.Scount;i++)
 	{
 		Spos[i]=m_D3_Model.Soffset[i];
 		if(m_D3_Model.Sparent[i] !=-1)
@@ -3943,7 +3932,7 @@ void CMODVIEW32Doc::D3_CalcDisplay()
 
 	float Min=0.0;
 	float Max=0.0;
-	for(unsigned long i=0;i<m_D3_Model.Vcount;i++)
+	for(unsigned int i=0;i<m_D3_Model.Vcount;i++)
 	{
 		D3_VPNT Testpos=m_D3_Model.Vpoint[i];
 		Testpos.x+=Spos[m_D3_Model.VSobj[i]].x;
@@ -4125,12 +4114,11 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 	UINTW	n_polygon_models=0,n_gagues=0,n_object_bitmaps=0;
 	UINTW	n_bitmap_ptrs=0,n_cockpits=0,first_multi_bitmap=0;
 	UINTW	n_reactors=0,s_robots=0,s_robot_joints=0,s_object_bitmaps=0;
-	UINT32	i;
 
-	for(i=0;i<625;i++)
+	for(int i=0;i<625;i++)
 		m_D2_HxmObjBitmap[i].index=0xffff;
 
-	for(i=0;i<MAX_D2_POLYGON_MODELS;i++)
+	for(int i=0;i<MAX_D2_POLYGON_MODELS;i++)
 	{
 		m_D2_PolType[i]=D2_POLYMODEL_TYPE_UNKNOWN;
 		m_D2_AmLores[i]=FALSE;
@@ -4143,26 +4131,26 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 		{
 			m_FileVersion=read_UINTW(fp);
 			n_textures=read_UINTW(fp);             // read tmap_info
-			for(i=0;i<n_textures;i++)
+			for(unsigned int i=0;i<n_textures;i++)
 				cfseek(fp,sizeof(D2_BITMAP_INDEX),SEEK_CUR);
-			for(i=0;i<n_textures;i++)
+			for(unsigned int i=0;i<n_textures;i++)
 				cfseek(fp,sizeof(D2_TMAP_INFO),SEEK_CUR);
 			n_sounds=read_UINTW(fp);                  // read sounds
-			for(i=0;i<n_sounds;i++)
+			for(unsigned int i=0;i<n_sounds;i++)
 				cfseek(fp,sizeof(UINT8),SEEK_CUR);
-			for(i=0;i<n_sounds;i++)
+			for(unsigned int i=0;i<n_sounds;i++)
 				cfseek(fp,sizeof(UINT8),SEEK_CUR);
 			n_vclips=read_UINTW(fp);              // read video clips
-			for(i=0;i<n_vclips;i++)
+			for(unsigned int i=0;i<n_vclips;i++)
 				cfseek(fp,sizeof(D2_VCLIP),SEEK_CUR);
 			n_eclips=read_UINTW(fp);                 // read effect clips
-			for(i=0;i<n_eclips;i++)
+			for(unsigned int i=0;i<n_eclips;i++)
 				cfseek(fp,sizeof(D2_ECLIP),SEEK_CUR);
 			n_wclips=read_UINTW(fp);               // read weapon clips
-			for(i=0;i<n_wclips;i++)
+			for(unsigned int i=0;i<n_wclips;i++)
 				cfseek(fp,sizeof(D2_WCLIP),SEEK_CUR);
 			n_robots=read_UINTW(fp);                // read robot info
-			for(i=0;i<n_robots;i++)
+			for(unsigned int i=0;i<n_robots;i++)
 			{
 				m_D2_MO_RobotInfo[i]=fp->GetPosition();
 				D2_ReadROB(fp,i);
@@ -4172,7 +4160,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 				m_D2_PolType[m_D2_Model.RobotInfo.model_num]=D2_POLYMODEL_TYPE_ROBOT;
 			}
 			n_robot_joints=read_UINTW(fp);          // read robot joints
-			for(i=0;i<n_robot_joints;i++)
+			for(unsigned int i=0;i<n_robot_joints;i++)
 			{
 				D2_JOINTPOS temp;
 				fp->Read(&temp,sizeof(D2_JOINTPOS));
@@ -4182,14 +4170,14 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			}
 
 			n_weapons=read_UINTW(fp);                 // read weapon info
-			for(i=0;i<n_weapons;i++)
+			for(unsigned int i=0;i<n_weapons;i++)
 				fp->Read(&m_D2_Weapons[i],sizeof(D2_WEAPON_INFO));
 			n_powerups=read_UINTW(fp);                 // read powerup info
-			for(i=0;i<n_powerups;i++)
+			for(unsigned int i=0;i<n_powerups;i++)
 				cfseek(fp,sizeof(D2_POWERUP_TYPE_INFO),SEEK_CUR);
 			n_polygon_models=read_UINTW(fp);              // read polygon models
 			//ERROR CHECK!
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_ModelLoadnr_to_ID[i]=i;
 				m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
@@ -4203,39 +4191,39 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 					m_D2_AmLores[j-1]=TRUE;
 				}*/
 			}
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_PolygonModels[i].offsetModelData=fp->GetPosition();
 				//m_D2_MO_ModelData[i]=model_data_cpos[i];
 				cfseek(fp,m_D2_PolygonModels[i].sizeModelData,SEEK_CUR);
 			}
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_PolygonModels[i].offsetDyingModel=fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dying_modelnum,sizeof(UINT32));
 			}
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_PolygonModels[i].offsetDestroyedModel=fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].destroyed_modelnum,sizeof(UINT32));
 			}
 			n_gagues=read_UINTW(fp);                 // read gagues
-			for(i=0;i<n_gagues;i++)
+			for(unsigned int i=0;i<n_gagues;i++)
 				cfseek(fp,sizeof(D2_BITMAP_INDEX),SEEK_CUR);
-			for(i=0;i<n_gagues;i++)
+			for(unsigned int i=0;i<n_gagues;i++)
 				cfseek(fp,sizeof(D2_BITMAP_INDEX),SEEK_CUR);
 			n_object_bitmaps=read_UINTW(fp);            // read object bitmaps
-			for(i=0;i<n_object_bitmaps;i++)
+			for(unsigned int i=0;i<n_object_bitmaps;i++)
 				fp->Read(&m_D2_ObjBitmap[i],sizeof(D2_BITMAP_INDEX));
-			for(i=0;i<n_object_bitmaps;i++)
+			for(unsigned int i=0;i<n_object_bitmaps;i++)
 				fp->Read(&m_D2_ObjBitmapPtr[i],sizeof(D2_BITMAP_INDEX));
 			fp->Read(&m_D2_PlayerShip,sizeof(D2_PLAYER_SHIP));
 			n_cockpits=read_UINTW(fp);               // read cockpit data
-			for(i=0;i<n_cockpits;i++)
+			for(unsigned int i=0;i<n_cockpits;i++)
 				cfseek(fp,sizeof(UINT16),SEEK_CUR);
 			first_multi_bitmap=read_UINTW(fp);         // read first multi bitmap
 			n_reactors=read_UINTW(fp);                // read reactor data
-			for(i=0;i<n_reactors;i++)
+			for(unsigned int i=0;i<n_reactors;i++)
 				fp->Read(&m_D2_Reactors[i],sizeof(D2_REACTOR));
 			m_D2_Marker_ModelNum=read_UINTW(fp);      // read marker model number
 			cfseek(fp,sizeof(UINT16)*2600,SEEK_CUR);  // read game bitmap translate
@@ -4246,11 +4234,11 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 		{
 			m_FileVersion=read_UINTW(fp)+100;       // read version
 			n_weapons=read_UINTW(fp);         // read weapon info
-			for(i=0;i<n_weapons;i++)
+			for(unsigned int i=0;i<n_weapons;i++)
 				cfseek(fp,sizeof(D2_WEAPON_INFO),SEEK_CUR);
 
 			n_robots=read_UINTW(fp);         // read robot info
-			for(i=0;i<n_robots;i++)
+			for(unsigned int i=0;i<n_robots;i++)
 			{
 			/*	m_D2_MO_RobotInfo[i]=fp->GetPosition();
 				D2_ReadROB(fp,i);
@@ -4260,12 +4248,12 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			}
 
 			n_robot_joints=read_UINTW(fp);      // read robot joints
-			for(i=0;i<n_robot_joints;i++)
+			for(unsigned int i=0;i<n_robot_joints;i++)
 				cfseek(fp,sizeof(D2_JOINTPOS),SEEK_CUR);
 
 			n_polygon_models=read_UINTW(fp);      // read polygon models
 			//ERROR CHECK!
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_ModelLoadnr_to_ID[i]=i+D2_VHAM_IDFIRSTMODEL;
 				m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
@@ -4288,32 +4276,32 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 					m_D2_AmLores[j-1]=TRUE;
 				}*/
 			}
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_PolygonModels[i].offsetModelData=fp->GetPosition();
 				cfseek(fp,m_D2_PolygonModels[i].sizeModelData,SEEK_CUR);
 			}
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_PolygonModels[i].offsetDyingModel=fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].dying_modelnum,sizeof(UINT32));
 				//cfseek(fp,sizeof(UINT32),SEEK_CUR);
 			}
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_PolygonModels[i].offsetDestroyedModel=fp->GetPosition();
 				fp->Read(&m_D2_PolygonModels[i].destroyed_modelnum,sizeof(UINT32));
 				//cfseek(fp,sizeof(UINT32),SEEK_CUR);
 			}
 
-			for(i=422;i<600;i++)
+			for(int i=422;i<600;i++)
 				m_D2_ObjBitmap[i].index=0;                    // clear vertigo bitmaps
 
-			for(i=502;i<600;i++)
+			for(int i=502;i<600;i++)
 				m_D2_ObjBitmapPtr[i]=0;                       // clear vertigo pointers
 
 			n_object_bitmaps=read_UINTW(fp);          // read object bitmaps
-			for(i=0;i<n_object_bitmaps;i++)
+			for(unsigned int i=0;i<n_object_bitmaps;i++)
 			{
 				D2_BITMAP_INDEX	new_bitmap;
 				fp->Read(&new_bitmap, sizeof(D2_BITMAP_INDEX));
@@ -4321,13 +4309,13 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			}
 
 			n_bitmap_ptrs=read_UINTW(fp);       // read bitmap pointers
-			for(i=0;i<n_bitmap_ptrs;i++)
+			for(unsigned int i=0;i<n_bitmap_ptrs;i++)
 			{
 				UINT16 new_pointer;
 				fp->Read(&new_pointer, sizeof(UINT16));
 				m_D2_ObjBitmapPtr[i+502]=new_pointer;
 			}
-			for(i=0;i<n_bitmap_ptrs;i++)            // don't know what this is...
+			for(unsigned int i=0;i<n_bitmap_ptrs;i++)            // don't know what this is...
 				cfseek(fp,sizeof(UINT16),SEEK_CUR);
 		}
 		break;
@@ -4336,13 +4324,13 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 		{
 			m_FileVersion=read_UINTW(fp)+200;      // read version
 			n_robots=read_UINTW(fp);      // read robot info
-			for(i=0;i<n_robots;i++)
+			for(unsigned int i=0;i<n_robots;i++)
 			{
 				s_robots=read_UINTW(fp);
 				cfseek(fp,sizeof(D2_ROBOT_INFO),SEEK_CUR);
 			}
 			n_robot_joints=read_UINTW(fp);   // read robot joints
-			for(i=0;i<n_robot_joints;i++)
+			for(unsigned int i=0;i<n_robot_joints;i++)
 			{
 				s_robot_joints=read_UINTW(fp);
 				cfseek(fp,sizeof(D2_JOINTPOS),SEEK_CUR);
@@ -4350,7 +4338,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 			n_polygon_models=read_UINTW(fp);       // read polygon models
 			/*model_count=n_polygon_models;*/
 			//ERROR CHECK!
-			for(i=0;i<n_polygon_models;i++)
+			for(unsigned int i=0;i<n_polygon_models;i++)
 			{
 				m_D2_ModelLoadnr_to_ID[i]=read_UINTW(fp);
 				m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
@@ -4364,7 +4352,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 				fp->Read(&m_D2_PolygonModels[i].destroyed_modelnum,sizeof(UINT32));
 			}
 			n_object_bitmaps=read_UINTW(fp);             // read object bitmaps
-			for(i=0;i<n_object_bitmaps;i++)
+			for(unsigned int i=0;i<n_object_bitmaps;i++)
 			{
 				s_object_bitmaps=read_UINTW(fp);
 				fp->Read(&m_D2_HxmObjBitmap[s_object_bitmaps], sizeof(D2_BITMAP_INDEX));
@@ -4390,7 +4378,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 
 			n_polygon_models=1;       // read polygon models
 			//model_count=n_polygon_models;
-			i=0;
+			int i=0;
 			m_D2_ModelLoadnr_to_ID[i]=read_UINTW(fp);
 			m_D2_PolygonModels[i].offsetPolyModel=fp->GetPosition();
 			fp->Read(&m_D2_PolygonModels[i].dataPolyModel, sizeof(D2_POLYMODEL));
@@ -4422,7 +4410,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 
 	//*******************************************
 	//Enumerate polygon models - ROBOTS
-	for(i=0;i<n_robots;i++)
+	for(unsigned int i=0;i<n_robots;i++)
 	{
 		int m=m_D2_Robots[i].model_num;
 		//ERROR CHECK m
@@ -4437,15 +4425,15 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 
 		m_D2_PolygonModels[m].Joints.Available=TRUE;
 
-		for(int i1=0;i1<MAX_D2_GUNS+1;i1++)
+		for(int j=0;j<MAX_D2_GUNS+1;j++)
 		{
-			for(int i2=0;i2<N_ANIM_STATES;i2++)
-				m_D2_PolygonModels[m].Joints.Anim_states[i1][i2]=m_D2_Robots[i].anim_states[i1][i2];
+			for(int k=0;k<N_ANIM_STATES;k++)
+				m_D2_PolygonModels[m].Joints.Anim_states[j][k]=m_D2_Robots[i].anim_states[j][k];
 		}
 	}
 
 	//Enumerate polygon models - REACTORS
-	for(i=0;i<n_reactors;i++)
+	for(unsigned int i=0;i<n_reactors;i++)
 	{
 		int m=m_D2_Reactors[i].model_num;
 		//ERROR CHECK m
@@ -4470,25 +4458,25 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 	}
 
 	//Enumerate polygon models - WEAPONS
-	for(i=0;i<n_weapons;i++)
+	for(unsigned int i=0;i<n_weapons;i++)
 	{
 		if(m_D2_Weapons[i].render_type!=1)
 		{
-			int m=m_D2_Weapons[i].model_num;
-			if((m>0) && (m<256))
+			int n=m_D2_Weapons[i].model_num;
+			if((n>0) && (m<256))
 			{
-				m_D2_PolygonModels[m].Type=D2_POLYMODEL_TYPE_WEAPON;
-				m_D2_PolygonModels[m].GunNum=0;
+				m_D2_PolygonModels[n].Type=D2_POLYMODEL_TYPE_WEAPON;
+				m_D2_PolygonModels[n].GunNum=0;
 			}
-			m_D2_PolygonModels[m].Joints.Available=FALSE;
+			m_D2_PolygonModels[n].Joints.Available=FALSE;
 
-			m=m_D2_Weapons[i].model_num_inner;
-			if((m>0) && (m<256))
+			n=m_D2_Weapons[i].model_num_inner;
+			if((n>0) && (n<256))
 			{
-				m_D2_PolygonModels[m].Type=D2_POLYMODEL_TYPE_WEAPONINNER;
-				m_D2_PolygonModels[m].GunNum=0;
+				m_D2_PolygonModels[n].Type=D2_POLYMODEL_TYPE_WEAPONINNER;
+				m_D2_PolygonModels[n].GunNum=0;
 			}
-			m_D2_PolygonModels[m].Joints.Available=FALSE;
+			m_D2_PolygonModels[n].Joints.Available=FALSE;
 		}
 	}
 
@@ -4497,7 +4485,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 	//ERROR CHECK m
 	m_D2_PolygonModels[m].Type=D2_POLYMODEL_TYPE_PLAYERSHIP;
 	m_D2_PolygonModels[m].GunNum=N_PLAYER_GUNS;
-	for(i=0;i<N_PLAYER_GUNS;i++)
+	for(unsigned int i=0;i<N_PLAYER_GUNS;i++)
 	{
 		m_D2_PolygonModels[m].Gun[i]=m_D2_PlayerShip.gun_points[i];
 		//m_D2_Model[m].ExInfo.GunDirection[i]=0/0/1;
@@ -4506,9 +4494,9 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 	m_D2_PolygonModels[m].Joints.Available=FALSE;
 
 	//Enumerate polygon models - LORES flag
-	for(i=0;i<n_polygon_models;i++)
+	for(unsigned int i=0;i<n_polygon_models;i++)
 	{
-		int m=m_D2_PolygonModels[i].dataPolyModel.simpler_model-1;
+		m=m_D2_PolygonModels[i].dataPolyModel.simpler_model-1;
 		if(m!=-1)
 		{
 			m_D2_PolygonModels[m].Type=m_D2_PolygonModels[i].Type | D2_POLYMODEL_TYPE_FLAG_LORES;
@@ -4523,9 +4511,9 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 	}
 
 	//Enumerate polygon models - DESTROYED flag
-	for(i=0;i<n_polygon_models;i++)
+	for(unsigned int i=0;i<n_polygon_models;i++)
 	{
-		int m=m_D2_PolygonModels[i].destroyed_modelnum;
+		m=m_D2_PolygonModels[i].destroyed_modelnum;
 		if(m!=-1)
 		{
 			m_D2_PolygonModels[m].Type=m_D2_PolygonModels[i].Type | D2_POLYMODEL_TYPE_FLAG_DESTROYED;
@@ -4540,9 +4528,9 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 	}
 
 	//Enumerate polygon models - DYING flag
-	for(i=0;i<n_polygon_models;i++)
+	for(unsigned int i=0;i<n_polygon_models;i++)
 	{
-		int m=m_D2_PolygonModels[i].dying_modelnum;
+		m=m_D2_PolygonModels[i].dying_modelnum;
 		if(m!=-1)
 		{
 			m_D2_PolygonModels[m].Type=m_D2_PolygonModels[i].Type | D2_POLYMODEL_TYPE_FLAG_DYING;
@@ -4575,7 +4563,7 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 		ExplorerClear();
 		ExplorerAddRoot((char *)&tempfname);
 
-		for(i=0;i<n_polygon_models;i++)
+		for(unsigned int i=0;i<n_polygon_models;i++)
 		{
 			m_ArchiveStats_NumTotal++;
 			sprintf(tempfname,"Model #%i: %s [ID %i]",i,m_D2_PM_Desc[m_D2_ModelLoadnr_to_ID[i]],m_D2_ModelLoadnr_to_ID[i]);
@@ -6098,7 +6086,7 @@ unsigned char * CMODVIEW32Doc::EditorFS_GenerateTextures()
 	memcpy(buffer+ptr,&size,4); ptr+=4;
 
 	memcpy(buffer+ptr,&m_FS_BitmapData.count,4); ptr+=4;
-	for(unsigned long i=0;i<m_FS_BitmapData.count;i++)
+	for(unsigned int i=0;i<m_FS_BitmapData.count;i++)
 	{
 		int slen,si; unsigned char ch; CString tmp;
 		tmp=m_FS_BitmapData.pic[i].name;
@@ -6143,10 +6131,10 @@ unsigned char * CMODVIEW32Doc::EditorFS_GenerateModelHeader()
 	memcpy(buffer+ptr,&m_FS_Model._maxbox.y,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_Model._maxbox.z,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_PMinfo.n_detail,4); ptr+=4;
-	for(unsigned long i=0;i<m_FS_PMinfo.n_detail;i++)
+	for(unsigned int i=0;i<m_FS_PMinfo.n_detail;i++)
 	{	memcpy(buffer+ptr,&m_FS_PMinfo.detail[i],4); ptr+=4;	}
 	memcpy(buffer+ptr,&m_FS_PMinfo.n_debris,4); ptr+=4;
-	for(unsigned long i=0;i<m_FS_PMinfo.n_debris;i++)
+	for(unsigned int i=0;i<m_FS_PMinfo.n_debris;i++)
 	{	memcpy(buffer+ptr,&m_FS_PMinfo.debris[i],4); ptr+=4;	}
 	memcpy(buffer+ptr,&m_FS_ModelInfo.mass,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_ModelInfo.mass_center.x,4); ptr+=4;
@@ -6182,12 +6170,12 @@ unsigned char * CMODVIEW32Doc::EditorFS_GenerateShields()
 	int size=0;
 	memcpy(buffer+ptr,&size,4); ptr+=4;
 	memcpy(buffer+ptr,&m_FS_Model.shields.Vcount,4); ptr+=4;
-	for(unsigned long vert=0;vert<m_FS_Model.shields.Vcount;vert++)
+	for(unsigned int vert=0;vert<m_FS_Model.shields.Vcount;vert++)
 	{	memcpy(buffer+ptr,&m_FS_Model.shields.Vpoint[vert][0],4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Vpoint[vert][1],4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Vpoint[vert][2],4); ptr+=4;	}
 	memcpy(buffer+ptr,&m_FS_Model.shields.Fcount,4); ptr+=4;
-	for(unsigned long face=0;face<m_FS_Model.shields.Fcount;face++)
+	for(unsigned int face=0;face<m_FS_Model.shields.Fcount;face++)
 	{	memcpy(buffer+ptr,&m_FS_Model.shields.Face[face].Normal.x,4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Face[face].Normal.y,4); ptr+=4;
 		memcpy(buffer+ptr,&m_FS_Model.shields.Face[face].Normal.z,4); ptr+=4;

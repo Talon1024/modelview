@@ -135,7 +135,7 @@ public:
 	BOOL m_RenderZbuffer;
 	BOOL m_SkipBuild;
 	BOOL m_FastTextureLoad;
-	unsigned long m_Detaillevel;
+	unsigned int m_Detaillevel;
 	BOOL m_ShowThruster;
 	BOOL m_ShowShield;
 	BOOL m_FS_ShowDockingPoints;
@@ -165,12 +165,12 @@ public:
 	int D2_BuildScene();
 	void D2_BuildWireCube(D2_VMS_VECTOR min,D2_VMS_VECTOR max);
 	void D2_PreparePosition();
-	void D2_SetPosition(unsigned long pos);
+	void D2_SetPosition(unsigned int pos);
 	
 	BOOL m_RenderD3Flat;
 	BOOL m_RenderD3Smooth;
 	BOOL m_D3_Rotate;
-	unsigned long m_D3_Position;
+	unsigned int m_D3_Position;
 	GLuint  m_D3_ModelSobj[60];
 	GLuint	m_D3_CrossPnts;
 	BOOL    m_D3_LoadedSobj[60];
@@ -179,14 +179,14 @@ public:
 	GLfloat m_D3_Dnorm[20000][3];
 	GLfloat m_D3_Dvert[20000][3];
 	GLfloat m_D3_Duv[20000][2];
-	void D3_BuildPnts(unsigned long SubM);
+	void D3_BuildPnts(unsigned int SubM);
 	void D3_BuildSobj(unsigned short SobjNum);
 	void D3_BuildScene();
 	void D3_BuildArrays();
 	void D3_CrossPnt(D3_VPNT xhair);
 	void D3_CrossPntN(D3_VPNT xhair, D3_VPNT Dir);
 	void D3_RenderScene();
-	void D3_SetPosition(unsigned long pos);
+	void D3_SetPosition(unsigned int pos);
 	D3_POSANGLE m_D3_PosAngle_ShallBe[MAX_D3_SOBJ];
 	D3_POSANGLE m_D3_PosAngle_Current[MAX_D3_SOBJ];
 	D3_POSANGLE m_D3_PosAngle_StepBit[MAX_D3_SOBJ];

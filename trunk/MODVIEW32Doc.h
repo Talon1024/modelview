@@ -232,7 +232,7 @@ typedef struct TEXTUREINFO
 	ULONGLONG InSize;
 	BOOL Valid;
 	CString Error;
-	unsigned long PaletteLong[256]; //Unused if TEXTUREINFOFLAG_TEXTUREIS24BIT is set in Flags
+	unsigned int PaletteLong[256]; //Unused if TEXTUREINFOFLAG_TEXTUREIS24BIT is set in Flags
 	unsigned char Palette[3][256]; //Unused if TEXTUREINFOFLAG_TEXTUREIS24BIT is set in Flags
 	int FileType;
 #ifdef _WITHTXVIEW
@@ -410,7 +410,7 @@ public:
 	BOOL m_D3_OffTexture[MAX_D3_TEXTURE];
 	BOOL m_D3_OffTXTR;
 	float m_D3_Rstep[MAX_D3_SOBJ];
-	unsigned long m_D3_TotalTexture;
+	unsigned int m_D3_TotalTexture;
 	char m_D3_TextureList[MAX_D3_TEXTURE][36];
 	GLuint m_D3_ModelTexture[MAX_D3_TEXTURE];
 	
@@ -436,10 +436,10 @@ public:
 	int			m_FS_CurrVP_PofList[MAX_FS_POFFILESINVP];
 	int			m_FS_CurrVP_PofNum;
 	GLuint m_FS_ModelTexture[MAX_FS_TEXTURE];
-	unsigned long m_FS_PofDataL[MAX_FS_SOBJ],m_FS_PofDataH[MAX_FS_SOBJ];
-	unsigned long m_FS_RGBAtexture[1024*1024];   
-	unsigned long m_FS_RGBAtexture2[1024*2048];
-	unsigned long m_FS_LoadPCX[MAX_FS_SOBJ];
+	unsigned int m_FS_PofDataL[MAX_FS_SOBJ],m_FS_PofDataH[MAX_FS_SOBJ];
+	unsigned int m_FS_RGBAtexture[1024*1024];   
+	unsigned int m_FS_RGBAtexture2[1024*2048];
+	unsigned int m_FS_LoadPCX[MAX_FS_SOBJ];
 	PMINFO m_FS_PMinfo;   
 	FS_REALGUNS m_FS_RealGuns[2]; //0=GPNT, 1=MPNT
 	FS_TURRETS m_FS_Turrets[2]; //0=TGUN, 1=TMIS
@@ -562,7 +562,7 @@ public:
 	ERRORCODE FS_LoadVPContent(CString filename);
 	ERRORCODE FS_Walk(void *StartAt,int module,int StartByte);
 	ERRORCODE FS_ReadPOF(CFile *fp,int VpNum);
-	ERRORCODE FS_LoadPCXData(unsigned long ActivePM,BOOL bAniLoad,BOOL bFastload);
+	ERRORCODE FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL bFastload);
 	void FS_PreparePOF();
 	void FS_BuildGunGroups();
 	CString FS_MakeSubsystemDesc(CString x1,CString x2);
