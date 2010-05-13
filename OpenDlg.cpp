@@ -115,6 +115,8 @@ BOOL COpenDlg::OnInitDialog()
 
 BOOL COpenDlg::InsertItem(int game,CString desc, CString filename, int icon)
 {
+	if (game >= 256)
+		return FALSE;
 	if(num_files>=MAX_FILES)
 		return FALSE; //Out of memory
 	
@@ -210,7 +212,7 @@ void COpenDlg::OnBrowse()
 
 	if(pFileDialog->DoModal() == IDOK)
 	{
-		m_FileTree.Select(NULL,TVGN_CARET);
+		//m_FileTree.Select(NULL,TVGN_CARET);
 
 		CString filename=pFileDialog->GetPathName();
 		m_FileName.SetWindowText(filename);

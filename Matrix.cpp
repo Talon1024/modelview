@@ -296,63 +296,69 @@ void CMathStuff::Rotate_Object(int offset, int segment, FIXANG angle_xi,FIXANG a
 {
 // segment is what we are rotating, offset is the offset we are using for it...
 
-	long i;
 	matrix_4x4 rotate;
 	float temp_x, // used to hold intermediate results during rotation
 		temp_y,
 		temp_z;
 
-	// test if we need to rotate at all
-	if ((angle_xi==0) && (angle_yi==0) && (angle_zi==0))
-	{
-		for (i=0;i<Model->Vcount;i++)
+	if (offset < 10) {
+
+		// test if we need to rotate at all
+		if ((angle_xi==0) && (angle_yi==0) && (angle_zi==0))
 		{
-			if (Model->Vsegment[i]==segment)
+			for (int i=0;i<Model->Vcount;i++)
 			{
-				if (segment==offset)
+				if (i >= 800)
+					return;
+				if (Model->Vsegment[i]==segment)
 				{
-					Model->Vpoint[i].x-=Model->Soffset[offset].x;
-					Model->Vpoint[i].y-=Model->Soffset[offset].y;
-					Model->Vpoint[i].z-=Model->Soffset[offset].z;
+					if (segment==offset)
+					{
+						Model->Vpoint[i].x-=Model->Soffset[offset].x;
+						Model->Vpoint[i].y-=Model->Soffset[offset].y;
+						Model->Vpoint[i].z-=Model->Soffset[offset].z;
+					}
+					Model->Vpoint[i].x+=Model->Sbackup[offset].x;
+					Model->Vpoint[i].y+=Model->Sbackup[offset].y;
+					Model->Vpoint[i].z+=Model->Sbackup[offset].z;
 				}
-				Model->Vpoint[i].x+=Model->Sbackup[offset].x;
-				Model->Vpoint[i].y+=Model->Sbackup[offset].y;
-				Model->Vpoint[i].z+=Model->Sbackup[offset].z;
 			}
+			return;
 		}
-		return;
-	}
 
-	Gen_Rotate_Matrix(rotate,angle_xi,angle_yi,angle_zi);
+		Gen_Rotate_Matrix(rotate,angle_xi,angle_yi,angle_zi);
 
-	for (i=0;i<Model->Vcount;i++)
-	{
-		if (Model->Vsegment[i] == segment)
+		for (int i=0;i<Model->Vcount;i++)
 		{
-			if (segment == offset)
+			if (i >= 800)
+					return;
+			if (Model->Vsegment[i] == segment)
 			{
-				Model->Vpoint[i].x -= Model->Soffset[offset].x;
-				Model->Vpoint[i].y -= Model->Soffset[offset].y;
-				Model->Vpoint[i].z -= Model->Soffset[offset].z;
-			}
+				if (segment == offset)
+				{
+					Model->Vpoint[i].x -= Model->Soffset[offset].x;
+					Model->Vpoint[i].y -= Model->Soffset[offset].y;
+					Model->Vpoint[i].z -= Model->Soffset[offset].z;
+				}
 
-			temp_x=Model->Vpoint[i].x * rotate[0][0] +
+				temp_x=Model->Vpoint[i].x * rotate[0][0] +
 				 Model->Vpoint[i].y * rotate[1][0] +
 				 Model->Vpoint[i].z * rotate[2][0];
 
-			temp_y=Model->Vpoint[i].x * rotate[0][1] +
+				temp_y=Model->Vpoint[i].x * rotate[0][1] +
 				 Model->Vpoint[i].y * rotate[1][1] +
 				 Model->Vpoint[i].z * rotate[2][1];
 
-			temp_z=Model->Vpoint[i].x * rotate[0][2] +
+				temp_z=Model->Vpoint[i].x * rotate[0][2] +
 				 Model->Vpoint[i].y * rotate[1][2] +
 				 Model->Vpoint[i].z * rotate[2][2];
 
-			Model->Vpoint[i].x=(long)(temp_x+Model->Sbackup[offset].x);
-			Model->Vpoint[i].y=(long)(temp_y+Model->Sbackup[offset].y);
-			Model->Vpoint[i].z=(long)(temp_z+Model->Sbackup[offset].z);
-		}
+				Model->Vpoint[i].x=(long)(temp_x+Model->Sbackup[offset].x);
+				Model->Vpoint[i].y=(long)(temp_y+Model->Sbackup[offset].y);
+				Model->Vpoint[i].z=(long)(temp_z+Model->Sbackup[offset].z);
+			}
 
-	} // end for index
+		} // end for index
+	}
 
 } // end Rotate_Object

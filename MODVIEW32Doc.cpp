@@ -736,7 +736,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 
 	if(m_FS_BitmapData.count>0)
 	{
-		for(unsigned int i=m_FS_PofDataL[ActivePM];i<(m_FS_PofDataH[ActivePM]+1);i++)
+		for(unsigned int i=m_FS_PofDataL[ActivePM];(i<(m_FS_PofDataH[ActivePM]+1)) && (i < MAX_FS_TEXTURE);i++)
 		{
 			BOOL unknownfiletype=TRUE;
 			m_FS_BitmapData.pic[i].valid=1;
@@ -776,7 +776,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 			if(!m_InfoMode)
 			{
 				char str[256];
-				sprintf(str,"Loading %s...",Filename);
+				sprintf_s(str,"Loading %s...",Filename);
 				SetStatusBarText(str);
 			}
 
@@ -812,7 +812,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 			if(unknownfiletype && m_FS_CurrVP_Loaded)
 			{
 				unsigned int j=0;
-				while((j<m_FS_CurrVP_Header.dirnumber)&(strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
+				while((j<m_FS_CurrVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
 					j++;
 
 				if(j<m_FS_CurrVP_Header.dirnumber)
@@ -871,7 +871,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 			if(unknownfiletype && m_FS_MainVP_Loaded)
 			{
 				unsigned int j=0;
-				while((j<m_FS_MainVP_Header.dirnumber)&(strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
+				while((j<m_FS_MainVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
 					j++;
 
 				if(j<m_FS_MainVP_Header.dirnumber)
@@ -916,7 +916,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 			if(unknownfiletype && m_FS_CurrVP_Loaded)
 			{
 				unsigned int j=0;
-				while((j<m_FS_CurrVP_Header.dirnumber)&(strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
+				while((j<m_FS_CurrVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
 					j++;
 				if(j<m_FS_CurrVP_Header.dirnumber)
 				{
@@ -969,7 +969,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 			if(unknownfiletype && m_FS_MainVP_Loaded)
 			{
 				unsigned int j=0;
-				while((j<m_FS_MainVP_Header.dirnumber)&(strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
+				while((j<m_FS_MainVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
 					j++;
 				if(j<m_FS_MainVP_Header.dirnumber)
 				{
@@ -1144,7 +1144,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 #ifdef _WITHTXVIEW
 					for(unsigned int j=0;j<yreal;j++)
 						memcpy(&m_Textures[m_TexturesNum].Bitmap[j*x_clusterize4],&tmpbuffer[j*x_clusterize2],xreal);
-					delete(tmpbuffer);
+					delete[] tmpbuffer;
 #endif
 					for(unsigned int j=0;j<yreal;j++)
 					{
@@ -2161,7 +2161,7 @@ ERRORCODE CMODVIEW32Doc::FS_ReadPOF(CFile *fp,int VpNum)
 		default:
 			{
 				char outputbuf[256];
-				sprintf(outputbuf,"%i <%c%c%c%c> %d\n",(int)pos_start,*pid,*(pid+1),*(pid+2),*(pid+3),m_FS_NumSOBJ);
+				sprintf_s(outputbuf,"%i <%c%c%c%c> %d\n",(int)pos_start,*pid,*(pid+1),*(pid+2),*(pid+3),m_FS_NumSOBJ);
 				TRACE(outputbuf);
 			}
 			break;
@@ -2459,7 +2459,7 @@ ERRORCODE CMODVIEW32Doc::FS_InitVP(CFile *fp,VP_HEADER *vp_header,VP_INFO *vp_in
 	if(!m_InfoMode)
 	{
 		char str[256];
-		sprintf(str,"Listing %i files...",vp_header->dirnumber);
+		sprintf_s(str,"Listing %i files...",vp_header->dirnumber);
 		SetStatusBarText(str);
 	}
 
@@ -2492,7 +2492,7 @@ ERRORCODE CMODVIEW32Doc::FS_InitVP(CFile *fp,VP_HEADER *vp_header,VP_INFO *vp_in
 		{
 			if((pntptr=strrchr(temp[i].filename,'.')) !=NULL)
 			{
-				if(strcmpi(pntptr,".pof")==0)
+				if(_strcmpi(pntptr,".pof")==0)
 				{
 					m_ArchiveStats_NumTotal++;
 					m_FS_CurrVP_PofList[m_FS_CurrVP_PofNum]=i;
@@ -2500,7 +2500,7 @@ ERRORCODE CMODVIEW32Doc::FS_InitVP(CFile *fp,VP_HEADER *vp_header,VP_INFO *vp_in
 					{
 						m_FS_CurrVP_PofNum++;
 						memset(tempfname,0,36);
-						strncpy(tempfname,temp[i].filename,strlen(temp[i].filename)-4); //drop the ".pof"
+						strncpy_s(tempfname,temp[i].filename,strlen(temp[i].filename)-4); //drop the ".pof"
 						ExplorerAddChild(tempfname);
 					}
 					else
@@ -2552,9 +2552,9 @@ ERRORCODE CMODVIEW32Doc::FS_LoadVPContent(CString filename)
 	{
 		if((pntptr=strrchr(m_FS_CurrVP_Dir[i].filename,'.')) !=NULL)
 		{
-			if(strcmpi(pntptr,".pof")==0)
+			if(_strcmpi(pntptr,".pof")==0)
 			{
-				if(strcmpi(m_FS_CurrVP_Dir[i].filename,filename)==0) 
+				if(_strcmpi(m_FS_CurrVP_Dir[i].filename,filename)==0) 
 					VpPof=VpPofNum++;
 				VpPofNum++;
 			}
@@ -2843,7 +2843,8 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 			}
 
 		case ID_SOBJ: {		//Subobject header
-				unsigned int n_verts,n_faces,n_txtr,n_pnts;
+				unsigned int n_verts,n_txtr,n_pnts;
+				int n_faces;
 				char input_char;
 				unsigned int Vstart,StrTotal;
 
@@ -2926,44 +2927,46 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 
 				m_D3_Display.SpolyNum[m_D3_Model.Scount]=n_faces;
 
-				for(unsigned int i=0;i<n_faces;i++)
+				for(int i=0;(i<n_faces) && (i < MAX_D3_POLY);i++)
 				{
-					m_D3_Model.Poly[m_D3_Model.Pcount].Sobj=m_D3_Model.Scount;
-					m_D3_Model.Poly[m_D3_Model.Pcount].Normal=read_VECTOR(fp);	   //normal
+					if (m_D3_Model.Pcount < MAX_D3_POLY) {
+						m_D3_Model.Poly[m_D3_Model.Pcount].Sobj=m_D3_Model.Scount;
+						m_D3_Model.Poly[m_D3_Model.Pcount].Normal=read_VECTOR(fp);	   //normal
 
-					n_pnts=read_INT32(fp);	  //n_pnts
-					m_D3_Model.Poly[m_D3_Model.Pcount].Corners=n_pnts;
-					if(n_pnts>25)
-					{
-						m_ErrorString=ERROR_D3_TOOMANYPOINTSINPOLY_TEXT;
-						m_ErrorDetails.Format("Is: %i, Should be <=%i",n_pnts,25);
-						return ERROR_D3_TOOMANYPOINTSINPOLY;
-					}
+						n_pnts=read_INT32(fp);	  //n_pnts
+						m_D3_Model.Poly[m_D3_Model.Pcount].Corners=n_pnts;
+						if(n_pnts>25)
+						{
+							m_ErrorString=ERROR_D3_TOOMANYPOINTSINPOLY_TEXT;
+							m_ErrorDetails.Format("Is: %i, Should be <=%i",n_pnts,25);
+							return ERROR_D3_TOOMANYPOINTSINPOLY;
+						}
 
-					n_txtr=read_INT32(fp);	  //n_txtr
+						n_txtr=read_INT32(fp);	  //n_txtr
 					//if(n_txtr>1)  //The following line was commented out which caused the next line
 									// to become part of the if clause. As  a result the Poly[].type
 									// was not initialized.  So this line was meant as an error catch
 									// so I commented it out...(SteveKlinger)
 						//AfxMessageBox("n_txtr>1...","INFO",MB_OK);
 
-					m_D3_Model.Poly[m_D3_Model.Pcount].Type=n_txtr;
-					if(n_txtr==0)
-					{
-						m_D3_Model.Poly[m_D3_Model.Pcount].Red=read_INT8(fp);
-						m_D3_Model.Poly[m_D3_Model.Pcount].Green=read_INT8(fp);
-						m_D3_Model.Poly[m_D3_Model.Pcount].Blue=read_INT8(fp);
-					} else {
-						m_D3_Model.Poly[m_D3_Model.Pcount].Color=read_INT32(fp);                    
-						m_D3_Display.Used_texture[m_D3_Model.Poly[m_D3_Model.Pcount].Color]=TRUE;
-					}
+						m_D3_Model.Poly[m_D3_Model.Pcount].Type=n_txtr;
+						if(n_txtr==0)
+						{
+							m_D3_Model.Poly[m_D3_Model.Pcount].Red=read_INT8(fp);
+							m_D3_Model.Poly[m_D3_Model.Pcount].Green=read_INT8(fp);
+							m_D3_Model.Poly[m_D3_Model.Pcount].Blue=read_INT8(fp);
+						} else {
+							m_D3_Model.Poly[m_D3_Model.Pcount].Color=read_INT32(fp);                    
+							m_D3_Display.Used_texture[m_D3_Model.Poly[m_D3_Model.Pcount].Color]=TRUE;
+						}
 
-					for(unsigned int j=0;j<n_pnts;j++)
-					{
-						m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]=read_INT32(fp);	   //index
-						m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]+=Vstart;     
-						m_D3_Model.Poly[m_D3_Model.Pcount].U[j]=read_float(fp);		  //u
-						m_D3_Model.Poly[m_D3_Model.Pcount].V[j]=read_float(fp);		  //v
+						for(unsigned int j=0;j<n_pnts;j++)
+						{
+							m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]=read_INT32(fp);	   //index
+							m_D3_Model.Poly[m_D3_Model.Pcount].Vp[j]+=Vstart;     
+							m_D3_Model.Poly[m_D3_Model.Pcount].U[j]=read_float(fp);		  //u
+							m_D3_Model.Poly[m_D3_Model.Pcount].V[j]=read_float(fp);		  //v
+						}
 					}
 					if(version !=1907)
 					{
@@ -3000,8 +3003,10 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					for(unsigned int j=0;j<k_count;j++)
 					{
 						btemp=read_INT32(fp);
-						m_D3_Model.pkey[m_D3_Model.pindex[i] + j]=btemp;
-						m_D3_Model.pani[m_D3_Model.pindex[i] + j]=read_VECTOR(fp);
+						if ((m_D3_Model.pindex[i] + j) < MAX_D3_ANI) {
+							m_D3_Model.pkey[m_D3_Model.pindex[i] + j]=btemp;
+							m_D3_Model.pani[m_D3_Model.pindex[i] + j]=read_VECTOR(fp);
+						}
 						m_D3_Display.pr_key[btemp]=TRUE;
 					}
 				}
@@ -3037,9 +3042,11 @@ ERRORCODE CMODVIEW32Doc::D3_ReadOOF(CFile *fp,int OofNum)
 					for(unsigned int j=0;j<k_count;j++)
 					{
 						btemp=read_INT32(fp);
-						m_D3_Model.rkey[m_D3_Model.rindex[i] + j]=btemp;
-						m_D3_Model.rani[m_D3_Model.rindex[i] + j]=read_VECTOR(fp);
-						m_D3_Model.rangle[m_D3_Model.rindex[i] + j]=read_INT32(fp);
+						if (m_D3_Model.rindex[i] + j < MAX_D3_ANI) {
+							m_D3_Model.rkey[m_D3_Model.rindex[i] + j]=btemp;
+							m_D3_Model.rani[m_D3_Model.rindex[i] + j]=read_VECTOR(fp);
+							m_D3_Model.rangle[m_D3_Model.rindex[i] + j]=read_INT32(fp);
+						}
 						m_D3_Display.pr_key[btemp]=TRUE;
 					}
 				}
@@ -3318,7 +3325,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 		if(!m_InfoMode)
 		{
 			char str[256];
-			sprintf(str,"Loading %s...",m_D3_TextureList[i]);
+			sprintf_s(str,"Loading %s...",m_D3_TextureList[i]);
 			SetStatusBarText(str);
 		}
 
@@ -3337,8 +3344,8 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 
 		if(FileType==NEW_FILE)
 		{
-			strcpy(Filename,m_D3_TextureList[i]);
-			strcat(Filename, ".ogf");
+			strcpy_s(Filename,m_D3_TextureList[i]);
+			strcat_s(Filename, ".ogf");
 			
 			//OGF Search process #1: Current directory
 			if((file=fopen(Filename, "rb")) !=(FILE *) NULL)
@@ -3357,7 +3364,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			if(FileType==NEW_FILE)
 			{
 				unsigned int j=0;
-				while((j<m_D3_CurrHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_CurrHOG_Dir[j].filename)!=0))
+				while((j<m_D3_CurrHOG_Header.dirnumber)&(_strcmpi(Filename,m_D3_CurrHOG_Dir[j].filename)!=0))
 					j++;
 
 				if(j<m_D3_CurrHOG_Header.dirnumber)
@@ -3381,7 +3388,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			if((FileType==NEW_FILE)&(m_D3_MainHOG_Loaded))
 			{
 				unsigned int j=0;
-				while((j<m_D3_MainHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_MainHOG_Dir[j].filename)!=0))
+				while((j<m_D3_MainHOG_Header.dirnumber)&(_strcmpi(Filename,m_D3_MainHOG_Dir[j].filename)!=0))
 					j++;
 
 				if(j<m_D3_MainHOG_Header.dirnumber)
@@ -3404,8 +3411,8 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 
 		if(FileType==NEW_FILE)
 		{
-			strcpy(Filename,m_D3_TextureList[i]);
-			strcat(Filename, ".oaf");
+			strcpy_s(Filename,m_D3_TextureList[i]);
+			strcat_s(Filename, ".oaf");
 
 			//OAF Search process #1: Current directory
 			if((file=fopen(Filename, "rb")) !=(FILE *) NULL)
@@ -3424,7 +3431,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			if(FileType==NEW_FILE)
 			{
 				unsigned int j=0;
-				while((j<m_D3_CurrHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_CurrHOG_Dir[j].filename)!=0))
+				while((j<m_D3_CurrHOG_Header.dirnumber)&(_strcmpi(Filename,m_D3_CurrHOG_Dir[j].filename)!=0))
 					j++;
 
 				if(j<m_D3_CurrHOG_Header.dirnumber)
@@ -3448,7 +3455,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			if(FileType==NEW_FILE)
 			{
 				unsigned int j=0;
-				while((j<m_D3_MainHOG_Header.dirnumber)&(strcmpi(Filename,m_D3_MainHOG_Dir[j].filename)!=0))
+				while((j<m_D3_MainHOG_Header.dirnumber)&(_strcmpi(Filename,m_D3_MainHOG_Dir[j].filename)!=0))
 					j++;
 
 				if(j<m_D3_MainHOG_Header.dirnumber)
@@ -3582,7 +3589,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			if(!m_InfoMode)
 			{
 				char str[256];
-				sprintf(str,"Loading %s...",Filename);
+				sprintf_s(str,"Loading %s...",Filename);
 				SetStatusBarText(str);
 			}
 
@@ -3684,7 +3691,7 @@ void CMODVIEW32Doc::D3_LoadOGFData()
 			m_Textures[m_TexturesNum].Error="Not found";
 		}
 		if(m_D3_Display.TextureFlag[i])
-			strcpy(m_D3_Display.LoadName[i],Filename);
+			strcpy_s(m_D3_Display.LoadName[i],Filename);
 		else
 			m_D3_Display.LoadName[i][0]=0;
 
@@ -3736,7 +3743,7 @@ ERRORCODE CMODVIEW32Doc::D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD
 	for(unsigned int i=0;i<hog2_header->dirnumber;i++)
 	{
 		fp->Read(&hog2_info, sizeof(HOG2_INFO));
-		strncpy(hog2_ltmp[i].filename, hog2_info.filename, 36);
+		strncpy_s(hog2_ltmp[i].filename, hog2_info.filename, 36);
 		hog2_ltmp[i].size=hog2_info.size;
 		hog2_ltmp[i].offset=offset;
 		offset+=hog2_info.size;
@@ -3755,7 +3762,7 @@ ERRORCODE CMODVIEW32Doc::D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD
 		CMainFrame *viewFrame=static_cast<CMainFrame*>(m_view->GetParentFrame());
 
 		char tempfname[8192];
-		strcpy(tempfname,fp->GetFileName());
+		strcpy_s(tempfname,fp->GetFileName());
 		ExplorerClear();
 		ExplorerAddRoot((char *)&tempfname);
 
@@ -3764,15 +3771,16 @@ ERRORCODE CMODVIEW32Doc::D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD
 		{
 			if((pntptr=strrchr(hog2_ltmp[i].filename,'.')) !=NULL)
 			{
-				if(strcmpi(pntptr,".oof")==0)
+				if(_strcmpi(pntptr,".oof")==0)
 				{
 					m_D3_CurrHOG_OofList[m_D3_CurrHOG_OofNum]=i;
 					m_D3_CurrHOG_OofNum++;
 					//check if >MAX_OOFFILESINHOG2
 					
 					memset(tempfname,0,36);
-					strncpy(tempfname,hog2_ltmp[i].filename,strlen(hog2_ltmp[i].filename)-4); //drop the ".oof"
-
+					strncpy_s(tempfname,hog2_ltmp[i].filename,strlen(hog2_ltmp[i].filename)-4); //drop the ".oof"
+					if (tempfname[strlen(tempfname)-1] != 0)
+						tempfname[strlen(tempfname)-1] = 0;
 					//Apply Filter
 					m_ArchiveStats_NumTotal++;
 					CString x=tempfname;
@@ -3874,9 +3882,9 @@ ERRORCODE CMODVIEW32Doc::D3_LoadHOGContent(CString filename)
 	{
 		if((pntptr=strrchr(m_D3_CurrHOG_Dir[i].filename,'.')) !=NULL)
 		{
-			if(strcmpi(pntptr,".oof")==0)
+			if(_strcmpi(pntptr,".oof")==0)
 			{
-				if(strcmpi(m_D3_CurrHOG_Dir[i].filename,filename)==0) 
+				if(_strcmpi(m_D3_CurrHOG_Dir[i].filename,filename)==0) 
 					HogOof=HogOofNum++;
 				HogOofNum++;
 			}
@@ -4559,14 +4567,20 @@ int CMODVIEW32Doc::D2_InitHAM(CFile *fp, BOOL fillexplorer)
 		CMainFrame *viewFrame=static_cast<CMainFrame*>(m_view->GetParentFrame());
 
 		char tempfname[8192];
-		strcpy(tempfname,fp->GetFileName());
+		strcpy_s(tempfname,fp->GetFileName());
 		ExplorerClear();
 		ExplorerAddRoot((char *)&tempfname);
 
 		for(unsigned int i=0;i<n_polygon_models;i++)
 		{
 			m_ArchiveStats_NumTotal++;
-			sprintf(tempfname,"Model #%i: %s [ID %i]",i,m_D2_PM_Desc[m_D2_ModelLoadnr_to_ID[i]],m_D2_ModelLoadnr_to_ID[i]);
+
+			//Do string conversion to shut the analyzer up
+			const size_t newsizea = (m_D2_PM_Desc[m_D2_ModelLoadnr_to_ID[i]].GetLength() + 1);
+			char *nstringa = new char[newsizea];
+			strcpy_s(nstringa, newsizea, m_D2_PM_Desc[m_D2_ModelLoadnr_to_ID[i]]);
+
+			sprintf(tempfname,"Model #%i: %s [ID %i]",i,nstringa,m_D2_ModelLoadnr_to_ID[i]);
 
 			if(m_D2_PolygonModels[i].Type & D2_POLYMODEL_TYPE_FLAG_LORES)
 			{
@@ -5211,33 +5225,34 @@ UINT16 AnimatedIndex[600]=
 	{
 		read_location=offset_base+texture_info[j].offset;
 		fseek(file, read_location, SEEK_SET);
-
-		if((texture_info[j].flag & BM_FLAG_RLE)==0)
-		{
-			m_Textures[j_to_m_TexturesNum[j]].InSize=64*64;
-			m_Textures[j_to_m_TexturesNum[j]].Type="PIG texture (Uncompressed)";
-			m_Textures[j_to_m_TexturesNum[j]].FileType=TEXTUREINFOFILETYPE_D2U;
-			fread(&m_D2_BitmapData.bitmap[j].bitmap_array, sizeof(m_D2_BitmapData.bitmap[j].bitmap_array), 1, file);
-		}
-		else
-		{
-			m_Textures[j_to_m_TexturesNum[j]].Type="PIG texture (RLE-compressed)";
-			m_Textures[j_to_m_TexturesNum[j]].InSize=D2_ReadRLE(file,j);
-			m_Textures[j_to_m_TexturesNum[j]].FileType=TEXTUREINFOFILETYPE_D2C;
-		}
+		if ((j_to_m_TexturesNum[j] < 128) && (j_to_m_TexturesNum[j] != -1)) {
+			if((texture_info[j].flag & BM_FLAG_RLE)==0)
+			{
+				m_Textures[j_to_m_TexturesNum[j]].InSize=64*64;
+				m_Textures[j_to_m_TexturesNum[j]].Type="PIG texture (Uncompressed)";
+				m_Textures[j_to_m_TexturesNum[j]].FileType=TEXTUREINFOFILETYPE_D2U;
+				fread(&m_D2_BitmapData.bitmap[j].bitmap_array, sizeof(m_D2_BitmapData.bitmap[j].bitmap_array), 1, file);
+			}
+			else
+			{
+				m_Textures[j_to_m_TexturesNum[j]].Type="PIG texture (RLE-compressed)";
+				m_Textures[j_to_m_TexturesNum[j]].InSize=D2_ReadRLE(file,j);
+				m_Textures[j_to_m_TexturesNum[j]].FileType=TEXTUREINFOFILETYPE_D2C;
+			}
 #ifdef _WITHTXVIEW
-		m_Textures[j_to_m_TexturesNum[j]].Flags=TEXTUREINFOFLAG_TEXTURELOADED;
-		m_Textures[j_to_m_TexturesNum[j]].Bitmap=new unsigned char[64*64];
-		memcpy(m_Textures[j_to_m_TexturesNum[j]].Bitmap,&m_D2_BitmapData.bitmap[j].bitmap_array,64*64);
+			m_Textures[j_to_m_TexturesNum[j]].Flags=TEXTUREINFOFLAG_TEXTURELOADED;
+			m_Textures[j_to_m_TexturesNum[j]].Bitmap=new unsigned char[64*64];
+			memcpy(m_Textures[j_to_m_TexturesNum[j]].Bitmap,&m_D2_BitmapData.bitmap[j].bitmap_array,64*64);
 
 		//Copy palette
-		for(i=0;i<256;i++)
-		{
-			m_Textures[j_to_m_TexturesNum[j]].Palette[0][i]=m_D2_Palettes[i*3+m_D2_TextureSet]*4;
-			m_Textures[j_to_m_TexturesNum[j]].Palette[1][i]=m_D2_Palettes[i*3+1+m_D2_TextureSet]*4;
-			m_Textures[j_to_m_TexturesNum[j]].Palette[2][i]=m_D2_Palettes[i*3+2+m_D2_TextureSet]*4;
-		}
+			for(i=0;i<256;i++)
+			{
+				m_Textures[j_to_m_TexturesNum[j]].Palette[0][i]=m_D2_Palettes[i*3+m_D2_TextureSet]*4;
+				m_Textures[j_to_m_TexturesNum[j]].Palette[1][i]=m_D2_Palettes[i*3+1+m_D2_TextureSet]*4;
+				m_Textures[j_to_m_TexturesNum[j]].Palette[2][i]=m_D2_Palettes[i*3+2+m_D2_TextureSet]*4;
+			}
 #endif
+		}
 	}
 	/*////
 	for(int j=0;j<255;j++)
@@ -5630,7 +5645,7 @@ void CMODVIEW32Doc::RF_InitVPP(CFile *fp, VPP_HEADER *vpp_header, VPP_LOAD **vpp
 	if(fillexplorer)
 	{
 		char tempfname[8192];
-		strcpy(tempfname,fp->GetFileName());
+		strcpy_s(tempfname,fp->GetFileName());
 		ExplorerClear();
 		ExplorerAddRoot((char *)&tempfname);
 	}
@@ -6005,6 +6020,7 @@ unsigned char * CMODVIEW32Doc::EditorFS_GenerateRealGuns(int type)
 unsigned char * CMODVIEW32Doc::EditorFS_GenerateSOBJ(int subm)
 {
 	ASSERT(subm<m_FS_NumSOBJ);
+	if (subm >= MAX_FS_SOBJ) return NULL;
 	ASSERT(m_FS_CurrVP_FreeSpaceVersion==1 || m_FS_CurrVP_FreeSpaceVersion==2);
 	ASSERT(m_FS_SOBJ[subm].bsp_data_size>=0);
 	ASSERT(m_FS_SOBJ[subm].reserved==0);

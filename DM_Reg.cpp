@@ -147,7 +147,10 @@ BOOL _WriteHKLM(CString path,CString key,CString value)
 	} catch (char* str) {
 			delete sizedata;
 			delete res;
+			return ERROR_GEN_FAILURE;
 	}
+
+	delete sizedata;
 }
 
 BOOL _WriteHKLM(CString path,CString key,int value)
@@ -173,7 +176,10 @@ BOOL _WriteHKLM(CString path,CString key,int value)
 	catch (char* str) {
 			delete sizedata;
 			delete res;
+			return ERROR_GEN_FAILURE;
 	}
+
+	delete sizedata;
 }
 
 BOOL DMReg_WriteHKCU(CString key,CString value)
@@ -200,7 +206,10 @@ BOOL DMReg_WriteHKCU(CString key,CString value)
 	catch (char* str) {
 			delete sizedata;
 			delete res;
+			return ERROR_GEN_FAILURE;
 	}
+
+	delete sizedata;
 }
 
 BOOL DMReg_WriteHKCU(CString key,int value)
@@ -227,7 +236,10 @@ BOOL DMReg_WriteHKCU(CString key,int value)
 	catch (char* str) {
 			delete sizedata;
 			delete res;
+			return ERROR_GEN_FAILURE;
 	}
+
+	delete sizedata;
 }
 
 
@@ -309,7 +321,7 @@ void _Init_RegisterModule()
 	CString version;
 	CString date;
 	CString coder;
-	int buildb;
+	int buildb = 0;
 	CString _moduldat=path+"dm_modul.dat";
 	if(_FileExists(_moduldat))
 	{
@@ -322,10 +334,10 @@ void _Init_RegisterModule()
 		ASSERT(pos!=-1);
 		if(pos!=-1)
 		{
-			CString _build=version.Mid(pos+6);
-			_build.TrimRight();
-			_build.TrimRight(")");
-			buildb=atoi(_build);
+			CString _builds=version.Mid(pos+6);
+			_builds.TrimRight();
+			_builds.TrimRight(")");
+			buildb=atoi(_builds);
 		}
 		else
 			buildb=0;

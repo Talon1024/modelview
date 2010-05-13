@@ -39,16 +39,19 @@ void CSplitterWndEx::ShowColumn()
           CWnd* pPaneShow = GetDlgItem(
                AFX_IDW_PANE_FIRST + row * 16 + m_nCols);
           ASSERT(pPaneShow != NULL);
-          pPaneShow->ShowWindow(SW_SHOWNA);
+		  if (pPaneShow) {
+	          pPaneShow->ShowWindow(SW_SHOWNA);
 
-          for (col = m_nCols - 2; col >= colNew; col--)
-          {
-               CWnd* pPane = GetPane(row, col);
-               ASSERT(pPane != NULL);
-               pPane->SetDlgCtrlID(IdFromRowCol(row, col + 1));
-          }
+	          for (col = m_nCols - 2; col >= colNew; col--)
+	          {
+	               CWnd* pPane = GetPane(row, col);
+	               ASSERT(pPane != NULL);
+				   if (pPane)
+					   pPane->SetDlgCtrlID(IdFromRowCol(row, col + 1));
+	          }
 
-         pPaneShow->SetDlgCtrlID(IdFromRowCol(row, colNew));
+			  pPaneShow->SetDlgCtrlID(IdFromRowCol(row, colNew));
+		  }
      }
 
     // new panes have been created -- recalculate layout
@@ -81,16 +84,18 @@ void CSplitterWndEx::HideColumn(int colHide)
      {
           CWnd* pPaneHide = GetPane(row, colHide);
           ASSERT(pPaneHide != NULL);
-          pPaneHide->ShowWindow(SW_HIDE);
-          pPaneHide->SetDlgCtrlID(
-               AFX_IDW_PANE_FIRST + row * 16 + m_nCols);
+		  if (pPaneHide) {
+			pPaneHide->ShowWindow(SW_HIDE);
+			pPaneHide->SetDlgCtrlID( AFX_IDW_PANE_FIRST + row * 16 + m_nCols);
 
-          for (int col = colHide + 1; col < m_nCols; col++)
-          {
-               CWnd* pPane = GetPane(row, col);
-               ASSERT(pPane != NULL);
-               pPane->SetDlgCtrlID(IdFromRowCol(row, col - 1));
-          }
+			for (int col = colHide + 1; col < m_nCols; col++)
+			{
+				CWnd* pPane = GetPane(row, col);
+				ASSERT(pPane != NULL);
+				if (pPane)
+					pPane->SetDlgCtrlID(IdFromRowCol(row, col - 1));
+			}
+		  }
      }
      m_nCols--;
      m_pColInfo[m_nCols].nCurSize = m_pColInfo[colHide].nCurSize;

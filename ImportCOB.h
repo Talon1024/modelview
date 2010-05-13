@@ -224,13 +224,13 @@ typedef struct fsmodel {
 	unsigned int Pcount;
 	PINFO Poly[POLY_MAX];
 	unsigned int Scount;
-	char Sname[SOBJ_MAX][30];
-	long Sparent[SOBJ_MAX];
-	FS_VPNT Soffset[SOBJ_MAX];
+	char Sname[MAX_FS_SOBJ][30];
+	long Sparent[MAX_FS_SOBJ];
+	FS_VPNT Soffset[MAX_FS_SOBJ];
 	unsigned int Debriscount;
-	unsigned int Sdebris[SOBJ_MAX];
+	unsigned int Sdebris[MAX_FS_SOBJ];
 	unsigned int Detailcount;
-	unsigned int Sdetail[SOBJ_MAX];
+	unsigned int Sdetail[MAX_FS_SOBJ];
 	long shield;
 } FSMODEL;
 

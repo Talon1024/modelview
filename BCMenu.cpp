@@ -299,23 +299,26 @@ void BCMenu::DrawItem(LPDRAWITEMSTRUCT)
 void BCMenu::DrawItem (LPDRAWITEMSTRUCT lpDIS)
 {
 	ASSERT(lpDIS != NULL);
-	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
-	if(pDC->GetDeviceCaps(RASTERCAPS) & RC_PALETTE)DrawItem_Win9xNT2000(lpDIS);
-	else{
-		if(IsWinXPLuna()){
-			if(xp_drawmode==BCMENU_DRAWMODE_XP) DrawItem_WinXP(lpDIS);
-			else DrawItem_Win9xNT2000(lpDIS);
-		}
+	if (lpDIS) {
+		CDC* pDC = CDC::FromHandle(lpDIS->hDC);
+		if(pDC->GetDeviceCaps(RASTERCAPS) & RC_PALETTE)DrawItem_Win9xNT2000(lpDIS);
 		else{
-			if(original_drawmode==BCMENU_DRAWMODE_XP) DrawItem_WinXP(lpDIS);
-			else DrawItem_Win9xNT2000(lpDIS);
-		}	
+			if(IsWinXPLuna()){
+				if(xp_drawmode==BCMENU_DRAWMODE_XP) DrawItem_WinXP(lpDIS);
+				else DrawItem_Win9xNT2000(lpDIS);
+			}
+			else{
+				if(original_drawmode==BCMENU_DRAWMODE_XP) DrawItem_WinXP(lpDIS);
+				else DrawItem_Win9xNT2000(lpDIS);
+			}	
+		}
 	}
 }
 
 void BCMenu::DrawItem_Win9xNT2000 (LPDRAWITEMSTRUCT lpDIS)
 {
 	ASSERT(lpDIS != NULL);
+	if (!lpDIS) return;
 	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
 	CRect rect;
 	UINT state = (((BCMenuData*)(lpDIS->itemData))->nFlags);
@@ -360,7 +363,7 @@ void BCMenu::DrawItem_Win9xNT2000 (LPDRAWITEMSTRUCT lpDIS)
 		
 		// draw the up/down/focused/disabled state
 		
-		UINT state = lpDIS->itemState;
+		state = lpDIS->itemState;
 		CString strText;
 		
 		if(lpDIS->itemData != NULL){
@@ -606,6 +609,7 @@ COLORREF BCMenu::DarkenColor(COLORREF col,double factor)
 void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 {
 	ASSERT(lpDIS != NULL);
+	if (!lpDIS) return;
 	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
 #ifdef BCMENU_USE_MEMDC
 	BCMenuMemDC *pMemDC=NULL;
@@ -679,7 +683,7 @@ void BCMenu::DrawItem_WinXP (LPDRAWITEMSTRUCT lpDIS)
 		
 		// draw the up/down/focused/disabled state
 		
-		UINT state = lpDIS->itemState;
+		state = lpDIS->itemState;
 		CString strText;
 		
 		if(lpDIS->itemData != NULL){
@@ -1244,6 +1248,7 @@ BOOL BCMenu::ModifyODMenuW(wchar_t *lpstrText,UINT nID,int nIconNormal)
 		}
 		
 		ASSERT(mdata);
+		if (!mdata) return NULL;
 		if(lpstrText)
 			mdata->SetWideString(lpstrText);  //SK: modified for dynamic allocation
 		mdata->menuIconNormal = -1;
@@ -1282,41 +1287,50 @@ BOOL BCMenu::ModifyODMenuA(const char * lpstrText,UINT nID,CImageList *il,int xo
 BOOL BCMenu::ModifyODMenuW(wchar_t *lpstrText,UINT nID,CImageList *il,int xoffset)
 {
 	int nLoc;
-	BCMenuData *mdata;
+	BCMenuData *mdata = NULL;
 	CArray<BCMenu*,BCMenu*>bcsubs;
 	CArray<int,int&>bclocs;
 	
 	// Find the old BCMenuData structure:
 	BCMenu *psubmenu = FindMenuOption(nID,nLoc);
-	do{
-		if(psubmenu && nLoc>=0)mdata = psubmenu->m_MenuList[nLoc];
-		else{
-			// Create a new BCMenuData structure:
-			mdata = new BCMenuData;
-			m_MenuList.Add(mdata);
-		}
-		
-		ASSERT(mdata);
-		if(lpstrText)
-			mdata->SetWideString(lpstrText);  //SK: modified for dynamic allocation
-		mdata->menuIconNormal = -1;
-		mdata->xoffset = -1;
-		if(il){
-			if(mdata->bitmap){
-				mdata->bitmap->DeleteImageList();
-				mdata->bitmap=NULL;
+	if (psubmenu) { 
+		do {	
+			if(psubmenu && nLoc>=0)
+				mdata = psubmenu->m_MenuList[nLoc];
+			else {
+				// Create a new BCMenuData structure:
+				mdata = new BCMenuData;
+				m_MenuList.Add(mdata);
 			}
-			mdata->global_offset = AddToGlobalImageList(il,xoffset,nID);
-		}
-		mdata->nFlags &= ~(MF_BYPOSITION);
-		mdata->nFlags |= MF_OWNERDRAW;
-		mdata->nID = nID;
-		bcsubs.Add(psubmenu);
-		bclocs.Add(nLoc);
-		if(psubmenu && nLoc>=0)psubmenu = FindAnotherMenuOption(nID,nLoc,bcsubs,bclocs);
-		else psubmenu=NULL;
-	}while(psubmenu);
-	return (CMenu::ModifyMenu(nID,mdata->nFlags,nID,(LPCTSTR)mdata));
+		
+			ASSERT(mdata);
+			if (!mdata) return NULL;
+			if(lpstrText)
+				mdata->SetWideString(lpstrText);  //SK: modified for dynamic allocation
+			mdata->menuIconNormal = -1;
+			mdata->xoffset = -1;
+			if(il){
+				if(mdata->bitmap){
+					mdata->bitmap->DeleteImageList();
+					mdata->bitmap=NULL;
+				}
+				mdata->global_offset = AddToGlobalImageList(il,xoffset,nID);
+			}
+			mdata->nFlags &= ~(MF_BYPOSITION);
+			mdata->nFlags |= MF_OWNERDRAW;
+			mdata->nID = nID;
+			bcsubs.Add(psubmenu);
+			bclocs.Add(nLoc);
+			if(psubmenu && nLoc>=0)psubmenu = FindAnotherMenuOption(nID,nLoc,bcsubs,bclocs);
+			else psubmenu=NULL;
+		} while (psubmenu);
+	}
+	//Let's make sure something happened
+	ASSERT( mdata );
+	if (mdata)
+		return (CMenu::ModifyMenu(nID,mdata->nFlags,nID,(LPCTSTR)mdata));
+	else
+		return NULL;
 }
 
 BOOL BCMenu::ModifyODMenuA(const char * lpstrText,UINT nID,CBitmap *bmp)
@@ -1478,7 +1492,7 @@ BCMenuData *BCMenu::NewODMenu(UINT pos,UINT nFlags,UINT nID,CString string)
 		ASSERT(!(nFlags&MF_STRING));
 		ModifyMenu(pos,nFlags,nID,(LPCTSTR)mdata);
 	}
-	else if (nFlags&MF_STRING){
+	else if (nFlags == MF_STRING){ // Bitwise and can not be used to check for a flag with the value 0x0000000....
 		ASSERT(!(nFlags&MF_OWNERDRAW));
 		ModifyMenu(pos,nFlags,nID,mdata->GetString());
 	}
@@ -1493,9 +1507,12 @@ BCMenuData *BCMenu::NewODMenu(UINT pos,UINT nFlags,UINT nID,CString string)
 BOOL BCMenu::LoadToolbars(const UINT *arID,int n)
 {
 	ASSERT(arID);
+	
 	BOOL returnflag=TRUE;
-	for(int i=0;i<n;++i){
-		if(!LoadToolbar(arID[i]))returnflag=FALSE;
+	if (arID) {
+		for(int i=0;i<n;++i){
+			if(!LoadToolbar(arID[i]))returnflag=FALSE;
+		}
 	}
 	return(returnflag);
 }
@@ -1657,8 +1674,9 @@ BCMenuData *BCMenu::FindMenuOption(wchar_t *lpstrText)
 			const wchar_t *szWide;//SK: we use const to prevent misuse of this Ptr
 			for(j=0;j<=m_MenuList.GetUpperBound();++j){     
 				szWide = m_MenuList[j]->GetWideString ();
-				if(szWide && !wcscmp(lpstrText,szWide))//SK: modified for dynamic allocation
-					return(m_MenuList[j]);
+				if(szWide) 
+					if (!wcscmp(lpstrText,szWide))//SK: modified for dynamic allocation
+						return(m_MenuList[j]);
 			}
 		}
 	}
@@ -1675,6 +1693,7 @@ BOOL BCMenu::LoadMenu(LPCTSTR lpszResourceName)
 {
 	ASSERT_VALID(this);
 	ASSERT(lpszResourceName != NULL);
+	if (!lpszResourceName) return FALSE;
 	
 	// Find the Menu Resource:
 	HINSTANCE hInst = AfxFindResourceHandle(lpszResourceName,RT_MENU);
@@ -1885,7 +1904,7 @@ void BCMenu::InsertSpaces(void)
 			t=pDC->GetTextExtent(lpstrText,_tcslen(lpstrText));
 			while(t.cx<maxlength){
 				newstring+=_T(' ');//SK: modified for Unicode correctness
-				LPCTSTR lpstrText = (LPCTSTR)(newstring);
+				lpstrText = (LPCTSTR)(newstring);
 				t=pDC->GetTextExtent(lpstrText,_tcslen(lpstrText));
 			}
 			newstring+=string.Mid(j);
@@ -2113,6 +2132,7 @@ void BCMenu::DitherBlt (HDC hdcDest, int nXDest, int nYDest, int nWidth,
 						COLORREF bgcolor)
 {
 	ASSERT(hdcDest && hbm);
+	if (!hdcDest) return;
 	ASSERT(nWidth > 0 && nHeight > 0);
 	
 	// Create a generic DC for all BitBlts
@@ -2428,33 +2448,38 @@ void BCMenu::AddFromToolBar(CToolBar* pToolBar, int nResourceID)
 		// OK, we have the command ID of the toolbar
 		// option, and the tollbar bitmap offset
 		int nLoc;
-		BCMenuData* pData;
+		BCMenuData* pData = NULL;
 		BCMenu *pSubMenu = FindMenuOption(nID, nLoc);
-		if (pSubMenu && nLoc >= 0)pData = pSubMenu->m_MenuList[nLoc];
+		if (pSubMenu) 
+			if ( nLoc >= 0)
+				pData = pSubMenu->m_MenuList[nLoc];
 		else {
 			// Create a new BCMenuData structure
 			pData = new BCMenuData;
 			m_MenuList.Add(pData);
 		}
-		// Set some default structure members
-		pData->menuIconNormal = nResourceID;
-		pData->nID = nID;
-		pData->nFlags =  MF_BYCOMMAND | MF_OWNERDRAW;
-		pData->xoffset = nImage;
-		if (pData->bitmap)pData->bitmap->DeleteImageList();
-		else pData->bitmap = new CImageList;
-		pData->bitmap->Create(m_iconX, m_iconY,ILC_COLORDDB|ILC_MASK, 1, 1);
+		ASSERT(pData);
+		if (pData) {
+			// Set some default structure members
+			pData->menuIconNormal = nResourceID;
+			pData->nID = nID;
+			pData->nFlags =  MF_BYCOMMAND | MF_OWNERDRAW;
+			pData->xoffset = nImage;
+			if (pData->bitmap)pData->bitmap->DeleteImageList();
+			else pData->bitmap = new CImageList;
+			pData->bitmap->Create(m_iconX, m_iconY,ILC_COLORDDB|ILC_MASK, 1, 1);
 		
-		if(!AddBitmapToImageList(pData->bitmap, nResourceID)){
-			pData->bitmap->DeleteImageList();
-			delete pData->bitmap;
-			pData->bitmap=NULL;
-			pData->menuIconNormal = -1;
-			pData->xoffset = -1;
+			if(!AddBitmapToImageList(pData->bitmap, nResourceID)){
+				pData->bitmap->DeleteImageList();
+				delete pData->bitmap;
+				pData->bitmap=NULL;
+				pData->menuIconNormal = -1;
+				pData->xoffset = -1;
+			}
+		
+			// Modify our menu
+			ModifyMenu(nID,pData->nFlags,nID,(LPCTSTR)pData);
 		}
-		
-		// Modify our menu
-		ModifyMenu(nID,pData->nFlags,nID,(LPCTSTR)pData);
 	}
 }
 
@@ -2946,8 +2971,9 @@ int BCMenu::GetMenuPosition(wchar_t* pText)
 			for(j=0;j<=m_MenuList.GetUpperBound();++j)
 			{     
 				szWide = m_MenuList[j]->GetWideString ();
-				if(szWide && !wcscmp(pText,szWide))//SK: modified for dynamic allocation
-					return j;
+				if(szWide) 
+					if ( !wcscmp(pText,szWide))//SK: modified for dynamic allocation
+						return j;
 			}
 		}
 	}

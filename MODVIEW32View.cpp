@@ -541,45 +541,44 @@ HPALETTE CMODVIEW32View::GetOpenGLPalette(HDC hDC)
 	// Allocate space for a logical palette structure plus all the palette entries
 	pPal=(LOGPALETTE*)malloc(sizeof(LOGPALETTE) +nColors*sizeof(PALETTEENTRY));
 
-	ASSERT( pPal );
+	if (pPal) {
+		// Fill in palette header
+		pPal->palVersion=0x300;		// Windows 3.0
+		pPal->palNumEntries=nColors; // table size
 
-	// Fill in palette header
-	pPal->palVersion=0x300;		// Windows 3.0
-	pPal->palNumEntries=nColors; // table size
+		// Build mask of all 1's.  This creates a number represented by having	
+		// the low order x bits set, where x=pfd.cRedBits, pfd.cGreenBits, and
+		// pfd.cBlueBits.
+		RedRange  =(1<<pfd.cRedBits)-1;
+		GreenRange=(1<<pfd.cGreenBits)-1;
+		BlueRange =(1<<pfd.cBlueBits)-1;
 
-	// Build mask of all 1's.  This creates a number represented by having
-	// the low order x bits set, where x=pfd.cRedBits, pfd.cGreenBits, and
-	// pfd.cBlueBits.
-	RedRange  =(1<<pfd.cRedBits)-1;
-	GreenRange=(1<<pfd.cGreenBits)-1;
-	BlueRange =(1<<pfd.cBlueBits)-1;
+		// Loop through all the palette entries
+		for(i=0; i<nColors; i++)
+		{
+			// Fill in the 8-bit equivalents for each component
+			pPal->palPalEntry[i].peRed=(i>>pfd.cRedShift) & RedRange;
+			pPal->palPalEntry[i].peRed=(unsigned char)(
+				(double) pPal->palPalEntry[i].peRed * 255.0 / RedRange);
 
-	// Loop through all the palette entries
-	for(i=0; i<nColors; i++)
-	{
-		// Fill in the 8-bit equivalents for each component
-		pPal->palPalEntry[i].peRed=(i>>pfd.cRedShift) & RedRange;
-		pPal->palPalEntry[i].peRed=(unsigned char)(
-			(double) pPal->palPalEntry[i].peRed * 255.0 / RedRange);
+			pPal->palPalEntry[i].peGreen=(i>>pfd.cGreenShift) & GreenRange;
+			pPal->palPalEntry[i].peGreen=(unsigned char)(
+				(double)pPal->palPalEntry[i].peGreen * 255.0 / GreenRange);
 
-		pPal->palPalEntry[i].peGreen=(i>>pfd.cGreenShift) & GreenRange;
-		pPal->palPalEntry[i].peGreen=(unsigned char)(
-			(double)pPal->palPalEntry[i].peGreen * 255.0 / GreenRange);
+			pPal->palPalEntry[i].peBlue=(i>>pfd.cBlueShift) & BlueRange;
+			pPal->palPalEntry[i].peBlue=(unsigned char)(
+				(double)pPal->palPalEntry[i].peBlue * 255.0 / BlueRange);
 
-		pPal->palPalEntry[i].peBlue=(i>>pfd.cBlueShift) & BlueRange;
-		pPal->palPalEntry[i].peBlue=(unsigned char)(
-			(double)pPal->palPalEntry[i].peBlue * 255.0 / BlueRange);
+			pPal->palPalEntry[i].peFlags=(unsigned char) NULL;
+		}
 
-		pPal->palPalEntry[i].peFlags=(unsigned char) NULL;
+			// Create the palette
+			hRetPal=CreatePalette(pPal);
+
+			// Go ahead and select and realize the palette for this device context
+			SelectPalette(hDC,hRetPal,FALSE);
+			RealizePalette(hDC);
 	}
-
-
-	// Create the palette
-	hRetPal=CreatePalette(pPal);
-
-	// Go ahead and select and realize the palette for this device context
-	SelectPalette(hDC,hRetPal,FALSE);
-	RealizePalette(hDC);
 
 	// Free the memory used for the logical palette structure
 	free(pPal);
@@ -1095,7 +1094,10 @@ void CMODVIEW32View::FS_BuildScene(void)
 	else
 		glDisable(GL_TEXTURE_2D);
 
-	for(unsigned int k=pDoc->m_FS_PofDataL[m_Detaillevel]; k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1) ;k++)
+	ASSERT (m_Detaillevel < 200);
+	if (m_Detaillevel >= 200) 
+		return; //Sanity check
+	for(unsigned int k=pDoc->m_FS_PofDataL[m_Detaillevel]; (k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1)) || (k >= 60) ;k++)
 	{
 		if((m_DisplayTexture==-1) | (m_DisplayTexture==(int)(k-pDoc->m_FS_PofDataL[m_Detaillevel])))
 		{
@@ -1113,6 +1115,8 @@ void CMODVIEW32View::FS_BuildScene(void)
 							TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
 						}
 //TRACE("%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.count,k,pDoc->m_FS_LoadPCX[k]);
+						ASSERT (pDoc->m_FS_LoadPCX[k] < 60);
+						if (pDoc->m_FS_LoadPCX[k] >= 60) return; //More sanity checking
 						glCallList(pDoc->m_FS_ModelTexture[pDoc->m_FS_LoadPCX[k]]);
 					} else
 						glRGB(192,192,192);
@@ -2141,6 +2145,8 @@ int CMODVIEW32View::D2_BuildScene()
 		ASSERT(k<MAX_D2_SUBMODELS+1);
 		while (k!=0)
 		{
+			ASSERT (k < 10);
+			if (k >= 10) return NULL; //Sanity check
 			cms.Rotate_Object(k,i,m_D2_PosAngle_Current[k].p,m_D2_PosAngle_Current[k].h,m_D2_PosAngle_Current[k].b,&pDoc->m_D2_Model);
 			k=pDoc->m_D2_Model.PolyModel.submodel_parents[k];
 		}
@@ -2788,7 +2794,7 @@ void CMODVIEW32View::D3_PreparePosition()
 			m=pDoc->m_D3_Model.rindex[k];
 			n=m+pDoc->m_D3_Model.rknum[k]-1;
 			unsigned int rkey=0;
-			while ((pDoc->m_D3_Model.rkey[m]!=pDoc->m_D3_Display.pr_active[m_D3_Position-1])&(m<n))
+			while ( (pDoc->m_D3_Model.rkey[m]!=pDoc->m_D3_Display.pr_active[m_D3_Position-1]) && (m<n) && (m < MAX_D3_ANI) )
 			{
 				if (pDoc->m_D3_Model.rkey[m]<=pDoc->m_D3_Display.pr_active[m_D3_Position-1])
 				{
@@ -2800,9 +2806,13 @@ void CMODVIEW32View::D3_PreparePosition()
 				}
 				m++;
 			}
-			if (pDoc->m_D3_Model.rkey[m]==pDoc->m_D3_Display.pr_active[m_D3_Position-1])
-				Rat=m;
+			if (m < MAX_D3_ANI)
+				if (pDoc->m_D3_Model.rkey[m]==pDoc->m_D3_Display.pr_active[m_D3_Position-1])
+					Rat=m;
 		}
+
+		ASSERT (Rat < MAX_D3_ANI);
+		if (Rat >= MAX_D3_ANI) return; //Saaaanity
 		m_D3_PosAngle_ShallBe[k].angle=(float)(pDoc->m_D3_Model.rangle[Rat]/182.0);
 		m_D3_PosAngle_ShallBe[k].pnt.x=pDoc->m_D3_Model.rani[Rat].x;
 		m_D3_PosAngle_ShallBe[k].pnt.y=pDoc->m_D3_Model.rani[Rat].y;
@@ -2815,7 +2825,7 @@ void CMODVIEW32View::D3_PreparePosition()
 			m=pDoc->m_D3_Model.pindex[k];
 			n=m + pDoc->m_D3_Model.pknum[k];
 			pkey=0;
-			while ((pDoc->m_D3_Model.pkey[m]!=pDoc->m_D3_Display.pr_active[m_D3_Position-1])&(m<n))
+			while ((pDoc->m_D3_Model.pkey[m]!=pDoc->m_D3_Display.pr_active[m_D3_Position-1]) && (m<n) && (m < MAX_D3_ANI))
 			{
 				if (pDoc->m_D3_Model.pkey[m]<=pDoc->m_D3_Display.pr_active[m_D3_Position-1])
 				{
@@ -2827,15 +2837,19 @@ void CMODVIEW32View::D3_PreparePosition()
 				}
 				m++;
 			}
-			if (pDoc->m_D3_Model.pkey[m]==pDoc->m_D3_Display.pr_active[m_D3_Position-1])
-				Pat=m;
+			if (m < MAX_D3_ANI)
+				if (pDoc->m_D3_Model.pkey[m]==pDoc->m_D3_Display.pr_active[m_D3_Position-1])
+					Pat=m;
 		}
 		if ((pDoc->m_D3_Model.pknum[k]>0)&((Pat!=-1)))
 		{
 			m_D3_PosAngle_ShallBe[k].patav=TRUE;
-			m_D3_PosAngle_ShallBe[k].pat.x=pDoc->m_D3_Model.pani[Pat].x;
-			m_D3_PosAngle_ShallBe[k].pat.y=pDoc->m_D3_Model.pani[Pat].y;
-			m_D3_PosAngle_ShallBe[k].pat.z=pDoc->m_D3_Model.pani[Pat].z;
+			//This should be true, but nonetheless, better check
+			if (Pat < MAX_D3_ANI) {
+				m_D3_PosAngle_ShallBe[k].pat.x=pDoc->m_D3_Model.pani[Pat].x;
+				m_D3_PosAngle_ShallBe[k].pat.y=pDoc->m_D3_Model.pani[Pat].y;
+				m_D3_PosAngle_ShallBe[k].pat.z=pDoc->m_D3_Model.pani[Pat].z;
+			}
 		}
 		else
 			m_D3_PosAngle_ShallBe[k].patav=FALSE;

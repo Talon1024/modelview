@@ -198,6 +198,7 @@ void CEditorFS_TGUN::InitGunMode()
 {
 	int gunmode=m_GunMode.GetCurSel();
 	ASSERT(gunmode==0 || gunmode==1);
+	if (gunmode >= 2) return;
 
 	m_List.ResetContent();
 	for(int i=0;i<GetDocument()->m_FS_Turrets[gunmode].Num;i++)
@@ -614,8 +615,9 @@ void CEditorFS_TGUN::DoDeleteItem()
 		return;
 
 	int m_CurrentItem = m_List.GetCurSel();
-	for(int i = m_CurrentItem + 1; i < GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Num; i++)
-		GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i-1] = GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i];
+	if (m_GunMode.GetCurSel() < 2)
+		for(int i = m_CurrentItem + 1; (i < GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Num) && (i < MAX_FS_TURRETS_BANKS); i++)
+			GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i-1] = GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Bank[i];
 	GetDocument()->m_FS_Turrets[m_GunMode.GetCurSel()].Num--;
 
 	//Remove from list
@@ -671,13 +673,15 @@ void CEditorFS_TGUN::OnConvert()
 	int agm=1-cgm;
 	int ntm=GetDocument()->m_FS_Turrets[agm].Num;
 
+	ASSERT(cgm < 2);
+	if (cgm >= 2) return;
 	//Create new item
 	GetDocument()->m_FS_Turrets[agm].Num++;
 	GetDocument()->m_FS_Turrets[agm].Bank[ntm]=GetDocument()->m_EditorFS_Turret;
 
 	//Delete old item
 	int m_CurrentItem=m_List.GetCurSel();
-	for(int i=m_CurrentItem+1;i<GetDocument()->m_FS_Turrets[cgm].Num;i++)
+	for(int i=m_CurrentItem+1;(i<GetDocument()->m_FS_Turrets[cgm].Num) && (i < MAX_FS_TURRETS_BANKS);i++)
 		GetDocument()->m_FS_Turrets[cgm].Bank[i-1]=GetDocument()->m_FS_Turrets[cgm].Bank[i];
 	GetDocument()->m_FS_Turrets[cgm].Num--;
 
@@ -724,7 +728,7 @@ void CEditorFS_TGUN::DoDeleteFiringPoint()
 		return;
 
 	int i2=GetCurrentFiringPointSelection();
-	for(int i=i2+1;i<GetDocument()->m_EditorFS_Turret.num_firing_points;i++)
+	for(int i=i2+1;(i<GetDocument()->m_EditorFS_Turret.num_firing_points) && (i < MAX_FS_FIRING_POINTS);i++)
 		GetDocument()->m_EditorFS_Turret.firing_point[i-1]=GetDocument()->m_EditorFS_Turret.firing_point[i];
 	GetDocument()->m_EditorFS_Turret.num_firing_points--;
 	UpdateEditorDisplay(TRUE);
@@ -761,7 +765,7 @@ void CEditorFS_TGUN::UpdateFiringPointsList()
 	for(int i=0;i<GetDocument()->m_EditorFS_Turret.num_firing_points;i++)
 	{
 		char t2[256];
-		_itoa(i,t2,10);
+		_itoa_s(i,t2,10);
 		VERIFY(m_FiringPoints_List.InsertItem(i,t2)==i);
 		fl.Format("%.4f",GetDocument()->m_EditorFS_Turret.firing_point[i].x);
 		m_FiringPoints_List.SetItemText(i,1,fl);

@@ -107,19 +107,20 @@ void CCoolControlsManager::InstallHook( DWORD dwThreadID, BOOL bDialogOnly )
 // This function may be called only when is put in a DLL.
 void CCoolControlsManager::InstallGlobalHook( HINSTANCE hInstance, BOOL bDialogOnly )
 {
-   ASSERT( hInstance );      // hInstance must not be NULL!
-   ASSERT( m_hkWndProc == NULL );
+	ASSERT( hInstance );      // hInstance must not be NULL!
+	if (hInstance) {
+		ASSERT( m_hkWndProc == NULL );
    
-   m_bDialogOnly = bDialogOnly;
+		m_bDialogOnly = bDialogOnly;
 
-   HOOKPROC hkProc = (HOOKPROC)GetProcAddress( hInstance, "CCM_CallWndProc" );
+		HOOKPROC hkProc = (HOOKPROC)GetProcAddress( hInstance, "CCM_CallWndProc" );
 
-   m_hkWndProc = (HOOKPROC)SetWindowsHookEx( WH_CALLWNDPROC,
+		m_hkWndProc = (HOOKPROC)SetWindowsHookEx( WH_CALLWNDPROC,
                                          (HOOKPROC)hkProc,
                                          hInstance,
                                          0 );   
-
-   CCM_TRACE( _T( "CCoolControlsManager: WH_CALLWNDPROC global hook installed\n" ) );
+		CCM_TRACE( _T( "CCoolControlsManager: WH_CALLWNDPROC global hook installed\n" ) );
+	}
 }
 
 void CCoolControlsManager::UninstallHook( DWORD dwThreadID )
@@ -673,14 +674,16 @@ BOOL CCoolControlsManager::CCMControl::NeedRedraw( const POINT& /*point*/ )
 
 void CCoolControlsManager::CCMCore::Subclass( HWND hWnd, WNDPROC wndNewProc )
 {
-   ASSERT( hWnd );      // Do you really want to subclass a window that has a NULL handle?
-   m_hWnd = hWnd;   
+	ASSERT( hWnd );      // Do you really want to subclass a window that has a NULL handle?
+	if ( hWnd ) {
+		m_hWnd = hWnd;   
 
-   // Store address of the original window procedure
-   m_oldWndProc = (WNDPROC)GetWindowLong( m_hWnd, GWL_WNDPROC );
+		// Store address of the original window procedure
+		m_oldWndProc = (WNDPROC)GetWindowLong( m_hWnd, GWL_WNDPROC );
 
-   // And set the new one
-   SetWindowLong( m_hWnd, GWL_WNDPROC, (LONG)wndNewProc );
+		// And set the new one
+		SetWindowLong( m_hWnd, GWL_WNDPROC, (LONG)wndNewProc );
+	}
 }
 
 void CCoolControlsManager::CCMCore::Unsubclass()
@@ -1306,6 +1309,7 @@ void CCoolControlsManager::CCMUpDown::DrawControl( HDC hDC, const RECT& rect )
    CCMControl* pCtl = NULL;
    DWORD dwStyle = GetWindowLong( m_hWnd, GWL_STYLE );
    HWND hWnd = (HWND)SendMessage( m_hWnd, UDM_GETBUDDY, 0, 0L );
+   if (!hWnd) return; 
    if ( hWnd && ( dwStyle & UDS_ALIGNRIGHT || dwStyle & UDS_ALIGNLEFT ) )
    {
       if ( dwStyle & UDS_ALIGNLEFT )
