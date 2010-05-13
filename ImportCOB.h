@@ -31,11 +31,11 @@ private:
 	void ohdr();
 	void txtr();
 	void Dump0Data();
-	void Dump1Data(unsigned long Segment);
+	void Dump1Data(unsigned int Segment);
 	void Dump23Data(int Polygon);
 	void Dump4Data(FS_VPNT Normal, FS_VPNT Point, FS_VPNT Min, FS_VPNT Max);
 	void Dump5Data(FS_VPNT Min, FS_VPNT Max);
-	void split(FS_VPNT Min, FS_VPNT Max,unsigned long SobjNum);
+	void split(FS_VPNT Min, FS_VPNT Max,unsigned int SobjNum);
 	void sobj(int SobjNum);
 	void shld();
 	void pinf();
@@ -81,12 +81,12 @@ typedef struct cob_header {
 } COB_HEADER;
 
 typedef struct chunk_header {
-	unsigned long Type;
+	unsigned int Type;
 	unsigned short Major;
 	unsigned short Minor;
-	unsigned long Chunkid;
-	unsigned long Parentid;
-	unsigned long Size;
+	unsigned int Chunkid;
+	unsigned int Parentid;
+	unsigned int Size;
 } CHUNK_HEADER;
 
 typedef struct grou_data {
@@ -124,33 +124,33 @@ typedef struct cindex {
 } CINDEX;
 
 typedef struct cface {
-	unsigned long n_index;
-	unsigned long segment;
-	unsigned long chunk;
-	unsigned long chunkmatl;
+	unsigned int n_index;
+	unsigned int segment;
+	unsigned int chunk;
+	unsigned int chunkmatl;
 	char facet;
-	unsigned long material;
-	unsigned long polytype;
-	unsigned long matlindex;
+	unsigned int material;
+	unsigned int polytype;
+	unsigned int matlindex;
 	CINDEX index[25];
 } CFACE;
 
 typedef struct cmodel
 {
-	unsigned long Vcount;
+	unsigned int Vcount;
 	CVPNT Vpoint[VEC_MAX];
-	unsigned long Vpntseg[VEC_MAX];
-	unsigned long Vpntchunk[VEC_MAX];
-	unsigned long Vpntreal[VEC_MAX];
+	unsigned int Vpntseg[VEC_MAX];
+	unsigned int Vpntchunk[VEC_MAX];
+	unsigned int Vpntreal[VEC_MAX];
 	unsigned short Vpntfinal[VEC_MAX];
-	unsigned long UVcount;
+	unsigned int UVcount;
 	CUV UVpoint[VEC_MAX*2];
-	unsigned long Pcount;
+	unsigned int Pcount;
 	CFACE Poly[POLY_MAX];
-	unsigned long Scount;
+	unsigned int Scount;
 	char Sname[SOBJ_MAX][30];
 	CVPNT Soffset[SOBJ_MAX];
-	unsigned long parent[SOBJ_MAX];
+	unsigned int parent[SOBJ_MAX];
 } CMODEL;
 
 
@@ -189,14 +189,14 @@ typedef struct bbinfo {
 } BBINFO;
 
 typedef struct pinfo {
-	unsigned long Corners;
-	unsigned long Colors;
-	unsigned long facet;
-	unsigned long Segment;
-	unsigned long Chunk;
-	unsigned long Sobj;
-	unsigned long Ptype;
-	unsigned long detail;
+	unsigned int Corners;
+	unsigned int Colors;
+	unsigned int facet;
+	unsigned int Segment;
+	unsigned int Chunk;
+	unsigned int Sobj;
+	unsigned int Ptype;
+	unsigned int detail;
 	FS_VPNT Center;
 	FS_VPNT Normal;
 	float Radius;
@@ -214,46 +214,46 @@ typedef struct fsmodel {
 
 	unsigned short Vcount;
 	FS_VPNT Vpoint[VEC_MAX];
-	unsigned long Vpntseg[VEC_MAX];
-	unsigned long Vpntchunk[VEC_MAX];
+	unsigned int Vpntseg[VEC_MAX];
+	unsigned int Vpntchunk[VEC_MAX];
 	unsigned char n_vn[VEC_MAX];
 	unsigned short Ncount;
 	FS_VPNT Npoint[VEC_MAX*2];
-	unsigned long BBcount;
+	unsigned int BBcount;
 	BBINFO Bbox[POLY_MAX];
-	unsigned long Pcount;
+	unsigned int Pcount;
 	PINFO Poly[POLY_MAX];
-	unsigned long Scount;
+	unsigned int Scount;
 	char Sname[SOBJ_MAX][30];
 	long Sparent[SOBJ_MAX];
 	FS_VPNT Soffset[SOBJ_MAX];
-	unsigned long Debriscount;
-	unsigned long Sdebris[SOBJ_MAX];
-	unsigned long Detailcount;
-	unsigned long Sdetail[SOBJ_MAX];
+	unsigned int Debriscount;
+	unsigned int Sdebris[SOBJ_MAX];
+	unsigned int Detailcount;
+	unsigned int Sdetail[SOBJ_MAX];
 	long shield;
 } FSMODEL;
 
 typedef struct sinfo {
-	unsigned long VScount;
-	unsigned long VSlist[SHIELD_MAX];
-	unsigned long PScount;
-	unsigned long PSlist[SHIELD_MAX];
-	unsigned long PSnext[SHIELD_MAX][3];
+	unsigned int VScount;
+	unsigned int VSlist[SHIELD_MAX];
+	unsigned int PScount;
+	unsigned int PSlist[SHIELD_MAX];
+	unsigned int PSnext[SHIELD_MAX][3];
 } SINFO;
 
 MATL_DATA Matldata[MATL_MAX];
 MATLT_DATA Matltdata[MATL_MAX];
 char Matlname[MATL_MAX][100];
-unsigned long Matlcount,numtextures;
+unsigned int Matlcount,numtextures;
 
 // Place to hold the model data...
 FSMODEL FSModel;
 CMODEL Cmodel;
-unsigned long chunknum;
+unsigned int chunknum;
 
 unsigned char *OutputData;
-unsigned long OutputLength;
+unsigned int OutputLength;
 
 };
 //

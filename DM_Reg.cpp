@@ -145,9 +145,7 @@ BOOL _WriteHKLM(CString path,CString key,CString value)
 		delete res;
 		return ret==ERROR_SUCCESS;
 	} catch (char* str) {
-		if (sizedata != NULL)
 			delete sizedata;
-		if (res != NULL)
 			delete res;
 	}
 }
@@ -173,9 +171,7 @@ BOOL _WriteHKLM(CString path,CString key,int value)
 		return ret==ERROR_SUCCESS;
 	}
 	catch (char* str) {
-		if (sizedata != NULL)
 			delete sizedata;
-		if (res != NULL)
 			delete res;
 	}
 }
@@ -202,9 +198,7 @@ BOOL DMReg_WriteHKCU(CString key,CString value)
 		return ret==ERROR_SUCCESS; 
 	} 
 	catch (char* str) {
-		if (sizedata != NULL)
 			delete sizedata;
-		if (res != NULL)
 			delete res;
 	}
 }
@@ -231,9 +225,7 @@ BOOL DMReg_WriteHKCU(CString key,int value)
 		return ret==ERROR_SUCCESS;
 	} 
 	catch (char* str) {
-		if (sizedata != NULL)
 			delete sizedata;
-		if (res != NULL)
 			delete res;
 	}
 }

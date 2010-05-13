@@ -102,7 +102,7 @@ BOOL COptionsDlg::OnInitDialog()
 	if(DMReg_ReadHKCUint("DisableXPMenuStyle",0)==0)
 		c_MenuStyle.SetCheck(TRUE);
 
-	delete(options);
+	delete[] options;
 	
 	return TRUE;	// return TRUE unless you set the focus to a control
 					// EXCEPTION: OCX Property Pages should return FALSE

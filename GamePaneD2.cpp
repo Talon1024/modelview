@@ -123,7 +123,7 @@ void CGamePaneD2::Init()
 	}
 	lbox->SetCurSel(0);
 
-	delete(temp);
+	delete[] temp;
 }
 
 void CGamePaneD2::FillTab()

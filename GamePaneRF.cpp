@@ -101,6 +101,6 @@ void CGamePaneRF::Init()
 	ctrl=(CStatic *)GetDlgItem(IDC_RF_SOBJ);
 	ctrl->SetWindowText(sep+_itoa(pDoc->m_RF_Model.num_geounits,temp,10));
 
-	delete(temp);
+	delete[] temp;
 }
 

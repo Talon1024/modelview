@@ -122,27 +122,27 @@ return(0);
 //
 ERRORCODE CImportCOB::ReadCOB(CFile *f)
 {
-	unsigned long i,j,Chunkend,texture;
+	unsigned int i,j,Chunkend,texture;
 	COB_HEADER cobheader;
 	CHUNK_HEADER chunkheader;
 	unsigned short Polhname;
 	unsigned short Polhn_string;
 	char Polhstring[100];
-	unsigned long long position;
+	unsigned int long position;
 	short identifier;
 	POLH_DATA Polhdata;
 	unsigned short Grouname;
 	unsigned short Groun_string;
 	char Groustring[100];
 	GROU_DATA Groudata[SOBJ_MAX];
-	unsigned long Parentid[SOBJ_MAX];
+	unsigned int Parentid[SOBJ_MAX];
 
-	unsigned long rd_flag,matltflag,GroupFlagError;
-	unsigned long n_vertix,n_uv,n_facehole;
-	unsigned long VStartSet,UVStartSet;
+	unsigned int rd_flag,matltflag,GroupFlagError;
+	unsigned int n_vertix,n_uv,n_facehole;
+	unsigned int VStartSet,UVStartSet;
 	CVPNT Vin;
 	char *pid;
-	unsigned long red,blue,green;
+	unsigned int red,blue,green;
 
 
 	LOGTEXT("Source file: %s\n",f->GetFilePath()); LOGDOIT;
@@ -232,9 +232,9 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 			f->Read(&Matldata[Matlcount], sizeof(MATL_DATA));
 			if(f->GetPosition()>=(position+chunkheader.Size))
 			{ // flatpoly
-				red=(unsigned long)(Matldata[Matlcount].red*0x00ff);
-				green=(unsigned long)(Matldata[Matlcount].green*0x00ff);
-				blue=(unsigned long)(Matldata[Matlcount].blue*0x00ff);
+				red=(unsigned int)(Matldata[Matlcount].red*0x00ff);
+				green=(unsigned int)(Matldata[Matlcount].green*0x00ff);
+				blue=(unsigned int)(Matldata[Matlcount].blue*0x00ff);
 				//LOGTEXT("  Flatpoly: red=%d, green=%d, blue=%d\n",red,green,blue); LOGDOIT;
 				green=green << 8;
 				blue=blue << 16;
@@ -507,7 +507,7 @@ void CImportCOB::calcNormal(float v[3][3], float out[3])
 //
 void CImportCOB::ConvertCob2Model(void)
 {
-	unsigned long i,j,k,gotdetail,m,n,n_smooth;
+	unsigned int i,j,k,gotdetail,m,n,n_smooth;
 	float v[3][3];
 	float vout[3];
 	unsigned char SNum[SOBJ_MAX];
@@ -851,7 +851,7 @@ void CImportCOB::ConvertCob2Model(void)
 
 #define wc(walker)(*((unsigned char *) (walker)))
 #define ws(walker)(*((unsigned short *) (walker)))
-#define wi(walker)(*((unsigned long *) (walker)))
+#define wi(walker)(*((unsigned int *) (walker)))
 #define wf(walker)(*((float *) (walker)))
 #define v(walker)(*((FS_VPNT *) (walker)))
 #define wp(walker) ((unsigned short *) (walker))
@@ -863,7 +863,7 @@ void CImportCOB::ConvertCob2Model(void)
 //*************************************************************
 void CImportCOB::ohdr(void)
 {
-	unsigned long i;
+	unsigned int i;
 	FS_VPNT Max,Min;
 	float minx,miny,minz,maxx,maxy,maxz,Radius,Radius2;
 	float tmpx,tmpy,tmpz;
@@ -990,7 +990,7 @@ void CImportCOB::ohdr(void)
 	OutputLength+=4;
 
 	FS_VPNT test1,Center;
-	unsigned long SizeAt,StartSize;
+	unsigned int SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	wi(walker+OutputLength)=0x01234567;
@@ -1088,7 +1088,7 @@ void CImportCOB::ohdr(void)
 //*************************************************************
 void CImportCOB::txtr(void)
 {
-	unsigned long h,i,j,k;
+	unsigned int h,i,j,k;
 	char tname[25];
 
 	GetDocument()->m_FS_BitmapData.count=numtextures;
@@ -1097,7 +1097,7 @@ void CImportCOB::txtr(void)
 		LOGTEXT(" Building chunk TXTR\n"); LOGDOIT;
 		
 		/*
-		unsigned long SizeAt,StartSize;
+		unsigned int SizeAt,StartSize;
 		unsigned char *walker=OutputData;
 		wi(walker+OutputLength)=ID_TXTR;
 		OutputLength+=4;
@@ -1164,12 +1164,12 @@ void CImportCOB::Dump0Data(void)
 //
 // SOBJ type 1 data
 //
-void CImportCOB::Dump1Data(unsigned long Segment)
+void CImportCOB::Dump1Data(unsigned int Segment)
 {
-	unsigned long i,j,k,SizeAt,StartSize;
+	unsigned int i,j,k,SizeAt,StartSize;
 //	VPNT Vtemp;
 	unsigned char *walker=OutputData;
-	unsigned long n_verts,n_norms;
+	unsigned int n_verts,n_norms;
 
 	n_verts=0;
 	n_norms=0;
@@ -1253,8 +1253,8 @@ void CImportCOB::Dump1Data(unsigned long Segment)
 //
 void CImportCOB::Dump23Data(int Polygon)
 {
-	unsigned long i,j;
-	unsigned long SizeAt,StartSize;
+	unsigned int i,j;
+	unsigned int SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	i=Polygon;
@@ -1313,7 +1313,7 @@ void CImportCOB::Dump23Data(int Polygon)
 //
 void CImportCOB::Dump4Data(FS_VPNT Normal, FS_VPNT Point, FS_VPNT Min, FS_VPNT Max)
 {
-	unsigned long SizeAt,StartSize;
+	unsigned int SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	//LOGTEXT("  doing 4: splitting\n"); LOGDOIT;
@@ -1358,7 +1358,7 @@ void CImportCOB::Dump4Data(FS_VPNT Normal, FS_VPNT Point, FS_VPNT Min, FS_VPNT M
 //
 void CImportCOB::Dump5Data(FS_VPNT Min, FS_VPNT Max)
 {
-	unsigned long SizeAt,StartSize;
+	unsigned int SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	//LOGTEXT("  doing 5: BoundBox\n"); LOGDOIT;
@@ -1389,13 +1389,13 @@ void CImportCOB::Dump5Data(FS_VPNT Min, FS_VPNT Max)
 //
 // split
 //
-void CImportCOB::split(FS_VPNT Min, FS_VPNT Max,unsigned long SobjNum)
+void CImportCOB::split(FS_VPNT Min, FS_VPNT Max,unsigned int SobjNum)
 {
-	unsigned long i,j,total,total1,total2,Polygon1,Polygon2;
+	unsigned int i,j,total,total1,total2,Polygon1,Polygon2;
 	FS_VPNT Max1,Min1,Max2,Min2,Max3,Min3,Max4,Min4;
 	FS_VPNT Normal,Point;
 	float testx,testy,testz;
-	unsigned long Type4At,Type5At,Front,Back,Prelist,Postlist,Online;
+	unsigned int Type4At,Type5At,Front,Back,Prelist,Postlist,Online;
 	unsigned char *walker=OutputData;
 
 
@@ -1633,11 +1633,11 @@ void CImportCOB::split(FS_VPNT Min, FS_VPNT Max,unsigned long SobjNum)
 //
 void CImportCOB::sobj(int SobjNum)
 {
-	unsigned long i;
+	unsigned int i;
 	FS_VPNT test1,test2;
 	//FS_VPNT Offset,Center;
 	FS_VPNT Max,Min;
-	//unsigned long SizeAt,StartSize,SizeAt2,StartSize2;
+	//unsigned int SizeAt,StartSize,SizeAt2,StartSize2;
 	unsigned char *walker=OutputData;
 	float minx,miny,minz,maxx,maxy,maxz,Radius,Radius2;
 	double maxxyz;
@@ -1908,9 +1908,9 @@ f.Close();*/
 //*************************************************************
 void CImportCOB::shld(void)
 {
-	unsigned long i,j,k; 
+	unsigned int i,j,k; 
 	unsigned char *walker=OutputData;
-	unsigned long n_verts,n_faces;
+	unsigned int n_verts,n_faces;
 	SINFO Sinfo;
 	short back[3]={2,0,1};
 
@@ -2005,7 +2005,7 @@ void CImportCOB::shld(void)
 		/*wi(walker+OutputLength)=ID_SHLD;
 		OutputLength+=4;
 
-		unsigned long SizeAt,StartSize;
+		unsigned int SizeAt,StartSize;
 
 		wi(walker+OutputLength)=0x01234567;
 		SizeAt=OutputLength;					// to fix the size at the end...
@@ -2056,7 +2056,7 @@ void CImportCOB::shld(void)
 //*************************************************************
 void CImportCOB::pinf(void)
 {
-	unsigned long SizeAt,StartSize;
+	unsigned int SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	LOGTEXT(" Building chunk PINF\n"); LOGDOIT;
@@ -2088,7 +2088,7 @@ void CImportCOB::pinf(void)
 //*************************************************************
 void CImportCOB::MakePof(/*char *output*/)
 {
-	unsigned long i;
+	unsigned int i;
 
 	LOGTEXT("\n"); LOGDOIT;
 	LOGTEXT("Building POF file chunks ->\n"); LOGDOIT;

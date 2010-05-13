@@ -150,7 +150,7 @@ void CEditorFS_SHLD::OnEditorfsShldModifyApply()
 		return;
 	}
 
-	for(unsigned long i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
+	for(unsigned int i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
 	{
 		GetDocument()->m_FS_Model.shields.Vpoint[i][0]*=mx;
 		GetDocument()->m_FS_Model.shields.Vpoint[i][1]*=my;
@@ -265,7 +265,7 @@ int CEditorFS_SHLD::ReadShieldData(CString fn, FS_SHIELDS *sh)
 			f.Read(&sh->Vcount,4);
 			if(sh->Vcount>MAX_FS_SHIELDVERTICES)
 				return -2;
-			for( unsigned long i=0;i<sh->Vcount;i++)
+			for( unsigned int i=0;i<sh->Vcount;i++)
 			{
 				f.Read(&sh->Vpoint[i][0],4);
 				f.Read(&sh->Vpoint[i][1],4);
@@ -275,7 +275,7 @@ int CEditorFS_SHLD::ReadShieldData(CString fn, FS_SHIELDS *sh)
 			f.Read(&sh->Fcount,4);
 			if(sh->Fcount>MAX_FS_SHIELDFACES)
 				return -2;
-			for(unsigned long i=0; i<sh->Fcount; i++)
+			for(unsigned int i=0; i<sh->Fcount; i++)
 			{
 				f.Read(&sh->Face[i].Normal.x,4);
 				f.Read(&sh->Face[i].Normal.y,4);
@@ -385,7 +385,7 @@ void CEditorFS_SHLD::OnChangeData()
 		if(my==0) my=1;
 		if(mz==0) mz=1;
 
-		for(unsigned long i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
+		for(unsigned int i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
 		{
 			GetDocument()->m_FS_Model.shields.Vpoint[i][0]=m_OwnShieldsBackup.Vpoint[i][0]*mx;
 			GetDocument()->m_FS_Model.shields.Vpoint[i][1]=m_OwnShieldsBackup.Vpoint[i][1]*my;

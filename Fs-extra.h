@@ -83,11 +83,11 @@ typedef struct bbinfo
 
 typedef struct FS_PINFO
 {
-	unsigned long Corners;
-	unsigned long Colors;
-	unsigned long Sobj;
-	unsigned long Ptype;
-	unsigned long detail;
+	unsigned int Corners;
+	unsigned int Colors;
+	unsigned int Sobj;
+	unsigned int Ptype;
+	unsigned int detail;
 	FS_VPNT Center;
 	FS_VPNT Normal;
 	short Vp[20];
@@ -105,9 +105,9 @@ typedef struct FS_shieldface
 
 typedef struct FS_shields
 {
-	unsigned long Vcount;
+	unsigned int Vcount;
 	float Vpoint[MAX_FS_SHIELDVERTICES][3];
-	unsigned long Fcount;
+	unsigned int Fcount;
 	FS_SHIELDFACE Face[MAX_FS_SHIELDFACES];
 } FS_SHIELDS;
 
@@ -122,14 +122,14 @@ typedef struct FS_thruster
 
 typedef struct FS_MODEL
 {
-	unsigned long Vcount;
+	unsigned int Vcount;
 	FS_VPNT Vpoint[MAX_FS_VERTICES];
 	short VSobj[MAX_FS_VERTICES];
-	unsigned long Ncount;
+	unsigned int Ncount;
 	FS_VPNT Npoint[MAX_FS_NORMALS];
-	unsigned long BBcount;
+	unsigned int BBcount;
 	BBINFO Bbox[MAX_FS_BBOXS];
-	unsigned long Pcount;
+	unsigned int Pcount;
 	FS_PINFO Poly[MAX_FS_POLYGONS];
 
 	int num_thrusters;
@@ -198,9 +198,9 @@ typedef struct FS_MODELINFO
 } FS_MODELINFOtag;
 
 typedef struct pminfo {
-	unsigned long n_models;
-	unsigned long n_detail,detail[6];
-	unsigned long n_debris,debris[64];
+	unsigned int n_models;
+	unsigned int n_detail,detail[6];
+	unsigned int n_debris,debris[64];
 } PMINFO;
 
 //
@@ -231,37 +231,37 @@ typedef struct pcxheader
 typedef struct
 {
 	unsigned char valid;
-	unsigned long xsize,ysize;
-	unsigned long xreal,yreal;
+	unsigned int xsize,ysize;
+	unsigned int xreal,yreal;
 	char name[30];
 //  unsigned char bitmap[1024*1024];
-//  unsigned long *bitmap;
+//  unsigned int *bitmap;
 //  unsigned char PcxVgaPal[256*3];
-//  unsigned long PcxPal[256];
+//  unsigned int PcxPal[256];
 	short detail;
 } FS_BITMAPDATA;
 
 typedef struct
 {
-	unsigned long count;
+	unsigned int count;
 	FS_BITMAPDATA pic[MAX_FS_TEXTURE];
 } FS_MODELBITMAPS;
 
 
 typedef struct
 {
-	unsigned long signature;
-	unsigned long version;
-	unsigned long diroffset;
-	unsigned long dirnumber;
+	unsigned int signature;
+	unsigned int version;
+	unsigned int diroffset;
+	unsigned int dirnumber;
 } VP_HEADER;
 
 typedef struct
 {
-	unsigned long offset;
-	unsigned long size;
+	unsigned int offset;
+	unsigned int size;
 	char filename[32];
-	unsigned long timestamp;
+	unsigned int timestamp;
 } VP_INFO;
 
 //

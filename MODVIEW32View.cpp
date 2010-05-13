@@ -541,6 +541,8 @@ HPALETTE CMODVIEW32View::GetOpenGLPalette(HDC hDC)
 	// Allocate space for a logical palette structure plus all the palette entries
 	pPal=(LOGPALETTE*)malloc(sizeof(LOGPALETTE) +nColors*sizeof(PALETTEENTRY));
 
+	ASSERT( pPal );
+
 	// Fill in palette header
 	pPal->palVersion=0x300;		// Windows 3.0
 	pPal->palNumEntries=nColors; // table size
@@ -598,7 +600,7 @@ void CMODVIEW32View::FS_SetDetailLevel(int mode)
 	InvalidateRect(NULL);
 }
 
-void CMODVIEW32View::D2_SetPosition(unsigned long pos)
+void CMODVIEW32View::D2_SetPosition(unsigned int pos)
 {
 	m_D2_Position=pos;
 	D2_PreparePosition();
@@ -606,7 +608,7 @@ void CMODVIEW32View::D2_SetPosition(unsigned long pos)
 	viewFrame->RedrawWindow();
 }
 
-void CMODVIEW32View::D3_SetPosition(unsigned long pos)
+void CMODVIEW32View::D3_SetPosition(unsigned int pos)
 {
 	m_D3_Position=pos;
 	D3_PreparePosition();
@@ -958,7 +960,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 		glBegin(GL_TRIANGLES);
 
 		ASSERT(pDoc->m_FS_Model.shields.Fcount<MAX_FS_SHIELDFACES);
-		for (unsigned long j=0;j<pDoc->m_FS_Model.shields.Fcount;j++)
+		for (unsigned int j=0;j<pDoc->m_FS_Model.shields.Fcount;j++)
 		{
 			normal[0]=pDoc->m_FS_Model.shields.Face[j].Normal.x;
 			normal[1]=pDoc->m_FS_Model.shields.Face[j].Normal.y;
@@ -1035,7 +1037,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 	ASSERT(pDoc->m_FS_Model.Pcount<MAX_FS_POLYGONS);
 	ASSERT(pDoc->m_FS_Model.Vcount<MAX_FS_VERTICES);
 	ASSERT(pDoc->m_FS_Model.Ncount<MAX_FS_NORMALS);
-	for(unsigned long j=0;j<pDoc->m_FS_Model.Pcount;j++)
+	for(unsigned int j=0;j<pDoc->m_FS_Model.Pcount;j++)
 	{			   // type 2 polygons
 		if((pDoc->m_FS_Model.Poly[j].Ptype==2)&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel))
 		{
@@ -1056,7 +1058,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			normal[2]=pDoc->m_FS_Model.Poly[j].Normal.z;
 
 			ASSERT(pDoc->m_FS_Model.Poly[j].Corners<35);
-			for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+			for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 			{
 				v[i][0]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].x;
 				v[i][1]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].y;
@@ -1064,7 +1066,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			}
 			if(m_RenderSmooth)
 			{
-				for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+				for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 				{
 					n[i][0]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].x;
 					n[i][1]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].y;
@@ -1073,7 +1075,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			} else
 				glNormal3fv(normal);
 
-			for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+			for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 			{
 				if(m_RenderSmooth)
 					glNormal3fv(n[i]);
@@ -1093,7 +1095,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 	else
 		glDisable(GL_TEXTURE_2D);
 
-	for(unsigned long k=pDoc->m_FS_PofDataL[m_Detaillevel]; k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1) ;k++)
+	for(unsigned int k=pDoc->m_FS_PofDataL[m_Detaillevel]; k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1) ;k++)
 	{
 		if((m_DisplayTexture==-1) | (m_DisplayTexture==(int)(k-pDoc->m_FS_PofDataL[m_Detaillevel])))
 		{
@@ -1107,7 +1109,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 					{
 						glRGB(255,255,255);
 						glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-						for(unsigned long xv=0;xv<pDoc->m_FS_BitmapData.count;xv++) {
+						for(unsigned int xv=0;xv<pDoc->m_FS_BitmapData.count;xv++) {
 							TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
 						}
 //TRACE("%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.count,k,pDoc->m_FS_LoadPCX[k]);
@@ -1120,7 +1122,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 			if(ValidTexture)
 			{
-				for(unsigned long j=0;j<pDoc->m_FS_Model.Pcount;j++)
+				for(unsigned int j=0;j<pDoc->m_FS_Model.Pcount;j++)
 				{			   // type 3 polygons
 					if((pDoc->m_FS_Model.Poly[j].Ptype==3)
 						&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel)
@@ -1138,7 +1140,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 							normal[1]=pDoc->m_FS_Model.Poly[j].Normal.y;
 							normal[2]=pDoc->m_FS_Model.Poly[j].Normal.z;
 
-							for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+							for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 							{
 								v[i][0]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].x;
 								v[i][1]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].y;
@@ -1146,7 +1148,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 							}
 							if(m_RenderSmooth)
 							{
-								for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									n[i][0]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].x;
 									n[i][1]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].y;
@@ -1156,7 +1158,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 							if(m_ShowThruster)
 							{
-								for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									uv[i][0]=pDoc->m_FS_Model.Poly[j].U[i] *
 											((float)pDoc->m_FS_BitmapData.pic[k].xreal/(float)pDoc->m_FS_BitmapData.pic[k].xsize);
@@ -1164,7 +1166,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 											((float)pDoc->m_FS_BitmapData.pic[k].yreal/(float)pDoc->m_FS_BitmapData.pic[k].ysize);
 								}
 							} else {
-								for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									uv[i][0]=pDoc->m_FS_Model.Poly[j].U[i];
 									uv[i][1]=pDoc->m_FS_Model.Poly[j].V[i];
@@ -1172,7 +1174,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 							}
 							if (!m_RenderSmooth)
 								glNormal3fv(normal);
-							for(unsigned long i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+							for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 							{
 								if (m_RenderSmooth)
 									glNormal3fv(n[i]);
@@ -1202,7 +1204,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 void CMODVIEW32View::D3_BuildSobj(unsigned short SobjNum)
 {
 
-	unsigned long i,lastload;
+	unsigned int i,lastload;
 	CMODVIEW32Doc* pDoc=GetDocument();
 
 	if(m_D3_LoadedSobj[SobjNum])
@@ -1367,7 +1369,7 @@ void CMODVIEW32View::D3_BuildScene(void)
 // Called to draw scene
 void CMODVIEW32View::D3_RenderScene()
 {
-	unsigned long i;
+	unsigned int i;
 	GLfloat GlowOff[]={0.0, 0.0, 0.0, 1.0};
 	CMODVIEW32Doc* pDoc=GetDocument();
 
@@ -1507,16 +1509,16 @@ void CMODVIEW32View::D3_RenderScene()
 
 void CMODVIEW32View::D3_BuildArrays()
 {
-	unsigned long CurPoly=0;
-	unsigned long CurPnt=0;
+	unsigned int CurPoly=0;
+	unsigned int CurPnt=0;
 	CMODVIEW32Doc* pDoc=GetDocument();
 
-	for(unsigned long i=0;i<pDoc->m_D3_Model.Scount;i++)
+	for(unsigned int i=0;i<pDoc->m_D3_Model.Scount;i++)
 	{
 		m_D3_Dsobj[i].startpoly=CurPoly;
 
 		// start of the type 2 stuff...
-		for(unsigned long j=0;j<pDoc->m_D3_Model.Pcount;j++)
+		for(unsigned int j=0;j<pDoc->m_D3_Model.Pcount;j++)
 		{		// flat polygons
 			if((pDoc->m_D3_Model.Poly[j].Type==0)&(pDoc->m_D3_Model.Poly[j].Sobj==i)&(m_RenderD3Flat)) {
 				m_D3_Dpoly[CurPoly].flag=0;
@@ -1531,7 +1533,7 @@ void CMODVIEW32View::D3_BuildArrays()
 					m_D3_Dpoly[CurPoly].blue =pDoc->m_D3_Model.Poly[j].Blue;
 				}
 				m_D3_Dpoly[CurPoly].startpnt=CurPnt;
-				for(unsigned long l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
+				for(unsigned int l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
 				{
 					if (m_RenderD3Smooth)
 					{
@@ -1555,7 +1557,7 @@ void CMODVIEW32View::D3_BuildArrays()
 		}
 
 
-		for(unsigned long j=0;j<pDoc->m_D3_Model.Pcount;j++)
+		for(unsigned int j=0;j<pDoc->m_D3_Model.Pcount;j++)
 		{
 			// flat polygons
 			if((pDoc->m_D3_Model.Poly[j].Type==1)&
@@ -1575,7 +1577,7 @@ void CMODVIEW32View::D3_BuildArrays()
 					m_D3_Dpoly[CurPoly].blue= (char)192;
 				}
 				m_D3_Dpoly[CurPoly].startpnt=CurPnt;
-				for(unsigned long l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
+				for(unsigned int l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
 				{
 					if (m_RenderD3Smooth)
 					{
@@ -1599,11 +1601,11 @@ void CMODVIEW32View::D3_BuildArrays()
 		}
 
 		// start the type 3 stuff...
-		for(unsigned long k=0;k<pDoc->m_D3_TotalTexture;k++)
+		for(unsigned int k=0;k<pDoc->m_D3_TotalTexture;k++)
 		{
 			if(pDoc->m_D3_Display.TextureFlag[k])
 			{
-				for(unsigned long j=0;j<pDoc->m_D3_Model.Pcount;j++)
+				for(unsigned int j=0;j<pDoc->m_D3_Model.Pcount;j++)
 				{
 					// type 3 polygons
 					if((pDoc->m_D3_Model.Poly[j].Type==1)&(pDoc->m_D3_Model.Poly[j].Sobj==i)&
@@ -1612,7 +1614,7 @@ void CMODVIEW32View::D3_BuildArrays()
 						m_D3_Dpoly[CurPoly].flag=1;
 						m_D3_Dpoly[CurPoly].red=(char)pDoc->m_D3_Model.Poly[j].Color;
 						m_D3_Dpoly[CurPoly].startpnt=CurPnt;
-						for(unsigned long l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
+						for(unsigned int l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
 						{
 							if(m_RenderD3Smooth)
 							{
@@ -1642,9 +1644,9 @@ void CMODVIEW32View::D3_BuildArrays()
 	}
 }
 
-void CMODVIEW32View::D3_BuildPnts(unsigned long SubM)
+void CMODVIEW32View::D3_BuildPnts(unsigned int SubM)
 {
-	//unsigned long i;
+	//unsigned int i;
 	CMODVIEW32Doc* pDoc=GetDocument();
 
 	glDisable(GL_BLEND);
@@ -2776,16 +2778,16 @@ void CMODVIEW32View::D3_PreparePosition()
 		return;
 
 	CMODVIEW32Doc* pDoc=GetDocument();
-	for(unsigned long k=0; k<pDoc->m_D3_Model.Scount; k++)
+	for(unsigned int k=0; k<pDoc->m_D3_Model.Scount; k++)
 	{
 		//Get Rotation information
-		unsigned long Rat=-1;
-		unsigned long m,n,pkey;
+		unsigned int Rat=-1;
+		unsigned int m,n,pkey;
 		if (pDoc->m_D3_Model.rknum[k]>0)
 		{
 			m=pDoc->m_D3_Model.rindex[k];
 			n=m+pDoc->m_D3_Model.rknum[k]-1;
-			unsigned long rkey=0;
+			unsigned int rkey=0;
 			while ((pDoc->m_D3_Model.rkey[m]!=pDoc->m_D3_Display.pr_active[m_D3_Position-1])&(m<n))
 			{
 				if (pDoc->m_D3_Model.rkey[m]<=pDoc->m_D3_Display.pr_active[m_D3_Position-1])
@@ -2807,7 +2809,7 @@ void CMODVIEW32View::D3_PreparePosition()
 		m_D3_PosAngle_ShallBe[k].pnt.z=pDoc->m_D3_Model.rani[Rat].z;
 
 		//Calculate Pat
-		unsigned long Pat=-1;
+		unsigned int Pat=-1;
 		if (pDoc->m_D3_Model.pknum[k]>0)
 		{
 			m=pDoc->m_D3_Model.pindex[k];

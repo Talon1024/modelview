@@ -122,10 +122,10 @@ void CGamePaneFS::Init()
 		{
 			pDoc->m_FS_ModelHasDebris=TRUE;
 			ct->InsertItem(6,"Debris");
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,1,itoa(vert,tstr,10));
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,2,itoa(poly,tstr,10));
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,3,itoa(txtr,tstr,10));
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,4,itoa(sobj,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,1,_itoa(vert,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,2,_itoa(poly,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,3,_itoa(txtr,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,4,_itoa(sobj,tstr,10));
 		}
 	}
 
@@ -173,7 +173,7 @@ void CGamePaneFS::FillTab()
 		lbox->AddString("<All textures>");
 		if(pDoc->m_FS_BitmapData.count > 0)
 		{
-			for(unsigned long m=pDoc->m_FS_PofDataL[0];m<pDoc->m_FS_PofDataH[0]+1;m++)
+			for(unsigned int m=pDoc->m_FS_PofDataL[0];m<pDoc->m_FS_PofDataH[0]+1;m++)
 				lbox->AddString(pDoc->m_FS_BitmapData.pic[m].name);
 			lbox->SetCurSel(0);
 		}
@@ -256,21 +256,21 @@ void CGamePaneFS::GetPolyInfo(int detaillevel, int *vert, int *poly, int *txtr, 
 	CMODVIEW32Doc *pDoc=GetDocument();
 
 	int num_vert=0;
-	for(unsigned long m=0;m<pDoc->m_FS_Model.Vcount;m++)
+	for(unsigned int m=0;m<pDoc->m_FS_Model.Vcount;m++)
 	{
 		if(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.VSobj[m]].detail==(long)detaillevel)
 			num_vert++;
 	}
 
 	int num_poly=0;
-	for(unsigned long m=0;m<pDoc->m_FS_Model.Pcount;m++)
+	for(unsigned int m=0;m<pDoc->m_FS_Model.Pcount;m++)
 	{
 		if(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[m].Sobj].detail==(long)detaillevel)
 			num_poly++;
 	}
 
 	int num_txtr=0;
-	for(unsigned long m=0;m<pDoc->m_FS_BitmapData.count;m++)
+	for(unsigned int m=0;m<pDoc->m_FS_BitmapData.count;m++)
 	{
 		if(pDoc->m_FS_BitmapData.pic[m].valid==1)
 			num_txtr++;
