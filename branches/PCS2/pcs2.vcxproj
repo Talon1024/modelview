@@ -1,0 +1,310 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName />
+    <SccLocalPath />
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>F:\SRC\wxWidgets-2.9.0\include;F:\SRC\wxWidgets-2.9.0\include\msvc;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>F:\SRC\wxWidgets-2.9.0\include;F:\SRC\wxWidgets-2.9.0\include\msvc;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MaxSpeed</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>C:\libraries\wxWidgets\lib\msw;C:\libraries\wxWidgets\include;C:\libraries\DevIL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
+      <BrowseInformation>true</BrowseInformation>
+      <PrecompiledHeaderOutputFile>.\Release\pcs2.pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>.\Release\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Release\pcs2.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release\pcs2.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>libc.lib;libci.lib;msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <OutputFile>.\Release\pcs2.exe</OutputFile>
+      <AdditionalLibraryDirectories>C:\libraries\wxWidgets\lib;C:\libraries\DevIL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxmsw.lib;png.lib;zlib.lib;jpeg.lib;tiff.lib;devil.lib;ilu.lib;ilut.lib;opengl32.lib;glu32.lib;comctl32.lib;wsock32.lib;RPCRT4.LIB;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <Optimization>Disabled</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <MinimalRebuild>true</MinimalRebuild>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>C:\libraries\wxWidgets\lib\mswd;C:\libraries\wxWidgets\include;C:\libraries\DevIL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WXDEBUG__;WXDEBUG=1;__WIN95__;__WIN32__;WINVER=0x0400;STRICT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
+      <BrowseInformation>true</BrowseInformation>
+      <PrecompiledHeaderOutputFile>.\Debug\pcs2.pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>.\Debug\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\Debug\pcs2.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug\pcs2.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <IgnoreSpecificDefaultLibraries>libcd.lib;libcid.lib;msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <OutputFile>.\Debug\pcs2.exe</OutputFile>
+      <AdditionalLibraryDirectories>C:\libraries\wxWidgets\lib;C:\libraries\DevIL\lib\debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxmswd.lib;pngd.lib;zlibd.lib;jpegd.lib;tiffd.lib;devild.lib;ilu-d.lib;ilutd.lib;opengl32.lib;glu32.lib;comctl32.lib;wsock32.lib;RPCRT4.LIB;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="apply.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="bullet.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="dock.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="down.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="fuel.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="glow.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="header.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="left.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="new.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="open.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="paths.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="pcsico.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="placeholder.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="revert.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="right.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="save.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="solid.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="spcl.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="subobjects.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="textured.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="textures.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="turrets.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="up.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="weap.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="wireframe.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="xleft.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="xright.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="yleft.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="yright.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="zin.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="zleft.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="zout.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="zright.xpm">
+      <FileType>Document</FileType>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="pcs2.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="POFDataStructs.h" />
+    <ClInclude Include="POFHandler.h" />
+    <ClInclude Include="BSPDataStructs.h" />
+    <ClInclude Include="BSPHandler.h" />
+    <ClInclude Include="COBDataStructs.h" />
+    <ClInclude Include="COBHandler.h" />
+    <ClInclude Include="pcs_file.h" />
+    <ClInclude Include="pcs_file_dstructs.h" />
+    <ClInclude Include="pcs_pof_bspfuncs.h" />
+    <ClInclude Include="FileList.h" />
+    <ClInclude Include="kaz_templates.h" />
+    <ClInclude Include="tex_ctrl.h" />
+    <ClInclude Include="vector3d.h" />
+    <ClInclude Include="VPReader.h" />
+    <ClInclude Include="pe_base.h" />
+    <ClInclude Include="pe_docking.h" />
+    <ClInclude Include="pe_glows.h" />
+    <ClInclude Include="pe_header.h" />
+    <ClInclude Include="pe_paths.h" />
+    <ClInclude Include="pe_subobjects.h" />
+    <ClInclude Include="pe_subsystems.h" />
+    <ClInclude Include="pe_textures.h" />
+    <ClInclude Include="pe_thrusters.h" />
+    <ClInclude Include="pe_turrets.h" />
+    <ClInclude Include="pe_weapons.h" />
+    <ClInclude Include="pcs2.h" />
+    <ClInclude Include="pcs2_CIDs.h" />
+    <ClInclude Include="pcs2_filethread.h" />
+    <ClInclude Include="wxCTreeCtrl.h" />
+    <ClInclude Include="wxPCSPref.h" />
+    <ClInclude Include="compat\filelength.h" />
+    <ClInclude Include="compat\strncmp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="POFHandler.cpp" />
+    <ClCompile Include="BSPDataStructs.cpp" />
+    <ClCompile Include="BSPHandler.cpp" />
+    <ClCompile Include="COBHandler.cpp" />
+    <ClCompile Include="pcs_file.cpp" />
+    <ClCompile Include="pcs_file_dstructs.cpp" />
+    <ClCompile Include="pcs_pmf_cob.cpp" />
+    <ClCompile Include="pcs_pmf_pof.cpp" />
+    <ClCompile Include="pcs_pof_bspfuncs.cpp" />
+    <ClCompile Include="FileList.cpp" />
+    <ClCompile Include="kaz_templates.cpp" />
+    <ClCompile Include="tex_ctrl.cpp" />
+    <ClCompile Include="vector3d.cpp" />
+    <ClCompile Include="VPReader.cpp" />
+    <ClCompile Include="pe_docking.cpp" />
+    <ClCompile Include="pe_glows.cpp" />
+    <ClCompile Include="pe_header.cpp" />
+    <ClCompile Include="pe_paths.cpp" />
+    <ClCompile Include="pe_subobjects.cpp" />
+    <ClCompile Include="pe_subsystems.cpp" />
+    <ClCompile Include="pe_textures.cpp" />
+    <ClCompile Include="pe_thrusters.cpp" />
+    <ClCompile Include="pe_turrets.cpp" />
+    <ClCompile Include="pe_weapons.cpp" />
+    <ClCompile Include="pcs2.cpp" />
+    <ClCompile Include="pcs2_filethread.cpp" />
+    <ClCompile Include="PCS2_MainPanel.cpp" />
+    <ClCompile Include="wxCTreeCtrl.cpp" />
+    <ClCompile Include="wxGL_PMFCanvas.cpp" />
+    <ClCompile Include="wxPCSPref.cpp" />
+    <ClCompile Include="compat\filelength.cpp" />
+    <ClCompile Include="compat\strncmp.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

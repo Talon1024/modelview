@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{2a34eba6-b86c-4ca0-acbf-b632f8070d1e}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="POF">
+      <UniqueIdentifier>{c08ed417-2585-4c67-88a2-31651beb7626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BSP">
+      <UniqueIdentifier>{22e440b0-0b00-4dde-a66f-bea4da37f962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="COB">
+      <UniqueIdentifier>{7032f092-f5b1-4b6e-bebc-3bf0bde1eb28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PMF">
+      <UniqueIdentifier>{99c30110-cff4-494b-bc47-517243addf12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{b114dccc-fcae-4924-bf42-28b081ba5ccb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{f328db2d-44aa-43c6-b5b6-7c78f8238483}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Header Files">
+      <UniqueIdentifier>{fb4c1830-e6dd-4ee6-8dc2-dc020f077425}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="GUI\Header Files\Editor Headers">
+      <UniqueIdentifier>{db4ca9e1-4fc7-4536-a737-caf207e41518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Source Files">
+      <UniqueIdentifier>{d4b0d13a-1c23-4a09-abf2-941a38113c4d}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="GUI\Source Files\Editor Sources">
+      <UniqueIdentifier>{e4c99ee7-45f6-4fdd-8011-1d791db1260b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compat">
+      <UniqueIdentifier>{634fbc97-edbd-48ae-8120-0d07a77fc3da}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="pcs2.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="POFDataStructs.h">
+      <Filter>POF</Filter>
+    </ClInclude>
+    <ClInclude Include="POFHandler.h">
+      <Filter>POF</Filter>
+    </ClInclude>
+    <ClInclude Include="BSPDataStructs.h">
+      <Filter>BSP</Filter>
+    </ClInclude>
+    <ClInclude Include="BSPHandler.h">
+      <Filter>BSP</Filter>
+    </ClInclude>
+    <ClInclude Include="COBDataStructs.h">
+      <Filter>COB</Filter>
+    </ClInclude>
+    <ClInclude Include="COBHandler.h">
+      <Filter>COB</Filter>
+    </ClInclude>
+    <ClInclude Include="pcs_file.h">
+      <Filter>PMF</Filter>
+    </ClInclude>
+    <ClInclude Include="pcs_file_dstructs.h">
+      <Filter>PMF</Filter>
+    </ClInclude>
+    <ClInclude Include="pcs_pof_bspfuncs.h">
+      <Filter>PMF</Filter>
+    </ClInclude>
+    <ClInclude Include="FileList.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="kaz_templates.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="tex_ctrl.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="vector3d.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="VPReader.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_base.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_docking.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_glows.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_header.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_paths.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_subobjects.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_subsystems.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_textures.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_thrusters.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_turrets.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_weapons.h">
+      <Filter>GUI\Header Files\Editor Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pcs2.h">
+      <Filter>GUI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pcs2_CIDs.h">
+      <Filter>GUI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pcs2_filethread.h">
+      <Filter>GUI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wxCTreeCtrl.h">
+      <Filter>GUI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wxPCSPref.h">
+      <Filter>GUI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="compat\filelength.h">
+      <Filter>compat</Filter>
+    </ClInclude>
+    <ClInclude Include="compat\strncmp.h">
+      <Filter>compat</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="POFHandler.cpp">
+      <Filter>POF</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPDataStructs.cpp">
+      <Filter>BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPHandler.cpp">
+      <Filter>BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="COBHandler.cpp">
+      <Filter>COB</Filter>
+    </ClCompile>
+    <ClCompile Include="pcs_file.cpp">
+      <Filter>PMF</Filter>
+    </ClCompile>
+    <ClCompile Include="pcs_file_dstructs.cpp">
+      <Filter>PMF</Filter>
+    </ClCompile>
+    <ClCompile Include="pcs_pmf_cob.cpp">
+      <Filter>PMF</Filter>
+    </ClCompile>
+    <ClCompile Include="pcs_pmf_pof.cpp">
+      <Filter>PMF</Filter>
+    </ClCompile>
+    <ClCompile Include="pcs_pof_bspfuncs.cpp">
+      <Filter>PMF</Filter>
+    </ClCompile>
+    <ClCompile Include="FileList.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="kaz_templates.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="tex_ctrl.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="vector3d.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="VPReader.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_docking.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_glows.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_header.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_paths.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_subobjects.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_subsystems.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_textures.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_thrusters.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_turrets.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_weapons.cpp">
+      <Filter>GUI\Source Files\Editor Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pcs2.cpp">
+      <Filter>GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcs2_filethread.cpp">
+      <Filter>GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PCS2_MainPanel.cpp">
+      <Filter>GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wxCTreeCtrl.cpp">
+      <Filter>GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wxGL_PMFCanvas.cpp">
+      <Filter>GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wxPCSPref.cpp">
+      <Filter>GUI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\filelength.cpp">
+      <Filter>compat</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\strncmp.cpp">
+      <Filter>compat</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="apply.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="bullet.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dock.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="down.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="fuel.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="glow.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="header.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="left.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="new.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="open.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="paths.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="pcsico.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="placeholder.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="revert.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="right.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="save.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="solid.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="spcl.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="subobjects.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="textured.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="textures.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="turrets.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="up.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="weap.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="wireframe.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="xleft.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="xright.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="yleft.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="yright.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="zin.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="zleft.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="zout.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="zright.xpm">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
