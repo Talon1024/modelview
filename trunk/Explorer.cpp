@@ -73,7 +73,9 @@ void CExplorer::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 		HTREEITEM itm=GetTreeCtrl().GetSelectedItem();
 		ASSERT(itm!=NULL);
+		if (!itm) return;
 		CString name=GetTreeCtrl().GetItemText(itm);
+
 	
 		CMainFrame *viewFrame=static_cast<CMainFrame*>(GetParentFrame());
 		CMODVIEW32View *view=(CMODVIEW32View *)viewFrame->GetActiveView();

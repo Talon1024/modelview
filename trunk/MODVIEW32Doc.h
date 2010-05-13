@@ -439,7 +439,7 @@ public:
 	unsigned int m_FS_PofDataL[MAX_FS_SOBJ],m_FS_PofDataH[MAX_FS_SOBJ];
 	unsigned int m_FS_RGBAtexture[1024*1024];   
 	unsigned int m_FS_RGBAtexture2[1024*2048];
-	unsigned int m_FS_LoadPCX[MAX_FS_SOBJ];
+	unsigned int m_FS_LoadPCX[MAX_FS_TEXTURE];
 	PMINFO m_FS_PMinfo;   
 	FS_REALGUNS m_FS_RealGuns[2]; //0=GPNT, 1=MPNT
 	FS_TURRETS m_FS_Turrets[2]; //0=TGUN, 1=TMIS

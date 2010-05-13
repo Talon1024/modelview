@@ -14,25 +14,27 @@ CSortClass::CSortClass(CListCtrl * _pWnd, const int _iCol, const bool _bIsNumeri
 	bIsNumeric = _bIsNumeric;
 	
 	ASSERT(pWnd);
-	int max = pWnd->GetItemCount();
-	DWORD dw;
-	CString txt;
-	if (bIsNumeric)
-	{
-		for (int t = 0; t < max; t++)
+	if (pWnd) {
+		int max = pWnd->GetItemCount();
+		DWORD dw;
+		CString txt;
+		if (bIsNumeric)
 		{
-			dw = pWnd->GetItemData(t);
-			txt = pWnd->GetItemText(t, iCol);
-			pWnd->SetItemData(t, (DWORD) new CSortItemInt(dw, txt));
+			for (int t = 0; t < max; t++)
+			{
+				dw = pWnd->GetItemData(t);
+				txt = pWnd->GetItemText(t, iCol);
+				pWnd->SetItemData(t, (DWORD) new CSortItemInt(dw, txt));
+			}
 		}
-	}
-	else
-	{
-		for (int t = 0; t < max; t++)
+		else
 		{
-			dw = pWnd->GetItemData(t);
-			txt = pWnd->GetItemText(t, iCol);
-			pWnd->SetItemData(t, (DWORD) new CSortItem(dw, txt));
+			for (int t = 0; t < max; t++)
+			{
+				dw = pWnd->GetItemData(t);
+				txt = pWnd->GetItemText(t, iCol);
+				pWnd->SetItemData(t, (DWORD) new CSortItem(dw, txt));
+			}
 		}
 	}
 }
@@ -40,27 +42,33 @@ CSortClass::CSortClass(CListCtrl * _pWnd, const int _iCol, const bool _bIsNumeri
 CSortClass::~CSortClass()
 {
 	ASSERT(pWnd);
-	int max = pWnd->GetItemCount();
-	if (bIsNumeric)
-	{
-		CSortItemInt * pItem;
-		for (int t = 0; t < max; t++)
+	if (pWnd) {
+		int max = pWnd->GetItemCount();
+		if (bIsNumeric)
 		{
-			pItem = (CSortItemInt *) pWnd->GetItemData(t);
-			ASSERT(pItem);
-			pWnd->SetItemData(t, pItem->dw);
-			delete pItem;
+			CSortItemInt * pItem;
+			for (int t = 0; t < max; t++)
+			{
+				pItem = (CSortItemInt *) pWnd->GetItemData(t);
+				ASSERT(pItem);
+				if (pItem) {
+					pWnd->SetItemData(t, pItem->dw);
+					delete pItem;
+				}
+			}
 		}
-	}
-	else
-	{
-		CSortItem * pItem;
-		for (int t = 0; t < max; t++)
+		else
 		{
-			pItem = (CSortItem *) pWnd->GetItemData(t);
-			ASSERT(pItem);
-			pWnd->SetItemData(t, pItem->dw);
-			delete pItem;
+			CSortItem * pItem;
+			for (int t = 0; t < max; t++)
+			{
+				pItem = (CSortItem *) pWnd->GetItemData(t);
+				ASSERT(pItem);
+				if (pItem) {
+					pWnd->SetItemData(t, pItem->dw);
+					delete pItem;
+				}
+			}
 		}
 	}
 }
@@ -89,7 +97,9 @@ int CALLBACK CSortClass::CompareAsc(LPARAM lParam1, LPARAM lParam2, LPARAM lPara
 	CSortItem * i1 = (CSortItem *) lParam1;
 	CSortItem * i2 = (CSortItem *) lParam2;
 	ASSERT(i1 && i2);
-	return i1->txt.CompareNoCase(i2->txt);
+	if (i1 && i2)
+		return i1->txt.CompareNoCase(i2->txt);
+	else return NULL;
 }
 
 int CALLBACK CSortClass::CompareDes(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
@@ -97,7 +107,9 @@ int CALLBACK CSortClass::CompareDes(LPARAM lParam1, LPARAM lParam2, LPARAM lPara
 	CSortItem * i1 = (CSortItem *) lParam1;
 	CSortItem * i2 = (CSortItem *) lParam2;
 	ASSERT(i1 && i2);
-	return i2->txt.CompareNoCase(i1->txt);
+	if (i1 && i2)
+		return i2->txt.CompareNoCase(i1->txt);
+	else return NULL;
 }
 
 int CALLBACK CSortClass::CompareAscI(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
@@ -105,8 +117,10 @@ int CALLBACK CSortClass::CompareAscI(LPARAM lParam1, LPARAM lParam2, LPARAM lPar
 	CSortItemInt * i1 = (CSortItemInt *) lParam1;
 	CSortItemInt * i2 = (CSortItemInt *) lParam2;
 	ASSERT(i1 && i2);
-	if (i1->iInt == i2->iInt) return 0;
-	return i1->iInt > i2->iInt ? 1 : -1;
+	if (i1 && i2) {
+		if (i1->iInt == i2->iInt) return 0;
+		return i1->iInt > i2->iInt ? 1 : -1;
+	} else return NULL;
 }
 
 int CALLBACK CSortClass::CompareDesI(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
@@ -114,8 +128,11 @@ int CALLBACK CSortClass::CompareDesI(LPARAM lParam1, LPARAM lParam2, LPARAM lPar
 	CSortItemInt * i1 = (CSortItemInt *) lParam1;
 	CSortItemInt * i2 = (CSortItemInt *) lParam2;
 	ASSERT(i1 && i2);
-	if (i1->iInt == i2->iInt) return 0;
-	return i1->iInt < i2->iInt ? 1 : -1;
+	if (i1 && i2) {
+		if (i1->iInt == i2->iInt) return 0;
+		return i1->iInt < i2->iInt ? 1 : -1;
+	}
+	return NULL;
 }
 
 CSortClass::CSortItem::CSortItem(const DWORD _dw, const CString & _txt)

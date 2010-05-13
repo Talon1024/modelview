@@ -34,13 +34,15 @@ int filecopy(char *source, char *target)
 	fseek(file1,0,SEEK_SET);
 
 	int *buffer=(int *)malloc(filesize);
-	
-	fread(buffer,1,filesize,file1);
-	fwrite(buffer,1,filesize,file2);
 
-	free(buffer);
-	fclose(file2);
-	fclose(file1);
+	if (buffer) {
+		fread(buffer,1,filesize,file1);
+		fwrite(buffer,1,filesize,file2);
+
+		free(buffer);
+		fclose(file2);
+		fclose(file1);
+	}
 
 	return 0;
 }

@@ -478,7 +478,7 @@ void CMainFrame::ExplorerAddRoot(char *text)
 		{
 			char capname[8192];
 			char typestr[8192];
-			sprintf(typestr,"%i",typenr);
+			sprintf_s(typestr,"%i",typenr);
 			GetPrivateProfileString(gamecaption,typestr,"$",(char *)&capname,8191,m_TypeRootsFile);
 			if(strcmp(capname,"$")!=0)
 			{
@@ -540,10 +540,16 @@ void CMainFrame::ExplorerAddChild(char *filename,int typenr/*=-1*/)
 		e->typeroot_num[typenr]++;
 		CString captext;
 		captext.Format("%s (%i)",e->typeroot_str[typenr],e->typeroot_num[typenr]);
-		p->SetItemText(e->typeroot[typenr],captext);
+	
+		ASSERT(e->typeroot[typenr]);
+		ASSERT(captext);
+
+		if (e->typeroot[typenr] && captext)
+			p->SetItemText(e->typeroot[typenr],captext);
 
 		//Add item
-		p->InsertItem(filename,e->typeroot[typenr]);
+		if (e->typeroot[typenr] && filename)
+			p->InsertItem(filename,e->typeroot[typenr]);
 	}
 
 	//Update total num items

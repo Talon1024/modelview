@@ -130,11 +130,11 @@ void CGamePaneFS::Init()
 	}
 
 	CStatic *cs=(CStatic *)GetDlgItem(IDC_GUNS);
-	sprintf(tstr,"%i / %i",pDoc->m_FS_RealGuns[0].Num+pDoc->m_FS_RealGuns[1].Num,pDoc->m_FS_Turrets[0].Num+pDoc->m_FS_Turrets[1].Num);
+	sprintf_s(tstr,"%i / %i",pDoc->m_FS_RealGuns[0].Num+pDoc->m_FS_RealGuns[1].Num,pDoc->m_FS_Turrets[0].Num+pDoc->m_FS_Turrets[1].Num);
 	cs->SetWindowText(tstr);
 
 	cs=(CStatic *)GetDlgItem(IDC_SHIPSIZE);
-	sprintf(tstr,"%.0f|%.0f|%.0f",pDoc->m_FS_Model._maxbox.x-pDoc->m_FS_Model._minbox.x,pDoc->m_FS_Model._maxbox.y-pDoc->m_FS_Model._minbox.y,pDoc->m_FS_Model._maxbox.z-pDoc->m_FS_Model._minbox.z);
+	sprintf_s(tstr,"%.0f|%.0f|%.0f",pDoc->m_FS_Model._maxbox.x-pDoc->m_FS_Model._minbox.x,pDoc->m_FS_Model._maxbox.y-pDoc->m_FS_Model._minbox.y,pDoc->m_FS_Model._maxbox.z-pDoc->m_FS_Model._minbox.z);
 	cs->SetWindowText(tstr);
 
 	CTabCtrl *ts=(CTabCtrl *)GetDlgItem(IDC_FS_DISPLAY);
@@ -173,7 +173,7 @@ void CGamePaneFS::FillTab()
 		lbox->AddString("<All textures>");
 		if(pDoc->m_FS_BitmapData.count > 0)
 		{
-			for(unsigned int m=pDoc->m_FS_PofDataL[0];m<pDoc->m_FS_PofDataH[0]+1;m++)
+			for(unsigned int m=pDoc->m_FS_PofDataL[0];(m<pDoc->m_FS_PofDataH[0]+1) && (m < 60);m++)
 				lbox->AddString(pDoc->m_FS_BitmapData.pic[m].name);
 			lbox->SetCurSel(0);
 		}

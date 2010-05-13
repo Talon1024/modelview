@@ -333,25 +333,27 @@ public:
     BCMenuMemDC(CDC* pDC,LPCRECT lpSrcRect) : CDC()
     {
         ASSERT(pDC != NULL);
-
-		m_rect.CopyRect(lpSrcRect);
-        m_pDC = pDC;
-        m_pOldBitmap = NULL;
-        m_bMemDC = !pDC->IsPrinting();
-              
-        if (m_bMemDC)    // Create a Memory DC
-        {
-            CreateCompatibleDC(pDC);
-            m_bitmap.CreateCompatibleBitmap(pDC, m_rect.Width(), m_rect.Height());
-            m_pOldBitmap = SelectObject(&m_bitmap);
-            SetWindowOrg(m_rect.left, m_rect.top);
-        }
-        else        // Make a copy of the relevent parts of the current DC for printing
-        {
-            m_bPrinting = pDC->m_bPrinting;
-            m_hDC       = pDC->m_hDC;
-            m_hAttribDC = pDC->m_hAttribDC;
-        }
+		
+		if ( pDC ) { 
+			m_rect.CopyRect(lpSrcRect);
+	        m_pDC = pDC;
+	        m_pOldBitmap = NULL;
+	        m_bMemDC = !pDC->IsPrinting();
+	              
+	        if (m_bMemDC)    // Create a Memory DC
+	        {
+	            CreateCompatibleDC(pDC);
+	            m_bitmap.CreateCompatibleBitmap(pDC, m_rect.Width(), m_rect.Height());
+	            m_pOldBitmap = SelectObject(&m_bitmap);
+	            SetWindowOrg(m_rect.left, m_rect.top);
+	        }
+	        else        // Make a copy of the relevent parts of the current DC for printing
+	        {
+	            m_bPrinting = pDC->m_bPrinting;
+	            m_hDC       = pDC->m_hDC;
+	            m_hAttribDC = pDC->m_hAttribDC;
+			}
+		}
     }
     
     // Destructor copies the contents of the mem DC to the original DC
