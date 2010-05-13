@@ -128,7 +128,7 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 	unsigned short Polhname;
 	unsigned short Polhn_string;
 	char Polhstring[100];
-	unsigned int long position;
+	unsigned int position;
 	short identifier;
 	POLH_DATA Polhdata;
 	unsigned short Grouname;
@@ -228,7 +228,7 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 			break;
 
 		case D_MAT1:
-			position=f->GetPosition();
+			position=(unsigned int)f->GetPosition();
 			f->Read(&Matldata[Matlcount], sizeof(MATL_DATA));
 			if(f->GetPosition()>=(position+chunkheader.Size))
 			{ // flatpoly
@@ -334,7 +334,7 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 			break;
 
 		case D_POLH:
-			position=f->GetPosition();
+			position=(unsigned int) f->GetPosition();
 			//fseek(file,chunkheader.Size,SEEK_CUR);
 			if(Cmodel.Scount==0)
 			{
@@ -1088,7 +1088,7 @@ void CImportCOB::ohdr(void)
 //*************************************************************
 void CImportCOB::txtr(void)
 {
-	unsigned int h,i,j,k;
+	unsigned int j = 0, k = 0;
 	char tname[25];
 
 	GetDocument()->m_FS_BitmapData.count=numtextures;
@@ -1110,9 +1110,9 @@ void CImportCOB::txtr(void)
 		wi(walker+OutputLength)=numtextures;
 		OutputLength+=4;*/
 
-		for(h=0;h<numtextures;h++)
+		for(unsigned int h=0;h<numtextures;h++)
 		{
-			for(i=0;i<strlen(Matlname[h]);i++)
+			for(unsigned int i=0;i<strlen(Matlname[h]);i++)
 			{
 				if(Matlname[h][i]=='\\') j=i+1;
 				if(Matlname[h][i]=='.') k=i;
