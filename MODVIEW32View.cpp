@@ -2990,16 +2990,18 @@ void CMODVIEW32View::CopyToClipboard()
 		// Lock handle 
 		char *pData=(char *)::GlobalLock((HGLOBAL)handle); 
 		// Copy header and data 
-		memcpy(pData,&header,sizeof(BITMAPINFOHEADER)); 
-		memcpy(pData+sizeof(BITMAPINFOHEADER),pPixelData,NbBytes); 
-		// Unlock 
-		::GlobalUnlock((HGLOBAL)handle); 
+		if ( pData != NULL) {
+			memcpy(pData,&header,sizeof(BITMAPINFOHEADER)); 
+			memcpy(pData+sizeof(BITMAPINFOHEADER),pPixelData,NbBytes); 
+			// Unlock 
+			::GlobalUnlock((HGLOBAL)handle); 
 
-		// Push DIB in clipboard 
-		OpenClipboard(); 
-		EmptyClipboard(); 
-		SetClipboardData(CF_DIB,handle); 
-		CloseClipboard(); 
+			// Push DIB in clipboard 
+			OpenClipboard(); 
+			EmptyClipboard(); 
+			SetClipboardData(CF_DIB,handle); 
+			CloseClipboard(); 
+		}
 	}
 
 	// Cleanup 
