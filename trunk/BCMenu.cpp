@@ -1872,7 +1872,7 @@ void BCMenu::InsertSpaces(void)
 	ZeroMemory ((PVOID) &m_lf,sizeof (LOGFONT));
 	NONCLIENTMETRICS nm;
 	nm.cbSize = sizeof (NONCLIENTMETRICS);
-	VERIFY (SystemParametersInfo (SPI_GETNONCLIENTMETRICS,nm.cbSize,&nm,0)); 
+	VERIFY (SystemParametersInfo (SPI_GETNONCLIENTMETRICS,sizeof (NONCLIENTMETRICS),&nm,0)); 
 	m_lf =  nm.lfMenuFont;
 	m_fontMenu.CreateFontIndirect (&m_lf);
 	
