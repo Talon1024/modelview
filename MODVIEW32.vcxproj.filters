@@ -27,9 +27,6 @@
     <ClCompile Include="CompilerErrorDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CoolControlsManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DataSafe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -212,9 +209,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CompilerErrorDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CoolControlsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DataSafe.h">
