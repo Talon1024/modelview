@@ -89,7 +89,7 @@
     </ResourceCompile>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug1\MODVIEW32.bsc</OutputFile>
+      <OutputFile>.\Debug\MODVIEW32.bsc</OutputFile>
     </Bscmake>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -152,7 +152,6 @@
     <ClCompile Include="AW_CMultiViewSplitter.cpp" />
     <ClCompile Include="BCMenu.cpp" />
     <ClCompile Include="CompilerErrorDlg.cpp" />
-    <ClCompile Include="CoolControlsManager.cpp" />
     <ClCompile Include="DataSafe.cpp" />
     <ClCompile Include="Details.cpp" />
     <ClCompile Include="DM_Reg.cpp" />
@@ -223,7 +222,6 @@
     <ClInclude Include="AW_CMultiViewSplitter.h" />
     <ClInclude Include="BCMenu.h" />
     <ClInclude Include="CompilerErrorDlg.h" />
-    <ClInclude Include="CoolControlsManager.h" />
     <ClInclude Include="DataSafe.h" />
     <ClInclude Include="Details.h" />
     <ClInclude Include="DM_Reg.h" />

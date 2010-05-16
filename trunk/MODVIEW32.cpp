@@ -10,7 +10,6 @@
 #include "MODVIEW32Doc.h"
 #include "MODVIEW32View.h"
 #include "Explorer.h"
-//#include "CoolControlsManager.h"
 #include "dm_tools.h"
 #include "SplashNew.h"
 #include "welcome.h"
@@ -99,8 +98,6 @@ CATCH( CFileException, e )
     #endif
 }
 END_CATCH
-	
-	//GetCtrlManager().InstallHook();
 
 	//OpenGL warning message
 	if(DMReg_ReadHKCUint("OpenGL_WarningMessage",0)==0)
