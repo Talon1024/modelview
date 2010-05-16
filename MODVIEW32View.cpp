@@ -645,7 +645,13 @@ void CMODVIEW32View::FS_BuildScene(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);
+
+	glClearDepth(1.0f);									// Depth Buffer Setup
+	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
+	glEnable(GL_CULL_FACE);
+	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+	glShadeModel(GL_SMOOTH);
 
 	//Subsystems stuff
 	ASSERT(pDoc->m_FS_NumSOBJ<MAX_FS_SOBJ);

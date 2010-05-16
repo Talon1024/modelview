@@ -26,6 +26,7 @@
 
 #include "gl/gl.h"
 #include "gl/glu.h"
+#include "glext.h"
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

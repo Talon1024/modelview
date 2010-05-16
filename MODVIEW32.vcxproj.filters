@@ -376,6 +376,9 @@
     <ClInclude Include="WelcomePane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="glext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="res\back5a.bmp">
@@ -542,5 +545,8 @@
     </CustomBuild>
     <CustomBuild Include="D2Pal.dat" />
     <CustomBuild Include="MODVIEW32.reg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>
