@@ -97,6 +97,10 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>Debug/$(TargetFileName)</OutputFile>
       <AdditionalDependencies>glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>
+      </StackReserveSize>
+      <StackCommitSize>
+      </StackCommitSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -214,6 +218,7 @@
     <ClInclude Include="D2-extra.h" />
     <ClInclude Include="D3-extra.h" />
     <ClInclude Include="Fs-extra.h" />
+    <ClInclude Include="glext.h" />
     <ClInclude Include="RF-Extra.h" />
     <ClInclude Include="AW_CMultiViewSplitter.h" />
     <ClInclude Include="BCMenu.h" />
@@ -337,7 +342,15 @@
       <FileType>Document</FileType>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="MODVIEW32.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

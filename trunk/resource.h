@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by MODVIEW32.rc
 //
 #define IDD_ABOUTBOX                    100
@@ -26,7 +26,6 @@
 #define IDR_DESCENT2                    151
 #define IDR_DESCENT3                    153
 #define IDR_TOOLBAR1                    155
-#define IDB_SPLASH3                     160
 #define IDD_TABLE                       161
 #define IDD_PROGRESS                    162
 #define IDD_WELCOME                     163
@@ -38,7 +37,6 @@
 #define IDR_DESCENT3_SMALL              170
 #define IDR_DESCENT2_SMALL              172
 #define IDR_FREESPACE_SMALL             174
-#define IDB_VERSION                     180
 #define IDD_EXPLORER_BAR                181
 #define IDR_EXPLORER_BAR                182
 #define IDD_FREESPACE_EDITOR2           184
@@ -53,7 +51,6 @@
 #define IDR_EDITOR_SMALL                192
 #define IDD_DIALOG2                     192
 #define IDD_GAMEPANE_D2                 193
-#define IDB_VERSION_ALPHA               193
 #define IDD_GAMEPANE_D3                 194
 #define IDD_GAMEPANE_FS                 195
 #define IDB_TIPOFDAY                    195
