@@ -18,7 +18,6 @@
 #include "TXViewModeToolbar.h"
 #include "SilentSplitterWnd.h"
 #include "splitterex.h"
-//#include "BCMenu.h"
 #include "AW_CMultiViewSplitter.h"
 #include "VPFileDialog.h"
 
@@ -78,9 +77,7 @@ public:
 	void FS_ShowThruster();
 	void DockControlBarLeftOf(CToolBar *Bar, CToolBar *LeftOf);
 	void ResizeToolbar(CToolBar *tb,BOOL alwayssmall=FALSE);
-//	void GameBarD2();
 	int ExplorerOpenSubFile(char *filename);
-	//BCMenu
 	HMENU NewMenu(int menu=0);
 	CMenu m_menu;
 
@@ -104,8 +101,6 @@ public:
 	void ExplorerAddChild(char *filename,int typenr=-1);
 	virtual ~CMainFrame();
 	void GameBarNone();
-//	void GameBarD2();
-//	void GameBarD3();
 	void GameBarFS();
 	float CalcPaneStep();
 	float CalcPaneDrag();
@@ -118,14 +113,9 @@ protected:  // control bar embedded members
 	CStatusBar  m_wndStatusBar;
 	CToolBar    m_wndToolBar;
 	CToolBar	m_wndToolbarNoModel;
-//	CToolBar    m_wndToolBarD2;
-//	CToolBar    m_wndToolBarD3;
 	CToolBar    m_wndToolBarFS;
 	CToolBar	m_wndToolBarEditorFS;
 	CToolBar	m_wndToolBarNavigation;
-	//CGameBarD2	m_wndDlgBarD2;
-	//CGameBarD3	m_wndDlgBarD3;
-	//CGameBarFS	m_wndDlgBarFS;
 	int m_paneFS,
 		m_paneWelcome,
 		m_paneEdFS_MODEL,
@@ -151,7 +141,6 @@ protected:  // control bar embedded members
 
 public:
 	void UpdateMainDisplay();
-//	void GameBarRF();
 	void ParseCmd(CString cmd);
 	void SetTypeOfView(int type);
 	int m_TXCurrent;
@@ -256,22 +245,6 @@ protected:
 	afx_msg void OnUpdateModelNext(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateModelPrevious(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateNavigation(CCmdUI* pCmdUI);
-	//afx_msg void OnViewSpecialdescent3settingsNextposition();
-	//afx_msg void OnViewSpecialdescent3settingsPreviousposition();
-	//afx_msg void OnUpdateViewSpecialdescent3settingsNextposition(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateViewSpecialdescent3settingsPreviousposition(CCmdUI* pCmdUI);
-	//afx_msg void OnViewSpecialdescent2settingsMaintexturesetGroupa();
-	//afx_msg void OnViewSpecialdescent2settingsMaintexturesetWater();
-	//afx_msg void OnViewSpecialdescent2settingsMaintexturesetIce();
-	//afx_msg void OnViewSpecialdescent2settingsMaintexturesetFire();
-	//afx_msg void OnViewSpecialdescent2settingsMaintexturesetAlien2();
-	//afx_msg void OnViewSpecialdescent2settingsMaintexturesetAlien1();
-	//afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetFire(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetWater(CCmdUI* pCmdUI);
-	//afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetIce(CCmdUI* pCmdUI);
 	afx_msg void OnModelModelcomparisontable();
 	afx_msg void OnViewShowguns();
 	afx_msg void OnUpdateViewShowguns(CCmdUI* pCmdUI);
@@ -325,12 +298,6 @@ protected:
 	afx_msg void OnEditorImportpoffrom3dfile();
 	afx_msg void OnFileOpennewversion();
 	afx_msg void OnUpdateEditorImportpoffrom3dfile(CCmdUI* pCmdUI);
-//	afx_msg void OnVpfiledialogJumptodescent2directory();
-	//afx_msg void OnUpdateVpfiledialogJumptodescent2directory(CCmdUI* pCmdUI);
-	//afx_msg void OnVpfiledialogJumptodescent3directory();
-	//afx_msg void OnUpdateVpfiledialogJumptodescent3directory(CCmdUI* pCmdUI);
-	//afx_msg void OnVpfiledialogJumptofreespace1directory();
-	//afx_msg void OnUpdateVpfiledialogJumptofreespace1directory(CCmdUI* pCmdUI);
 	afx_msg void OnVpfiledialogJumptofreespace2directory();
 	afx_msg void OnUpdateVpfiledialogJumptofreespace2directory(CCmdUI* pCmdUI);
 	//}}AFX_MSG

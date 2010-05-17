@@ -375,12 +375,8 @@ CString DMReg_GetGameDir(int GameType,int DistributionType)
 
 	switch(GameType)
 	{
-	case DMREG_GAMETYPE_DESCENT1:	key+="Descent 1"; break;
-	case DMREG_GAMETYPE_DESCENT2:	key+="Descent 2"; break;
-	case DMREG_GAMETYPE_DESCENT3:	key+="Descent 3"; break;
 	case DMREG_GAMETYPE_FREESPACE1:	key+="FreeSpace 1"; break;
 	case DMREG_GAMETYPE_FREESPACE2:	key+="FreeSpace 2"; break;
-	case DMREG_GAMETYPE_SUMMONER1:	key+="Summoner 1"; break;
 	default: ASSERT(FALSE);	return "<Internal error: Invalid GameType>";
 	}
 
@@ -407,12 +403,8 @@ BOOL DMReg_SetGameDir(int GameType,int DistributionType,CString path)
 
 	switch(GameType)
 	{
-	case DMREG_GAMETYPE_DESCENT1:	key+="Descent 1"; break;
-	case DMREG_GAMETYPE_DESCENT2:	key+="Descent 2"; break;
-	case DMREG_GAMETYPE_DESCENT3:	key+="Descent 3"; break;
 	case DMREG_GAMETYPE_FREESPACE1:	key+="FreeSpace 1"; break;
 	case DMREG_GAMETYPE_FREESPACE2:	key+="FreeSpace 2"; break;
-	case DMREG_GAMETYPE_SUMMONER1:	key+="Summoner 1"; break;
 	default: ASSERT(FALSE);	return FALSE;
 	}
 

@@ -3,8 +3,6 @@
 #ifndef MATRIXH
 #define MATRIXH
 
-//#include "d2-extra.h"
-
 class CMathStuff
 {
 public:

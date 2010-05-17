@@ -247,32 +247,14 @@ void CDetails::GetTexture()
 	m_TextureResL=m_TextureResX*m_TextureResY;
 	m_TextureData=new unsigned char[m_TextureResL];
 
-{
-CString out;
-out.Format("Index %i, %i x %i",index,m_TextureResX,m_TextureResY);
-OutputDebugString(out);
-}
+	CString out;
+	out.Format("Index %i, %i x %i",index,m_TextureResX,m_TextureResY);
+	OutputDebugString(out);
 
-	switch(viewFrame->current_game)
-	{
-	/*case GAME_D2:
-		{
-			memcpy(m_TextureData,viewDoc->m_D2_BitmapData.bitmap[index].bitmap_array,m_TextureResL);
-			memcpy(&m_TexturePale,&viewDoc->m_D2_Palettes[viewDoc->m_D2_TextureSet],768);
-			for(int i=0;i<768;i++)
-			{
-				ASSERT(m_TexturePale[i]<64);
-				m_TexturePale[i]*=4;
-			}
-		}
-		break;*/
-
-	case GAME_FS:
-		{
-			memcpy(m_TextureData,&viewDoc->m_FS_ModelTexture[index],m_TextureResL);
-			for(int i=0;i<768;i++)
-				m_TexturePale[i]=i/3;
-		}
+	if (viewFrame->current_game == GAME_FS)	{
+		memcpy(m_TextureData,&viewDoc->m_FS_ModelTexture[index],m_TextureResL);
+		for(int i=0;i<768;i++)
+			m_TexturePale[i]=i/3;
 	}
 
 	//Blah

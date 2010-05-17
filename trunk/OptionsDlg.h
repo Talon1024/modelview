@@ -22,10 +22,6 @@ public:
 	~COptionsDlg();
 	int RemoveFilename(char *path);
 	char * GetMainPath(char *path);
-	char * GetDescentINI(char *);
-	CString GetD3Path();
-	CString GetD2Path();
-	CString GetD1Path();
 	CString GetF2Path();
 	CString GetF1Path();
 
@@ -59,6 +55,8 @@ protected:
 	afx_msg void OnConfigure();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedMenuStyle();
 };
 
 //{{AFX_INSERT_LOCATION}}
