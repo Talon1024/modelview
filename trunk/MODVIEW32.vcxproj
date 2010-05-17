@@ -47,6 +47,7 @@
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\Release\</OutDir>
@@ -155,7 +156,6 @@
     <ClCompile Include="DataSafe.cpp" />
     <ClCompile Include="Details.cpp" />
     <ClCompile Include="DM_Reg.cpp" />
-    <ClCompile Include="dm_tools.cpp" />
     <ClCompile Include="EditorFS_FUEL.cpp" />
     <ClCompile Include="EditorFS_GPNT.cpp" />
     <ClCompile Include="EditorFS_MODEL.cpp" />
@@ -225,7 +225,6 @@
     <ClInclude Include="DataSafe.h" />
     <ClInclude Include="Details.h" />
     <ClInclude Include="DM_Reg.h" />
-    <ClInclude Include="dm_tools.h" />
     <ClInclude Include="EditorFS_FUEL.h" />
     <ClInclude Include="EditorFS_GPNT.h" />
     <ClInclude Include="EditorFS_MODEL.h" />
@@ -271,6 +270,7 @@
     <ClInclude Include="TXList.h" />
     <ClInclude Include="TXView.h" />
     <ClInclude Include="TXViewModeToolbar.h" />
+    <ClInclude Include="version.h" />
     <ClInclude Include="VPFileDialog.h" />
     <ClInclude Include="VPFileDialogSubWnd.h" />
     <ClInclude Include="Welcome.h" />
@@ -339,9 +339,6 @@
     <CustomBuild Include="MODVIEW32.reg">
       <FileType>Document</FileType>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

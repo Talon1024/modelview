@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "DM_Reg.h"
+#include "version.h"
 
 //[HKEY_LOCAL_MACHINE\Software\Descent Network\Descent Manager Tools\<name of module>]
 //"Path"= (incl. "\")
@@ -57,7 +58,7 @@ CString _ReadHKLM(CString path,CString key)
     long valuesize;
 	CString regkey=DMREG_LM+path;
 	valuesize=8191;
-	ret=RegOpenKeyEx(HKEY_LOCAL_MACHINE,regkey,NULL,KEY_QUERY_VALUE,&hkey);
+	ret=RegOpenKeyEx(HKEY_CURRENT_USER,regkey,NULL,KEY_QUERY_VALUE,&hkey);
 	ret=RegQueryValueEx(hkey,key,NULL,NULL,(LPBYTE)value,(LPDWORD)&valuesize);
 	if(ret!=ERROR_SUCCESS)
 		*value=0; //make sure value is empty, if an error occured
@@ -76,7 +77,7 @@ int _ReadHKLMint(CString path,CString key,int def=0)
     long valuesize;
 	CString regkey=DMREG_LM+path;
 	valuesize=4;
-	ret=RegOpenKeyEx(HKEY_LOCAL_MACHINE,regkey,NULL,KEY_QUERY_VALUE,&hkey);
+	ret=RegOpenKeyEx(HKEY_CURRENT_USER,regkey,NULL,KEY_QUERY_VALUE,&hkey);
 	ret=RegQueryValueEx(hkey,key,NULL,NULL,(LPBYTE)&value,(LPDWORD)&valuesize);
 	if(ret!=ERROR_SUCCESS)
 		value=def; //make sure value is 0, if an error occured
@@ -136,7 +137,7 @@ BOOL _WriteHKLM(CString path,CString key,CString value)
 		strcpy_s(kvalue,value);
 		long valuesize=value.GetLength()+1;
 		CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-		long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
 		if(ret==ERROR_SUCCESS)
 			ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
 		if(ret==ERROR_SUCCESS)
@@ -164,7 +165,7 @@ BOOL _WriteHKLM(CString path,CString key,int value)
 		memcpy(kvalue,&value,4);
 		long valuesize=4;
 		CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-		long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
 		if(ret==ERROR_SUCCESS)
 			ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
 		if(ret==ERROR_SUCCESS)
@@ -267,7 +268,7 @@ void _Init_StIfMigrate()
 	//Read games dirs
 	if(_FileExists(descini))
 	{
-		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1 Demo","Path",_GetPrivateProfileString("Descent","D1Full",descini)));
+		/*VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1 Demo","Path",_GetPrivateProfileString("Descent","D1Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1 OEM","Path",_GetPrivateProfileString("Descent","D1OEM",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1","Path",_GetPrivateProfileString("Descent","D1Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 2 Demo","Path",_GetPrivateProfileString("Descent","D2Full",descini)));
@@ -275,16 +276,16 @@ void _Init_StIfMigrate()
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 2","Path",_GetPrivateProfileString("Descent","D2Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3 Demo","Path",_GetPrivateProfileString("Descent","D3Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3 OEM","Path",_GetPrivateProfileString("Descent","D3OEM",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3","Path",_GetPrivateProfileString("Descent","D3Full",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 Demo","Path",_GetPrivateProfileString("FreeSpace","FS1Demo",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 OEM","Path",_GetPrivateProfileString("FreeSpace","FS1OEM",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1","Path",_GetPrivateProfileString("FreeSpace","FS1Full",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2 Demo","Path",_GetPrivateProfileString("FreeSpace","FS2Demo",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3","Path",_GetPrivateProfileString("Descent","D3Full",descini)));*/
+		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 Demo","Path",_GetPrivateProfileString("FreeSpace","FS1Demo",descini)));
+		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 OEM","Path",_GetPrivateProfileString("FreeSpace","FS1OEM",descini)));
+		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1","Path",_GetPrivateProfileString("FreeSpace","FS1Full",descini)));
+		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2 Demo","Path",_GetPrivateProfileString("FreeSpace","FS2Demo",descini)));
 		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2 OEM","Path",_GetPrivateProfileString("FreeSpace","FS2OEM",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2","Path",_GetPrivateProfileString("FreeSpace","FS2Full",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1 Demo","Path",_GetPrivateProfileString("Summoner","S1Demo",descini)));
+		//VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1 Demo","Path",_GetPrivateProfileString("Summoner","S1Demo",descini)));
 		//VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1 OEM","Path",_GetPrivateProfileString("Summoner","S1OEM",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1","Path",_GetPrivateProfileString("Summoner","S1Full",descini)));
+		//VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1","Path",_GetPrivateProfileString("Summoner","S1Full",descini)));
 	}
 }
 
@@ -322,26 +323,16 @@ void _Init_RegisterModule()
 	CString date;
 	CString coder;
 	int buildb = 0;
-	CString _moduldat=path+"dm_modul.dat";
-	if(_FileExists(_moduldat))
-	{
-		version=_GetPrivateProfileString("Module","Vers",_moduldat);
-		date=_GetPrivateProfileString("Module","Date",_moduldat);
-		coder=_GetPrivateProfileString("Module","Coder",_moduldat);
 
-		//Extract build number
-		pos=version.Find("Build ");
-		ASSERT(pos!=-1);
-		if(pos!=-1)
-		{
-			CString _builds=version.Mid(pos+6);
-			_builds.TrimRight();
-			_builds.TrimRight(")");
-			buildb=atoi(_builds);
-		}
-		else
-			buildb=0;
-	}
+	version = VERSION;
+	date = BUILDDATE;
+	coder = CODER;
+	buildb = BUILDNUM;
+#ifdef DEBUG
+	exename = "MODVIEW32d.exe";
+#else
+	exename = "MODVIEW32.exe";
+#endif
 
 	//Write everything into the registry
 	CString keyname="\\Descent Manager Tools\\Descent Manager MODELVIEW32";
