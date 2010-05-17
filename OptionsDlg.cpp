@@ -41,7 +41,6 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(COptionsDlg)
 	DDX_Control(pDX, IDC_MENU_STYLE, c_MenuStyle);
 	DDX_Control(pDX, IDC_QUICKRENDERING, m_QuickRendering);
-	DDX_Control(pDX, IDC_D2_SMOOTHPOSITIONCHANGE, m_D2_SmoothPositionChange);
 	DDX_Control(pDX, IDC_EXPLORERINDEX, m_ExplorerIndex);
 	DDX_Control(pDX, IDC_SWAPMOUSEBUTTONS, m_SwapMouseButtons);
 	DDX_Control(pDX, IDC_TOOLBAR_TEXT, m_ToolBar_Text);
@@ -55,6 +54,8 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	ON_BN_CLICKED(IDC_CONFIGURE, OnConfigure)
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_MENU_STYLE, &COptionsDlg::OnBnClickedMenuStyle)
+//	ON_BN_CLICKED(IDC_QUICKRENDERING, &COptionsDlg::OnBnClickedQuickrendering)
+ON_BN_CLICKED(IDC_QUICKRENDERING, &COptionsDlg::OnBnClickedQuickrendering)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -95,8 +96,6 @@ BOOL COptionsDlg::OnInitDialog()
 	if(*(options+3)==1)
 		m_ExplorerIndex.SetCheck(1);
 	if(*(options+4)==1)
-		m_D2_SmoothPositionChange.SetCheck(1);
-	if(*(options+5)==1)
 		m_QuickRendering.SetCheck(1);
 
 	if(DMReg_ReadHKCUint("DisableXPMenuStyle",0)==0)
@@ -219,6 +218,11 @@ void COptionsDlg::OnConfigure()
 
 
 void COptionsDlg::OnBnClickedMenuStyle()
+{
+	// TODO: Add your control notification handler code here
+}
+
+void COptionsDlg::OnBnClickedQuickrendering()
 {
 	// TODO: Add your control notification handler code here
 }

@@ -501,7 +501,6 @@
     <CustomBuild Include="res\version_.bmp">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D2Pal.dat" />
     <CustomBuild Include="MODVIEW32.reg" />
   </ItemGroup>
 </Project>

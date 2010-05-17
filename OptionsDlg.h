@@ -30,7 +30,7 @@ public:
 	enum { IDD = IDD_OPTIONS };
 	CButton	c_MenuStyle;
 	CButton	m_QuickRendering;
-	CButton	m_D2_SmoothPositionChange;
+	//CButton	m_D2_SmoothPositionChange;
 	CButton	m_ExplorerIndex;
 	CButton	m_SwapMouseButtons;
 	CComboBox	m_ToolBar_Text;
@@ -57,6 +57,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedMenuStyle();
+//	afx_msg void OnBnClickedQuickrendering();
+	afx_msg void OnBnClickedQuickrendering();
 };
 
 //{{AFX_INSERT_LOCATION}}

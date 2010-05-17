@@ -247,8 +247,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	EnableDocking(CBRS_ALIGN_ANY);
 
-	InitToolbars();
 
+	InitToolbars();
 	return 0;
 }
 
@@ -1348,7 +1348,7 @@ void CMainFrame::LoadOptions()
 	m_ToolBarSize=*(options+1);
 	m_SwapMouseButtons=*(options+2);
 	m_ExplorerIndex=*(options+3);
-	m_QuickRendering=*(options+5);
+	m_QuickRendering=*(options+4);
 	delete[] options;
 }
 
