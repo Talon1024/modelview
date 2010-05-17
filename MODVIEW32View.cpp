@@ -519,7 +519,7 @@ void CMODVIEW32View::FS_SetDetailLevel(int mode)
 	CMODVIEW32Doc* pDoc=GetDocument();
 	m_Detaillevel=mode;
 	if(m_RenderMode==RENDER_TEXTURED)
-		pDoc->FS_LoadPCXData(mode,m_ShowThruster,m_FastTextureLoad);
+		pDoc->FS_LoadTextureData(mode,m_ShowThruster,m_FastTextureLoad);
 	CMainFrame *viewFrame=static_cast<CMainFrame*>(GetParentFrame());
 	viewFrame->FS_SetDetailLevel(mode);
 	InvalidateRect(NULL);
@@ -1016,7 +1016,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			ValidTexture=FALSE;
 			if(k<pDoc->m_FS_BitmapData.count)
 			{
-				if((pDoc->m_FS_BitmapData.pic[k].valid==1)|(SmartRenderEngine_RenderMode()!=RENDER_TEXTURED))
+				if((pDoc->m_FS_BitmapData.pic[k].valid==1) || (SmartRenderEngine_RenderMode()!=RENDER_TEXTURED))
 				{
 					ValidTexture=TRUE;
 					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)

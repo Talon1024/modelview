@@ -2183,7 +2183,7 @@ void CImportCOB::MakePof(/*char *output*/)
 		GetDocument()->m_FileVersion=2117;
 	}
 
-	GetDocument()->FS_LoadPCXData2();
+	GetDocument()->FS_LoadTextureData2();
 	GetDocument()->m_UntitledModel=TRUE;
 	GetDocument()->SetModifiedFlag(TRUE); //Document has been changed
 	GetDocument()->m_CurrentFile_Offset=0;

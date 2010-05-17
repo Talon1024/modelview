@@ -30,10 +30,9 @@
 #include <conio.h>
 #include <stdlib.h>
 
-#include			"tga.h"
+#include "tga.h"
 
-void	 
-ConvertUncompressedTGA(byte BitDepth,int width,int height,void *source,RGBA32_t *dest)
+void ConvertUncompressedTGA(byte BitDepth,int width,int height,void *source,RGBA32_t *dest)
 {
 	int i,j;
 	RGBA32_t	*d = dest;
@@ -78,8 +77,7 @@ ConvertUncompressedTGA(byte BitDepth,int width,int height,void *source,RGBA32_t 
 	};
 };
 
-void		
-TGA_LoadRGBA( char const* inName,RGBA32_t*& outData, int& outWidth, int& outHeight )
+void TGA_LoadRGBA( char const* inName,RGBA32_t*& outData, int& outWidth, int& outHeight )
 {
 	TGAHeader_t		*Header;
 	void			*Buffer;

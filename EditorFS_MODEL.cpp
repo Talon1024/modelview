@@ -530,7 +530,7 @@ void CEditorFS_MODEL::OnButtonTextureNames()
 
 	//Reload textures
 	if(GetMainView()->m_RenderMode == RENDER_TEXTURED)
-		GetDocument()->FS_LoadPCXData(GetMainView()->m_Detaillevel,GetMainView()->m_ShowThruster,GetMainView()->m_FastTextureLoad);
+		GetDocument()->FS_LoadTextureData(GetMainView()->m_Detaillevel,GetMainView()->m_ShowThruster,GetMainView()->m_FastTextureLoad);
 	GetMainView()->RedrawWindow();
 }
 
