@@ -96,11 +96,11 @@ BOOL COpenDlg::OnInitDialog()
 	m_FileTree.SetImageList(pImageList,TVSIL_NORMAL);
 
 	//Add standard files
-	InsertItem(GAME_D2,"Descent 2 Main HAM resource file","D:\\Games\\Descent 2\\","DESCENT2.HAM",0);
-	InsertItem(GAME_D3,"Descent 3 Main HOG data file","D:\\Games\\Descent 3 USA\\","D3.HOG",1);
-	InsertItem(GAME_D3,"Mercenary HOG data file","D:\\Games\\Descent 3 USA\\","MERC.HOG",1);
-	InsertItem(GAME_FS1,"FreeSpace 1 Main VP archive","D:\\Games\\FreeSpace 1 German\\DATA\\","FREESPACE.VP",2);
-	InsertItem(GAME_FS1,"Silent Threat VP archive","D:\\Games\\FreeSpace 1 German\\","MDISK.VP",2);
+//	InsertItem(GAME_D2,"Descent 2 Main HAM resource file","D:\\Games\\Descent 2\\","DESCENT2.HAM",0);
+//	InsertItem(GAME_D3,"Descent 3 Main HOG data file","D:\\Games\\Descent 3 USA\\","D3.HOG",1);
+//	InsertItem(GAME_D3,"Mercenary HOG data file","D:\\Games\\Descent 3 USA\\","MERC.HOG",1);
+//	InsertItem(GAME_FS1,"FreeSpace 1 Main VP archive","D:\\Games\\FreeSpace 1 German\\DATA\\","FREESPACE.VP",2);
+//	InsertItem(GAME_FS1,"Silent Threat VP archive","D:\\Games\\FreeSpace 1 German\\","MDISK.VP",2);
 	InsertItem(GAME_FS2,"FreeSpace 2 Main VP archive","D:\\Games\\FreeSpace 2 USA\\","SPARKY_FS2.VP",3);
 
 	//Add recent file list files
@@ -137,9 +137,9 @@ BOOL COpenDlg::InsertItem(int game,CString desc, CString filename, int icon)
 	CString gamename;
 	switch(game)
 	{
-	case GAME_D1: gamename="Descent"; break;
-	case GAME_D2: gamename="Descent 2"; break;
-	case GAME_D3: gamename="Descent 3"; break;
+	//case GAME_D1: gamename="Descent"; break;
+	//case GAME_D2: gamename="Descent 2"; break;
+	//case GAME_D3: gamename="Descent 3"; break;
 	case GAME_FS1: gamename="Conflict, Descent: FreeSpace"; break;
 	case GAME_FS2: gamename="FreeSpace 2"; break;
 	case GAME_RECENT: gamename="Recent opened files"; break;

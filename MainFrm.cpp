@@ -21,10 +21,10 @@
 #include "TableList.h"
 #include "Help_Using.h"
 #include "WelcomePane.h"
-#include "GamePaneD2.h"
-#include "GamePaneD3.h"
+//#include "GamePaneD2.h"
+//#include "GamePaneD3.h"
 #include "GamePaneFS.h"
-#include "GamePaneRF.h"
+//#include "GamePaneRF.h"
 
 #ifdef _WITHHTVIEW
 #include "HTMLTaskView.h"
@@ -120,22 +120,22 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_MODEL_NEXT, OnUpdateModelNext)
 	ON_UPDATE_COMMAND_UI(ID_MODEL_PREVIOUS, OnUpdateModelPrevious)
 	ON_UPDATE_COMMAND_UI(ID_MODEL_LEFT, OnUpdateNavigation)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT3SETTINGS_NEXTPOSITION, OnViewSpecialdescent3settingsNextposition)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT3SETTINGS_PREVIOUSPOSITION, OnViewSpecialdescent3settingsPreviousposition)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT3SETTINGS_NEXTPOSITION, OnUpdateViewSpecialdescent3settingsNextposition)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT3SETTINGS_PREVIOUSPOSITION, OnUpdateViewSpecialdescent3settingsPreviousposition)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_GROUPA, OnViewSpecialdescent2settingsMaintexturesetGroupa)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_WATER, OnViewSpecialdescent2settingsMaintexturesetWater)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ICE, OnViewSpecialdescent2settingsMaintexturesetIce)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_FIRE, OnViewSpecialdescent2settingsMaintexturesetFire)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN2, OnViewSpecialdescent2settingsMaintexturesetAlien2)
-	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN1, OnViewSpecialdescent2settingsMaintexturesetAlien1)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_GROUPA, OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_FIRE, OnUpdateViewSpecialdescent2settingsMaintexturesetFire)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN2, OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN1, OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_WATER, OnUpdateViewSpecialdescent2settingsMaintexturesetWater)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ICE, OnUpdateViewSpecialdescent2settingsMaintexturesetIce)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT3SETTINGS_NEXTPOSITION, OnViewSpecialdescent3settingsNextposition)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT3SETTINGS_PREVIOUSPOSITION, OnViewSpecialdescent3settingsPreviousposition)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT3SETTINGS_NEXTPOSITION, OnUpdateViewSpecialdescent3settingsNextposition)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT3SETTINGS_PREVIOUSPOSITION, OnUpdateViewSpecialdescent3settingsPreviousposition)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_GROUPA, OnViewSpecialdescent2settingsMaintexturesetGroupa)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_WATER, OnViewSpecialdescent2settingsMaintexturesetWater)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ICE, OnViewSpecialdescent2settingsMaintexturesetIce)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_FIRE, OnViewSpecialdescent2settingsMaintexturesetFire)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN2, OnViewSpecialdescent2settingsMaintexturesetAlien2)
+	//ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN1, OnViewSpecialdescent2settingsMaintexturesetAlien1)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_GROUPA, OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_FIRE, OnUpdateViewSpecialdescent2settingsMaintexturesetFire)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN2, OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN1, OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_WATER, OnUpdateViewSpecialdescent2settingsMaintexturesetWater)
+	//ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ICE, OnUpdateViewSpecialdescent2settingsMaintexturesetIce)
 	ON_COMMAND(ID_MODEL_MODELCOMPARISONTABLE, OnModelModelcomparisontable)
 	ON_COMMAND(ID_VIEW_SHOWGUNS, OnViewShowguns)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SHOWGUNS, OnUpdateViewShowguns)
@@ -202,12 +202,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_AS, OnUpdateEditorSave)
 	ON_COMMAND(ID_HELP_USING2, OnHelpUsing)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, OnSelchangeTab1)
-	ON_COMMAND(ID_VPFILEDIALOG_JUMPTODESCENT2DIRECTORY, OnVpfiledialogJumptodescent2directory)
-	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTODESCENT2DIRECTORY, OnUpdateVpfiledialogJumptodescent2directory)
-	ON_COMMAND(ID_VPFILEDIALOG_JUMPTODESCENT3DIRECTORY, OnVpfiledialogJumptodescent3directory)
-	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTODESCENT3DIRECTORY, OnUpdateVpfiledialogJumptodescent3directory)
-	ON_COMMAND(ID_VPFILEDIALOG_JUMPTOFREESPACE1DIRECTORY, OnVpfiledialogJumptofreespace1directory)
-	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTOFREESPACE1DIRECTORY, OnUpdateVpfiledialogJumptofreespace1directory)
+	//ON_COMMAND(ID_VPFILEDIALOG_JUMPTODESCENT2DIRECTORY, OnVpfiledialogJumptodescent2directory)
+	//ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTODESCENT2DIRECTORY, OnUpdateVpfiledialogJumptodescent2directory)
+	//ON_COMMAND(ID_VPFILEDIALOG_JUMPTODESCENT3DIRECTORY, OnVpfiledialogJumptodescent3directory)
+	//ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTODESCENT3DIRECTORY, OnUpdateVpfiledialogJumptodescent3directory)
+	//ON_COMMAND(ID_VPFILEDIALOG_JUMPTOFREESPACE1DIRECTORY, OnVpfiledialogJumptofreespace1directory)
+	//ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTOFREESPACE1DIRECTORY, OnUpdateVpfiledialogJumptofreespace1directory)
 	ON_COMMAND(ID_VPFILEDIALOG_JUMPTOFREESPACE2DIRECTORY, OnVpfiledialogJumptofreespace2directory)
 	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTOFREESPACE2DIRECTORY, OnUpdateVpfiledialogJumptofreespace2directory)
 	ON_COMMAND(ID_MODEL_SHOWMODELDETAILS_TEXTURES,TXShowTextures)
@@ -310,10 +310,10 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CMODVIEW32View), CSize(100, 100), pContext);
 #endif
 	m_paneWelcome=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CWelcomePane), pContext);
-	m_paneD2=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneD2), pContext);
-	m_paneD3=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneD3), pContext);
+//	m_paneD2=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneD2), pContext);
+//	m_paneD3=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneD3), pContext);
 	m_paneFS=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneFS), pContext);
-	m_paneRF=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneRF), pContext);
+//	m_paneRF=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneRF), pContext);
 
 #ifdef _WITHEDITOR
 	m_paneEdFS_MODEL=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CEditorFS_MODEL), pContext);
@@ -377,31 +377,31 @@ void CMainFrame::Dump(CDumpContext& dc) const
 // CMainFrame message handlers
 
 
-void CMainFrame::GameBarD2() 
-{
-	if(current_game!=GAME_D2)
-	{
-		GameBarNone();
-		m_wndSplitter.ShowView(m_paneD2);
-		ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
-		ShowControlBar(&m_wndToolBarD2,TRUE,FALSE);
-	}
-	current_game=GAME_D2;
-	((CGamePaneD2 *)GetGamePane())->Init();
-}
+//void CMainFrame::GameBarD2() 
+//{
+//	if(current_game!=GAME_D2)
+//	{
+//		GameBarNone();
+//		m_wndSplitter.ShowView(m_paneD2);
+//		ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
+//		ShowControlBar(&m_wndToolBarD2,TRUE,FALSE);
+//	}
+//	current_game=GAME_D2;
+//	((CGamePaneD2 *)GetGamePane())->Init();
+//}
 
-void CMainFrame::GameBarD3()
-{
-	if(current_game!=GAME_D3)
-	{
-		GameBarNone();
-		m_wndSplitter.ShowView(m_paneD3);
-		ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
-		ShowControlBar(&m_wndToolBarD3,TRUE,FALSE);
-	}
-	current_game=GAME_D3;
-	((CGamePaneD3 *)GetGamePane())->Init();
-}
+//void CMainFrame::GameBarD3()
+//{
+//	if(current_game!=GAME_D3)
+//	{
+//		GameBarNone();
+//		m_wndSplitter.ShowView(m_paneD3);
+//		ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
+//		ShowControlBar(&m_wndToolBarD3,TRUE,FALSE);
+//	}
+//	current_game=GAME_D3;
+//	((CGamePaneD3 *)GetGamePane())->Init();
+//}
 
 void CMainFrame::GameBarFS() 
 {
@@ -416,26 +416,26 @@ void CMainFrame::GameBarFS()
 	((CGamePaneFS *)GetGamePane())->Init();
 }
 
-void CMainFrame::GameBarRF()
-{
-	if(current_game!=GAME_RF)
-	{
-		GameBarNone();
-		m_wndSplitter.ShowView(m_paneRF);
-		//ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
-		//ShowControlBar(&m_wndToolBarRF,TRUE,FALSE);
-	}
-	current_game=GAME_RF;
-	((CGamePaneRF *)GetGamePane())->Init();
-}
+//void CMainFrame::GameBarRF()
+//{
+//	if(current_game!=GAME_RF)
+//	{
+//		GameBarNone();
+//		m_wndSplitter.ShowView(m_paneRF);
+//		//ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
+//		//ShowControlBar(&m_wndToolBarRF,TRUE,FALSE);
+//	}
+//	current_game=GAME_RF;
+//	((CGamePaneRF *)GetGamePane())->Init();
+//}
 
 void CMainFrame::GameBarNone()
 {
 	current_game=GAME_NONE;
 
 	ShowControlBar(&m_wndToolbarNoModel,TRUE,FALSE);
-	ShowControlBar(&m_wndToolBarD2,FALSE,FALSE);
-	ShowControlBar(&m_wndToolBarD3,FALSE,FALSE);
+	//ShowControlBar(&m_wndToolBarD2,FALSE,FALSE);
+	//ShowControlBar(&m_wndToolBarD3,FALSE,FALSE);
 	ShowControlBar(&m_wndToolBarFS,FALSE,FALSE);
 
 	m_wndSplitter.ShowView(m_paneWelcome);
@@ -466,13 +466,10 @@ void CMainFrame::ExplorerAddRoot(char *text)
 	ExplorerPane()->m_RootName=text;
 
 	int curgame=GetDocument()->m_Game;
-	if(curgame==GAME_D3 || curgame==GAME_FS)
+	if( curgame==GAME_FS )
 	{
 		CString gamecaption;
-		if(GetDocument()->m_Game==GAME_D3)
-			gamecaption="Descent3";
-		else
-			gamecaption="FreeSpace";
+		gamecaption="FreeSpace";
 
 		for(int typenr=0;typenr<MAX_TYPEROOTS;typenr++)
 		{
@@ -507,17 +504,17 @@ void CMainFrame::ExplorerAddChild(char *filename,int typenr/*=-1*/)
 	{
 		if(e->typeroot[typenr]==NULL)
 		{
-			//Get name
-			if(GetDocument()->m_Game==GAME_D2)
-			{
-				CString capname=GetDocument()->D2_GenerateModelTypeName(typenr);
-				e->typeroot[typenr]=p->InsertItem(capname,m_ExplorerLastRoot);
-				p->EnsureVisible(e->typeroot[typenr]);
-				e->typeroot_str[typenr]=capname;
-				e->typeroot_num[typenr]=0;
-			}
-			else
-				ASSERT(FALSE);
+			////Get name
+			//if(GetDocument()->m_Game==GAME_D2)
+			//{
+			//	CString capname=GetDocument()->D2_GenerateModelTypeName(typenr);
+			//	e->typeroot[typenr]=p->InsertItem(capname,m_ExplorerLastRoot);
+			//	p->EnsureVisible(e->typeroot[typenr]);
+			//	e->typeroot_str[typenr]=capname;
+			//	e->typeroot_num[typenr]=0;
+			//}
+			//else
+			//	ASSERT(FALSE);
 			/*{
 				char capname[8192];
 				char typestr[8192];
@@ -797,8 +794,8 @@ float CMainFrame::CalcPaneStep()
 {
 	switch(current_game)
 	{
-	case GAME_D2:	return GetDocument()->m_D2_Model.MaxXYZ/PANEDIV;
-	case GAME_D3:	return GetDocument()->m_D3_Display.MaxXYZ/PANEDIV;
+	//case GAME_D2:	return GetDocument()->m_D2_Model.MaxXYZ/PANEDIV;
+	//case GAME_D3:	return GetDocument()->m_D3_Display.MaxXYZ/PANEDIV;
 	case GAME_FS:	return GetDocument()->m_FS_Model.MaxXYZ/PANEDIV;
 	default:		return PANESPEED;
 	}
@@ -808,8 +805,8 @@ float CMainFrame::CalcPaneDrag()
 {
 	switch(current_game)
 	{
-	case GAME_D2:	return GetDocument()->m_D2_Model.MaxXYZ/100;
-	case GAME_D3:	return GetDocument()->m_D3_Display.MaxXYZ/50;
+	//case GAME_D2:	return GetDocument()->m_D2_Model.MaxXYZ/100;
+	//case GAME_D3:	return GetDocument()->m_D3_Display.MaxXYZ/50;
 	case GAME_FS:	return GetDocument()->m_FS_Model.MaxXYZ/100;
 	default:		return (float)1.0;
 	}
@@ -1094,14 +1091,14 @@ void CMainFrame::OnFileOpen()
 
 void CMainFrame::OnViewDorotation() 
 {
-	GetCurrentView()->m_D3_Rotate=!GetCurrentView()->m_D3_Rotate;
+	/*GetCurrentView()->m_D3_Rotate=!GetCurrentView()->m_D3_Rotate;*/
 	SetTimer(1,50,NULL);
 }
 
 void CMainFrame::OnUpdateViewDorotation(CCmdUI* pCmdUI) 
 {
 	pCmdUI->Enable(FALSE); //current_game==GAME_D3);
-	pCmdUI->SetCheck(GetCurrentView()->m_D3_Rotate);
+	/*pCmdUI->SetCheck(GetCurrentView()->m_D3_Rotate);*/
 }
 
 void CMainFrame::OnUpdateModelTexturelist(CCmdUI* pCmdUI) 
@@ -1179,22 +1176,22 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 	switch(nIDEvent)
 	{
 	case 0:
-		if(current_game==GAME_D2 /* or game_d3*/)
-		{
-			int redraw=FALSE;
-			for(int i=0;i<MAX_D2_SUBMODELS;i++)
-			{
-				redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].p,&pView->m_D2_PosAngle_ShallBe[i].p,&pView->m_D2_PosAngle_StepBit[i].p);
-				redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].h,&pView->m_D2_PosAngle_ShallBe[i].h,&pView->m_D2_PosAngle_StepBit[i].h);
-				redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].b,&pView->m_D2_PosAngle_ShallBe[i].b,&pView->m_D2_PosAngle_StepBit[i].b);
-			}
-			if(redraw)
-				pView->InvalidateRect(NULL);
-		}
+		//if(current_game==GAME_D2 /* or game_d3*/)
+		//{
+		//	int redraw=FALSE;
+		//	for(int i=0;i<MAX_D2_SUBMODELS;i++)
+		//	{
+		//		redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].p,&pView->m_D2_PosAngle_ShallBe[i].p,&pView->m_D2_PosAngle_StepBit[i].p);
+		//		redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].h,&pView->m_D2_PosAngle_ShallBe[i].h,&pView->m_D2_PosAngle_StepBit[i].h);
+		//		redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].b,&pView->m_D2_PosAngle_ShallBe[i].b,&pView->m_D2_PosAngle_StepBit[i].b);
+		//	}
+		//	if(redraw)
+		//		pView->InvalidateRect(NULL);
+		//}
 		break;
 
 	case 1:
-		if(current_game==GAME_D3)
+		/*if(current_game==GAME_D3)
 		{
 			OutputDebugString("D3\n");
 			if((pView->m_D3_Rotate)&(pDoc->m_D3_Display.PartsRotate))
@@ -1206,7 +1203,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 				}
 				pView->InvalidateRect(NULL);
 			}
-		}
+		}*/
 		break;
 	}	
 	CFrameWnd::OnTimer(nIDEvent);
@@ -1445,49 +1442,49 @@ void CMainFrame::OnUpdateModelNext(CCmdUI* pCmdUI)
 	pCmdUI->Enable(ExplorerCtrl()->GetCount()!=0);
 }
 
-void CMainFrame::OnViewSpecialdescent3settingsNextposition() 
-{
-	CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
-	int x=lbox->GetCurSel();
-	if(x<lbox->GetCount()-1)
-		x++;
-	lbox->SetCurSel(x);
-	((CGamePaneD3 *)GetGamePane())->OnPositionChange();
-}
+//void CMainFrame::OnViewSpecialdescent3settingsNextposition() 
+//{
+//	CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+//	int x=lbox->GetCurSel();
+//	if(x<lbox->GetCount()-1)
+//		x++;
+//	lbox->SetCurSel(x);
+//	((CGamePaneD3 *)GetGamePane())->OnPositionChange();
+//}
 
-void CMainFrame::OnViewSpecialdescent3settingsPreviousposition() 
-{
-	CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
-	int x=lbox->GetCurSel();
-	if(x>0)
-		x--;
-	lbox->SetCurSel(x);
-	((CGamePaneD3 *)GetGamePane())->OnPositionChange();
-}
+//void CMainFrame::OnViewSpecialdescent3settingsPreviousposition() 
+//{
+//	CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+//	int x=lbox->GetCurSel();
+//	if(x>0)
+//		x--;
+//	lbox->SetCurSel(x);
+//	((CGamePaneD3 *)GetGamePane())->OnPositionChange();
+//}
 
-void CMainFrame::OnUpdateViewSpecialdescent3settingsNextposition(CCmdUI* pCmdUI) 
-{
-	if(current_game==GAME_D3)
-	{
-		CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
-		int x=lbox->GetCurSel();
-		pCmdUI->Enable(x<lbox->GetCount()-1);
-	}
-	else
-		pCmdUI->Enable(FALSE);
-}
+//void CMainFrame::OnUpdateViewSpecialdescent3settingsNextposition(CCmdUI* pCmdUI) 
+//{
+//	if(current_game==GAME_D3)
+//	{
+//		CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+//		int x=lbox->GetCurSel();
+//		pCmdUI->Enable(x<lbox->GetCount()-1);
+//	}
+//	else
+//		pCmdUI->Enable(FALSE);
+//}
 
-void CMainFrame::OnUpdateViewSpecialdescent3settingsPreviousposition(CCmdUI* pCmdUI) 
-{
-	if(current_game==GAME_D3)
-	{
-		CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
-		int x=lbox->GetCurSel();
-		pCmdUI->Enable(x>0);
-	}
-	else
-		pCmdUI->Enable(FALSE);
-}
+//void CMainFrame::OnUpdateViewSpecialdescent3settingsPreviousposition(CCmdUI* pCmdUI) 
+//{
+//	if(current_game==GAME_D3)
+//	{
+//		CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+//		int x=lbox->GetCurSel();
+//		pCmdUI->Enable(x>0);
+//	}
+//	else
+//		pCmdUI->Enable(FALSE);
+//}
 
 void CMainFrame::FS_ShowShield()
 {
@@ -1499,89 +1496,89 @@ void CMainFrame::FS_ShowThruster()
 	OnViewShowthruster();
 }
 
-void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetGroupa() 
-{
-	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_GROUPA;
-	GetDocument()->D2_LoadPIGData();
-	GetCurrentView()->InvalidateRect(NULL);
-	UpdateTextureBar();
-}
-
-void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetWater() 
-{
-	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_WATER;
-	GetDocument()->D2_LoadPIGData();
-	GetCurrentView()->InvalidateRect(NULL);
-	UpdateTextureBar();
-}
-
-void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetIce() 
-{
-	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ICE;
-	GetDocument()->D2_LoadPIGData();
-	GetCurrentView()->InvalidateRect(NULL);
-	UpdateTextureBar();
-}
-
-void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetFire() 
-{
-	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_FIRE;
-	GetDocument()->D2_LoadPIGData();
-	GetCurrentView()->InvalidateRect(NULL);
-	UpdateTextureBar();
-}
-
-void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetAlien2() 
-{
-	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ALIEN2;
-	GetDocument()->D2_LoadPIGData();
-	GetCurrentView()->InvalidateRect(NULL);
-	UpdateTextureBar();
-}
-
-void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetAlien1() 
-{
-	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ALIEN1;
-	GetDocument()->D2_LoadPIGData();
-	GetCurrentView()->InvalidateRect(NULL);
-	UpdateTextureBar();
-}
-
-void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(current_game==GAME_D2);
-	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_GROUPA);
-}
-
-void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetFire(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(current_game==GAME_D2);
-	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_FIRE);
-}
-
-void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(current_game==GAME_D2);
-	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ALIEN2);
-}
-
-void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(current_game==GAME_D2);
-	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ALIEN1);
-}
-
-void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetWater(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(current_game==GAME_D2);
-	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_WATER);
-}
-
-void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetIce(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(current_game==GAME_D2);
-	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ICE);
-}
+//void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetGroupa() 
+//{
+//	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_GROUPA;
+//	GetDocument()->D2_LoadPIGData();
+//	GetCurrentView()->InvalidateRect(NULL);
+//	UpdateTextureBar();
+//}
+//
+//void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetWater() 
+//{
+//	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_WATER;
+//	GetDocument()->D2_LoadPIGData();
+//	GetCurrentView()->InvalidateRect(NULL);
+//	UpdateTextureBar();
+//}
+//
+//void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetIce() 
+//{
+//	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ICE;
+//	GetDocument()->D2_LoadPIGData();
+//	GetCurrentView()->InvalidateRect(NULL);
+//	UpdateTextureBar();
+//}
+//
+//void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetFire() 
+//{
+//	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_FIRE;
+//	GetDocument()->D2_LoadPIGData();
+//	GetCurrentView()->InvalidateRect(NULL);
+//	UpdateTextureBar();
+//}
+//
+//void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetAlien2() 
+//{
+//	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ALIEN2;
+//	GetDocument()->D2_LoadPIGData();
+//	GetCurrentView()->InvalidateRect(NULL);
+//	UpdateTextureBar();
+//}
+//
+//void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetAlien1() 
+//{
+//	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ALIEN1;
+//	GetDocument()->D2_LoadPIGData();
+//	GetCurrentView()->InvalidateRect(NULL);
+//	UpdateTextureBar();
+//}
+//
+//void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(current_game==GAME_D2);
+//	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_GROUPA);
+//}
+//
+//void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetFire(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(current_game==GAME_D2);
+//	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_FIRE);
+//}
+//
+//void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(current_game==GAME_D2);
+//	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ALIEN2);
+//}
+//
+//void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(current_game==GAME_D2);
+//	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ALIEN1);
+//}
+//
+//void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetWater(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(current_game==GAME_D2);
+//	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_WATER);
+//}
+//
+//void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetIce(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(current_game==GAME_D2);
+//	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ICE);
+//}
 
 void CMainFrame::OnModelModelcomparisontable() 
 {
@@ -1609,7 +1606,7 @@ void CMainFrame::OnViewShowguns()
 void CMainFrame::OnUpdateViewShowguns(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(GetCurrentView()->m_ShowGuns);
-	pCmdUI->Enable(GetCurrentView()->m_DisplayGun==-1 && current_game!=GAME_D3);
+	pCmdUI->Enable(GetCurrentView()->m_DisplayGun==-1);
 }
 
 void CMainFrame::OnViewShowsegments() 
@@ -1621,7 +1618,7 @@ void CMainFrame::OnViewShowsegments()
 void CMainFrame::OnUpdateViewShowsegments(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(GetCurrentView()->m_ShowSegments);
-	pCmdUI->Enable(current_game!=GAME_D3);
+	pCmdUI->Enable(true);
 }
 
 void CMainFrame::FS_SetDetailLevel(int mode)
@@ -1708,34 +1705,34 @@ void CMainFrame::InitToolbars()
 	ResizeToolbar(&m_wndToolBar);
 
 	//Descent 2 toolbar
-	m_wndToolBarD2.CreateEx(this, style, ctrlstyle);
-	if(m_ToolBarSize==TOOLBAR_SIZE_SMALL)
-		m_wndToolBarD2.LoadToolBar(IDR_DESCENT2_SMALL);
-	else
-		m_wndToolBarD2.LoadToolBar(IDR_DESCENT2);
-	m_wndToolBarD2.SetWindowText("Descent 2 toolbar");
-	SetButton(&m_wndToolBarD2,0,"","Open POG");
-	SetButton(&m_wndToolBarD2,1,"","Unload POG");
-	SetButton(&m_wndToolBarD2,3,"GROUPA","GROUPA.PIG");
-	SetButton(&m_wndToolBarD2,4,"WATER","WATER.PIG");
-	SetButton(&m_wndToolBarD2,5,"FIRE","FIRE.PIG");
-	SetButton(&m_wndToolBarD2,6,"ICE","ICE.PIG");
-	SetButton(&m_wndToolBarD2,7,"ALIEN1","ALIEN1.PIG");
-	SetButton(&m_wndToolBarD2,8,"ALIEN2","ALIEN2.PIG");
-	ResizeToolbar(&m_wndToolBarD2);
-	ShowControlBar(&m_wndToolBarD2,FALSE,FALSE);
+	//m_wndToolBarD2.CreateEx(this, style, ctrlstyle);
+	//if(m_ToolBarSize==TOOLBAR_SIZE_SMALL)
+	//	m_wndToolBarD2.LoadToolBar(IDR_DESCENT2_SMALL);
+	//else
+	//	m_wndToolBarD2.LoadToolBar(IDR_DESCENT2);
+	//m_wndToolBarD2.SetWindowText("Descent 2 toolbar");
+	//SetButton(&m_wndToolBarD2,0,"","Open POG");
+	//SetButton(&m_wndToolBarD2,1,"","Unload POG");
+	//SetButton(&m_wndToolBarD2,3,"GROUPA","GROUPA.PIG");
+	//SetButton(&m_wndToolBarD2,4,"WATER","WATER.PIG");
+	//SetButton(&m_wndToolBarD2,5,"FIRE","FIRE.PIG");
+	//SetButton(&m_wndToolBarD2,6,"ICE","ICE.PIG");
+	//SetButton(&m_wndToolBarD2,7,"ALIEN1","ALIEN1.PIG");
+	//SetButton(&m_wndToolBarD2,8,"ALIEN2","ALIEN2.PIG");
+	//ResizeToolbar(&m_wndToolBarD2);
+	//ShowControlBar(&m_wndToolBarD2,FALSE,FALSE);
 
-	//Descent 3 toolbar
-	m_wndToolBarD3.CreateEx(this, style, ctrlstyle);
-	if(m_ToolBarSize==TOOLBAR_SIZE_SMALL)
-		m_wndToolBarD3.LoadToolBar(IDR_DESCENT3_SMALL);
-	else
-		m_wndToolBarD3.LoadToolBar(IDR_DESCENT3);
-	m_wndToolBarD3.SetWindowText("Descent 3 toolbar");
-	SetButton(&m_wndToolBarD3,0,"Previous position","Prev. pos");
-	SetButton(&m_wndToolBarD3,1,"Next position","Next pos");
-	ResizeToolbar(&m_wndToolBarD3);
-	ShowControlBar(&m_wndToolBarD3,FALSE,FALSE);
+	////Descent 3 toolbar
+	//m_wndToolBarD3.CreateEx(this, style, ctrlstyle);
+	//if(m_ToolBarSize==TOOLBAR_SIZE_SMALL)
+	//	m_wndToolBarD3.LoadToolBar(IDR_DESCENT3_SMALL);
+	//else
+	//	m_wndToolBarD3.LoadToolBar(IDR_DESCENT3);
+	//m_wndToolBarD3.SetWindowText("Descent 3 toolbar");
+	//SetButton(&m_wndToolBarD3,0,"Previous position","Prev. pos");
+	//SetButton(&m_wndToolBarD3,1,"Next position","Next pos");
+	//ResizeToolbar(&m_wndToolBarD3);
+	//ShowControlBar(&m_wndToolBarD3,FALSE,FALSE);
 
 	//FreeSpace toolbar
 	m_wndToolBarFS.CreateEx(this,style, ctrlstyle);
@@ -2701,36 +2698,36 @@ void CMainFrame::OnUpdateTXHide(CCmdUI* pCmdUI)
 
 
 //Open/Save dialog helper functions
-
-void CMainFrame::OnVpfiledialogJumptodescent2directory() 
-{
-	VPFileDialogJump(DMReg_GetGameDir("Descent 2"));
-}
-
-void CMainFrame::OnUpdateVpfiledialogJumptodescent2directory(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(DMReg_GetGameDir("Descent 2")!="");		
-}
-
-void CMainFrame::OnVpfiledialogJumptodescent3directory() 
-{
-	VPFileDialogJump(DMReg_GetGameDir("Descent 3"));
-}
-
-void CMainFrame::OnUpdateVpfiledialogJumptodescent3directory(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(DMReg_GetGameDir("Descent 3")!="");		
-}
-
-void CMainFrame::OnVpfiledialogJumptofreespace1directory() 
-{
-	VPFileDialogJump(DMReg_GetGameDir("FreeSpace 1"));
-}
-
-void CMainFrame::OnUpdateVpfiledialogJumptofreespace1directory(CCmdUI* pCmdUI) 
-{
-	pCmdUI->Enable(DMReg_GetGameDir("FreeSpace 1")!="");		
-}
+//
+//void CMainFrame::OnVpfiledialogJumptodescent2directory() 
+//{
+//	VPFileDialogJump(DMReg_GetGameDir("Descent 2"));
+//}
+//
+//void CMainFrame::OnUpdateVpfiledialogJumptodescent2directory(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(DMReg_GetGameDir("Descent 2")!="");		
+//}
+//
+//void CMainFrame::OnVpfiledialogJumptodescent3directory() 
+//{
+//	VPFileDialogJump(DMReg_GetGameDir("Descent 3"));
+//}
+//
+//void CMainFrame::OnUpdateVpfiledialogJumptodescent3directory(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(DMReg_GetGameDir("Descent 3")!="");		
+//}
+//
+//void CMainFrame::OnVpfiledialogJumptofreespace1directory() 
+//{
+//	VPFileDialogJump(DMReg_GetGameDir("FreeSpace 1"));
+//}
+//
+//void CMainFrame::OnUpdateVpfiledialogJumptofreespace1directory(CCmdUI* pCmdUI) 
+//{
+//	pCmdUI->Enable(DMReg_GetGameDir("FreeSpace 1")!="");		
+//}
 
 void CMainFrame::OnVpfiledialogJumptofreespace2directory() 
 {

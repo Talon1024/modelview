@@ -70,7 +70,7 @@ typedef struct vms_vector
 
 #pragma pack(1)
 
-#define FS_VPNT D3_VPNT	//FreeSpace 1/2 points = Descent 3 points
+#define FS_VPNT vms_vector	//FreeSpace 1/2 points = Descent 3 points
 /*typedef struct FS_vpnt
 {
 	float  x,y,z;

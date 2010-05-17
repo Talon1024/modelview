@@ -84,29 +84,29 @@ void CExplorer::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult)
 	
 		switch(viewDoc->m_Game)
 		{
-		case GAME_D2:
-			if(name.Left(7).Compare("Model #")==0)
-			{
-				CString numS=name.Mid(7);
-				char *temp;
-				int m=strtol(numS,&temp,10);
-				viewFrame->m_ZoomLevel=1.0;
-				viewDoc->m_ErrorCode=viewDoc->D2_LoadHAXMContent(m);
-			}
-			else
-			{
-				viewDoc->ClearDocument();
-				viewDoc->m_ErrorString=ERROR_GEN_NOMODELSELECTED_TEXT;
-				viewDoc->m_ErrorCode=ERROR_GEN_NOMODELSELECTED;
-			}
-			break;
+		//case GAME_D2:
+		//	if(name.Left(7).Compare("Model #")==0)
+		//	{
+		//		CString numS=name.Mid(7);
+		//		char *temp;
+		//		int m=strtol(numS,&temp,10);
+		//		viewFrame->m_ZoomLevel=1.0;
+		//		viewDoc->m_ErrorCode=viewDoc->D2_LoadHAXMContent(m);
+		//	}
+		//	else
+		//	{
+		//		viewDoc->ClearDocument();
+		//		viewDoc->m_ErrorString=ERROR_GEN_NOMODELSELECTED_TEXT;
+		//		viewDoc->m_ErrorCode=ERROR_GEN_NOMODELSELECTED;
+		//	}
+		//	break;
 
 
-		case GAME_D3:
-			name=name+".oof";
-			viewFrame->m_ZoomLevel=1.0;
-			viewDoc->m_ErrorCode=viewDoc->D3_LoadHOGContent(name);
-			break;
+		//case GAME_D3:
+		//	name=name+".oof";
+		//	viewFrame->m_ZoomLevel=1.0;
+		//	viewDoc->m_ErrorCode=viewDoc->D3_LoadHOGContent(name);
+		//	break;
 
 		case GAME_FS:
 			name=name+".pof";
@@ -114,11 +114,11 @@ void CExplorer::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult)
 			viewDoc->m_ErrorCode=viewDoc->FS_LoadVPContent(name);
 			break;
 
-		case GAME_RF:
-			//name=name+".v3c";
-			viewFrame->m_ZoomLevel=1.0;
-			viewDoc->m_ErrorCode=viewDoc->RF_LoadVPPContent(name);
-			break;
+		//case GAME_RF:
+		//	//name=name+".v3c";
+		//	viewFrame->m_ZoomLevel=1.0;
+		//	viewDoc->m_ErrorCode=viewDoc->RF_LoadVPPContent(name);
+		//	break;
 
 		}
 	}
