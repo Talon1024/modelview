@@ -322,9 +322,6 @@
     <CustomBuild Include="res\toolbar2.bmp" />
     <CustomBuild Include="res\version.bmp" />
     <CustomBuild Include="res\version_.bmp" />
-    <CustomBuild Include="D2Pal.dat">
-      <FileType>Document</FileType>
-    </CustomBuild>
     <CustomBuild Include="MODVIEW32.reg">
       <FileType>Document</FileType>
     </CustomBuild>
