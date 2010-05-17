@@ -1461,50 +1461,23 @@ BEGIN
         MENUITEM "Show &Guns",                  ID_VIEW_SHOWGUNS
         MENUITEM "Show S&egments",              ID_VIEW_SHOWSEGMENTS
         MENUITEM SEPARATOR
-        POPUP "Special Descent &2 settings"
+        POPUP "Detail &level"
         BEGIN
-            POPUP "Main &texture set"
-            BEGIN
-                MENUITEM "GROUPA",                      ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_GROUPA
-                MENUITEM "WATER",                       ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_WATER
-                MENUITEM "FIRE",                        ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_FIRE
-                MENUITEM "ICE",                         ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ICE
-                MENUITEM "ALIEN1",                      ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN1
-                MENUITEM "ALIEN2",                      ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN2
-            END
-            MENUITEM "&Load POG file",              ID_VIEW_SPECIALDESCENT2SETTINGS_LOADPOGFILE
-            MENUITEM "&Unload POG",                 ID_VIEW_SPECIALDESCENT2SETTINGS_UNLOADPOG
+            MENUITEM "Level &1\tShift+1",           ID_VIEW_DETAILLEVEL_LEVEL1
+            MENUITEM "Level &2\tShift+2",           ID_VIEW_DETAILLEVEL_LEVEL2
+            MENUITEM "Level &3\tShift+3",           ID_VIEW_DETAILLEVEL_LEVEL3
+            MENUITEM "Level &4\tShift+4",           ID_VIEW_DETAILLEVEL_LEVEL4
+            MENUITEM "Level &5\tShift+5",           ID_VIEW_DETAILLEVEL_LEVEL5
+            MENUITEM "Level &6\tShift+6",           ID_VIEW_DETAILLEVEL_LEVEL6
+            MENUITEM "&Debris\tShift+0",            ID_VIEW_DETAILLEVEL_DEBRIS
         END
-        POPUP "Special Descent &3 settings"
+        MENUITEM "Show &Shields",               ID_VIEW_SHOWSHIELDS
+        MENUITEM "Show Thruster &Glows",        ID_VIEW_SHOWTHRUSTERGLOWS
+        MENUITEM "Show &Docking Points",        ID_VIEW_SHOWDOCKPOINTS
+        MENUITEM "&Rotate Parts",               ID_VIEW_ROTATE
+        POPUP "&Advanced Settings"
         BEGIN
-            MENUITEM "&Next position\tCtrl+W",      ID_VIEW_SPECIALDESCENT3SETTINGS_NEXTPOSITION
-            MENUITEM "&Previous position\tCtrl+Q",  ID_VIEW_SPECIALDESCENT3SETTINGS_PREVIOUSPOSITION
-            MENUITEM SEPARATOR
-            MENUITEM "Do R&otation",                ID_VIEW_DOROTATION
-            MENUITEM "D3 Smooth",                   ID_VIEW_RENDERSETTINGS_D3SMOOTH
-        END
-        POPUP "Special &FreeSpace settings"
-        BEGIN
-            POPUP "Detail &level"
-            BEGIN
-                MENUITEM "Level &1\tShift+1",           ID_VIEW_DETAILLEVEL_LEVEL1
-                MENUITEM "Level &2\tShift+2",           ID_VIEW_DETAILLEVEL_LEVEL2
-                MENUITEM "Level &3\tShift+3",           ID_VIEW_DETAILLEVEL_LEVEL3
-                MENUITEM "Level &4\tShift+4",           ID_VIEW_DETAILLEVEL_LEVEL4
-                MENUITEM "Level &5\tShift+5",           ID_VIEW_DETAILLEVEL_LEVEL5
-                MENUITEM "Level &6\tShift+6",           ID_VIEW_DETAILLEVEL_LEVEL6
-                MENUITEM "&Debris\tShift+0",            ID_VIEW_DETAILLEVEL_DEBRIS
-            END
-            MENUITEM SEPARATOR
-            MENUITEM "Show &Shields",               ID_VIEW_SHOWSHIELDS
-            MENUITEM "Show Thruster &Glows",        ID_VIEW_SHOWTHRUSTERGLOWS
-            MENUITEM "Show &Docking Points",        ID_VIEW_SHOWDOCKPOINTS
-            MENUITEM "&Rotate Parts",               ID_VIEW_ROTATE
-            MENUITEM SEPARATOR
-            POPUP "&Advanced Settings"
-            BEGIN
-                MENUITEM "&Fast Texture Load",          ID_VIEW_FASTTEXTURELOAD
-            END
+            MENUITEM "&Fast Texture Load",          ID_VIEW_FASTTEXTURELOAD
         END
     END
     POPUP "&Model"
@@ -1575,8 +1548,6 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&Keyboard/Mouse Help",        ID_HELP_USING2
-        MENUITEM SEPARATOR
-        MENUITEM "&Check for new version",      ID_HELP_CHECKFORNEWVERSION
         MENUITEM "&About MODVIEW32...",         ID_APP_ABOUT
     END
 END
@@ -1585,9 +1556,6 @@ IDR_VPFILEDIALOG MENU
 BEGIN
     POPUP "VPFileDialog"
     BEGIN
-        MENUITEM "Jump to Descent 2 directory", ID_VPFILEDIALOG_JUMPTODESCENT2DIRECTORY
-        MENUITEM "Jump to Descent 3 directory", ID_VPFILEDIALOG_JUMPTODESCENT3DIRECTORY
-        MENUITEM SEPARATOR
         MENUITEM "Jump to FreeSpace 1 directory", ID_VPFILEDIALOG_JUMPTOFREESPACE1DIRECTORY
         MENUITEM "Jump to FreeSpace 2 directory", ID_VPFILEDIALOG_JUMPTOFREESPACE2DIRECTORY
     END

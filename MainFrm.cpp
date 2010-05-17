@@ -1263,7 +1263,7 @@ HMENU CMainFrame::NewMenu(int menu/*=0*/)
   // The function parameter is an the toolbar id.
   // There is also a function called LoadToolbars that takes an
   // array of id's.
-  m_menu.LoadToolbar(IDR_SMALL);
+  m_menu.LoadMenu(IDR_SMALL);
 
   return(m_menu.Detach());
 }
@@ -1275,10 +1275,10 @@ void CMainFrame::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStru
   if(lpMeasureItemStruct->CtlType==ODT_MENU){
     if(IsMenu((HMENU)lpMeasureItemStruct->itemID)){
       CMenu* cmenu=CMenu::FromHandle((HMENU)lpMeasureItemStruct->itemID);
-      if(m_menu.IsMenu(cmenu)){
+      //if(m_menu.IsMenu(cmenu)){
         m_menu.MeasureItem(lpMeasureItemStruct);
         setflag=TRUE;
-      }
+    //  }
     }
   }
   if(!setflag)
@@ -1290,10 +1290,10 @@ void CMainFrame::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStru
 LRESULT CMainFrame::OnMenuChar(UINT nChar, UINT nFlags, CMenu* pMenu) 
 {
   LRESULT lresult;
-  if(m_menu.IsMenu(pMenu))
-    lresult=BCMenu::FindKeyboardShortcut(nChar, nFlags, pMenu);
-  else
-    lresult=CFrameWnd::OnMenuChar(nChar, nFlags, pMenu);
+  //if(m_menu.IsMenu(pMenu))
+  //lresult=CMenu::FindKeyboardShortcut(nChar, nFlags, pMenu);
+  //else
+  lresult=CFrameWnd::OnMenuChar(nChar, nFlags, pMenu);
   return(lresult);
 }
 
@@ -1301,11 +1301,11 @@ LRESULT CMainFrame::OnMenuChar(UINT nChar, UINT nFlags, CMenu* pMenu)
 //This handler updates the menus from time to time
 void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu) 
 {
-  CFrameWnd::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
-  if(!bSysMenu){
-    if(m_menu.IsMenu(pPopupMenu))
-      BCMenu::UpdateMenu(pPopupMenu);
-  }
+  //CFrameWnd::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
+  //if(!bSysMenu){
+  //  if(m_menu.IsMenu(pPopupMenu))
+  //    BCMenu::UpdateMenu(pPopupMenu);
+  //}
 }
 //************** BCMENU stuff END ****************
 

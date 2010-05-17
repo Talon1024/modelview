@@ -21,9 +21,6 @@
     <ClCompile Include="AW_CMultiViewSplitter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BCMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CompilerErrorDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -182,9 +179,6 @@
       <Filter>Header Files\Game definition Files</Filter>
     </ClInclude>
     <ClInclude Include="AW_CMultiViewSplitter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BCMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CompilerErrorDlg.h">
