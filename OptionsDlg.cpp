@@ -8,7 +8,7 @@
 #include "FolderDlg.h"
 #include "MainFrm.h"
 #include "DM_Reg.h"
-#include "DM_Tools.h"
+//#include "DM_Tools.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -246,6 +246,6 @@ CString COptionsDlg::GetINIfile()
 
 void COptionsDlg::OnConfigure() 
 {
-	DoGamesConfig();
+	//DoGamesConfig();
 	m_GameConfigChanged=TRUE;
 }

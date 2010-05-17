@@ -10,7 +10,7 @@
 #include "MODVIEW32Doc.h"
 #include "MODVIEW32View.h"
 #include "Explorer.h"
-#include "dm_tools.h"
+//#include "dm_tools.h"
 #include "SplashNew.h"
 #include "welcome.h"
 #include "DM_Reg.h"
@@ -224,7 +224,7 @@ END_MESSAGE_MAP()
 // App command to run the dialog
 void CMODVIEW32App::OnAppAbout()
 {
-	DoAbout();
+	//DoAbout();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -292,7 +292,7 @@ BOOL CMODVIEW32App::Check1stStartup()
 	{
 		//CWelcome dlg;
 		//dlg.DoModal();
-		DoGamesConfig();
+		//DoGamesConfig();
 		return TRUE;
 	}
 	return FALSE;
@@ -300,7 +300,7 @@ BOOL CMODVIEW32App::Check1stStartup()
 
 void CMODVIEW32App::OnHelpCheckfornewversion() 
 {
-	DoDMVC();
+	//DoDMVC();
 }
 
 void CMODVIEW32App::ReloadFile(CString fname)

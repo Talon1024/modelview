@@ -36,9 +36,6 @@
     <ClCompile Include="DM_Reg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dm_tools.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EditorFS_FUEL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -220,9 +217,6 @@
     <ClInclude Include="DM_Reg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dm_tools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EditorFS_FUEL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -371,6 +365,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="glext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -539,8 +536,5 @@
     </CustomBuild>
     <CustomBuild Include="D2Pal.dat" />
     <CustomBuild Include="MODVIEW32.reg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

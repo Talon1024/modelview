@@ -415,37 +415,37 @@ public:
 	GLuint m_D3_ModelTexture[MAX_D3_TEXTURE];
 	
 	//FreeSpace attributes
-	FS_MODELBITMAPS  m_FS_BitmapData;
-	BOOL m_FS_TextureFlag[MAX_FS_TEXTURE];	
-	FS_MODEL m_FS_Model;
-	BOOL m_FS_ModelHasDebris;
-	int m_FS_NumSubsystems;
-	FS_SUBSYSTEM	m_FS_Subsystems[MAX_FS_SUBSYSTEMS];
-	int m_FS_NumSOBJ;
-	FS_SOBJ			m_FS_SOBJ[MAX_FS_SOBJ];
-	CString		m_FS_MainVP_Filename;
-	VP_HEADER	m_FS_MainVP_Header;
-	VP_INFO		m_FS_MainVP_Dir[MAX_FS_FILESINVP];
-	BOOL		m_FS_MainVP_Loaded;
-	int			m_FS_MainVP_MainTextureSet;
-	CString		m_FS_CurrVP_Filename;
-	VP_HEADER	m_FS_CurrVP_Header;
-	VP_INFO		m_FS_CurrVP_Dir[MAX_FS_FILESINVP];
-	BOOL		m_FS_CurrVP_Loaded;
-	int			m_FS_CurrVP_FreeSpaceVersion;
-	int			m_FS_CurrVP_PofList[MAX_FS_POFFILESINVP];
-	int			m_FS_CurrVP_PofNum;
-	GLuint m_FS_ModelTexture[MAX_FS_TEXTURE];
-	unsigned int m_FS_PofDataL[MAX_FS_SOBJ],m_FS_PofDataH[MAX_FS_SOBJ];
-	unsigned int m_FS_RGBAtexture[1024*1024];   
-	unsigned int m_FS_RGBAtexture2[1024*2048];
-	unsigned int m_FS_LoadPCX[MAX_FS_TEXTURE];
-	PMINFO m_FS_PMinfo;   
-	FS_REALGUNS m_FS_RealGuns[2]; //0=GPNT, 1=MPNT
-	FS_TURRETS m_FS_Turrets[2]; //0=TGUN, 1=TMIS
-	int m_FS_NumDocks;
-	FS_DOCK m_FS_Docks[MAX_FS_DOCKS];
-	FS_MODELINFO m_FS_ModelInfo;
+	FS_MODELBITMAPS		m_FS_BitmapData;
+	BOOL				m_FS_TextureFlag[MAX_FS_TEXTURE];	
+	FS_MODEL			m_FS_Model;
+	BOOL				m_FS_ModelHasDebris;
+	int					m_FS_NumSubsystems;
+	FS_SUBSYSTEM		m_FS_Subsystems[MAX_FS_SUBSYSTEMS];
+	int					m_FS_NumSOBJ;
+	FS_SOBJ				m_FS_SOBJ[MAX_FS_SOBJ];
+	CString				m_FS_MainVP_Filename;
+	VP_HEADER			m_FS_MainVP_Header;
+	VP_INFO				m_FS_MainVP_Dir[MAX_FS_FILESINVP];
+	BOOL				m_FS_MainVP_Loaded;
+	int					m_FS_MainVP_MainTextureSet;
+	CString				m_FS_CurrVP_Filename;
+	VP_HEADER			m_FS_CurrVP_Header;
+	VP_INFO				m_FS_CurrVP_Dir[MAX_FS_FILESINVP];
+	BOOL				m_FS_CurrVP_Loaded;
+	int					m_FS_CurrVP_FreeSpaceVersion;
+	int					m_FS_CurrVP_PofList[MAX_FS_POFFILESINVP];
+	int					m_FS_CurrVP_PofNum;
+	GLuint				m_FS_ModelTexture[MAX_FS_TEXTURE];
+	unsigned int		m_FS_PofDataL[MAX_FS_SOBJ],m_FS_PofDataH[MAX_FS_SOBJ];
+	unsigned int		m_FS_RGBAtexture[1024*1024];   
+	unsigned int		m_FS_RGBAtexture2[1024*2048];
+	unsigned int		m_FS_LoadPCX[MAX_FS_TEXTURE];
+	PMINFO				m_FS_PMinfo;   
+	FS_REALGUNS			m_FS_RealGuns[2]; //0=GPNT, 1=MPNT
+	FS_TURRETS			m_FS_Turrets[2]; //0=TGUN, 1=TMIS
+	int					m_FS_NumDocks;
+	FS_DOCK				m_FS_Docks[MAX_FS_DOCKS];
+	FS_MODELINFO		m_FS_ModelInfo;
 
 	//Red Faction
 	RF_MODEL	m_RF_Model;
