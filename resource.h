@@ -85,7 +85,6 @@
 #define IDD_IMPORT                      246
 #define IDD_EDITORFS_FUEL               247
 #define IDB_ICON_RECENT                 247
-#define IDD_REDFACTION                  248
 #define IDB_SPLASH_NEW                  250
 #define IDD_SPLASH_NEW                  251
 #define IDD_TXVIEWMODE                  252
@@ -310,11 +309,6 @@
 #define IDC_EDITORFS_FUEL_TOOLBARGLOWPOINTS 1158
 #define IDC_EDITORFS_FUEL_TOOLBARAPPLYER 1159
 #define IDC_EDITORFS_FUEL_TOOLBARELEMENTS 1160
-#define IDC_RF_VERTICIES                1161
-#define IDC_RF_POLYGONS                 1162
-#define IDC_RF_TEXTURES                 1163
-#define IDC_RF_SOBJ                     1164
-#define IDC_RF_GUNS                     1165
 #define IDC_CONFIGURE                   1166
 #define IDC_MENU_STYLE                  1167
 #define ID_DUMMY                        32771

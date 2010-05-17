@@ -92,28 +92,8 @@ BOOL CTableList::OnInitDialog()
 	{
 		isamodel=TRUE;
 		CString name=t->GetItemText(k);
-	
-		switch(pDoc->m_Game)
-		{
-		//case GAME_D2:
-		//	if(name.Left(7).Compare("Model #")==0)
-		//	{
-		//		CString numS=name.Mid(7);
-		//		char *temp;
-		//		int m=strtol(numS,&temp,10);
-		//		pDoc->D2_LoadHAXMContent(m);
-		//	}
-		//	else
-		//		isamodel=FALSE;
-		//	break;
-
-		//case GAME_D3:
-		//	name=name+".oof";
-		//	if(pDoc->D3_LoadHOGContent(name)!=ERROR_GEN_NOERROR)
-		//		isamodel=FALSE;
-		//	break;
-
-		case GAME_FS:
+		
+		if (pDoc->m_Game == GAME_FS)
 		{
 			name=name+".pof";
 			ERRORCODE err=pDoc->FS_LoadVPContent(name);
@@ -130,8 +110,6 @@ BOOL CTableList::OnInitDialog()
 #endif
 				isamodel=FALSE;
 			}
-			break;
-		}
 		}
 		
 		if(isamodel)
@@ -165,18 +143,6 @@ BOOL CTableList::OnInitDialog()
 	{
 		int itm=m_ListView.InsertItem(i,me[j].name);
 		tS.Format("%.2f",(float)(me[j].filevers)/100);
-		//if(pDoc->m_Game==GAME_D2)
-		//{
-		//	tS="<Unknown>";
-		//	if(me[j].filevers<100)
-		//		tS.Format("HAM V%i",me[j].filevers);
-		//	if((me[j].filevers>99) && (me[j].filevers<200))
-		//		tS.Format("V-HAM V%i",me[j].filevers-100);
-		//	if((me[j].filevers>199) && (me[j].filevers<300))
-		//		tS.Format("HXM V%i",me[j].filevers-200);
-		//	if((me[j].filevers>299) && (me[j].filevers<400))
-		//		tS.Format("POL V%i",me[j].filevers-300);
-		//}
 		m_ListView.SetItemText(itm,1,tS);
 		tS.Format("%i",me[j].filesize);
 		m_ListView.SetItemText(itm,2,tS);
@@ -190,13 +156,6 @@ BOOL CTableList::OnInitDialog()
 		m_ListView.SetItemText(itm,6,tS);
 		tS.Format("%i",me[j].guns);
 		m_ListView.SetItemText(itm,7,tS);
-		//if(pDoc->m_Game==GAME_D2)
-		//	m_ListView.SetItemText(itm,8,me[j].desc);
-		//if(pDoc->m_Game==GAME_D3)
-		//{
-		//	tS.Format("%i",me[j].positions);
-		//	m_ListView.SetItemText(itm,8,tS);
-		//}
 	}
 
 	m_App->CloseProgressWnd();
