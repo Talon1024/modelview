@@ -143,11 +143,17 @@
 
 
 #define TEXTUREINFOFLAG_TEXTURELOADED	1
-#define TEXTUREINFOFLAG_TEXTUREIS24BIT	2 //Palette or RGBA-texture
+#define TEXTUREINFOFLAG_TEXTUREIS24BIT	2 //Palette or RGB-texture
+#define TEXTUREINFOFLAG_TEXTUREIS32BIT	3 //Anything with 8-bit alpha
 
 #define TEXTUREINFOFILETYPE_UNKNOWN	0
-#define TEXTUREINFOFILETYPE_PCX		1 //FreeSpace 1/2 texture
-#define TEXTUREINFOFILETYPE_ANI		2 //FreeSpace 1/2 animation
+#define TEXTUREINFOFILETYPE_DDS		1
+#define TEXTUREINFOFILETYPE_TGA		2
+#define TEXTUREINFOFILETYPE_PCX		3 //FreeSpace 1/2 texture
+#define TEXTUREINFOFILETYPE_EFF		4 //FSO EFF animation
+#define TEXTUREINFOFILETYPE_ANI		5 //FreeSpace 1/2 animation
+#define MAXTEXTURETYPES				5
+
 
 typedef struct TEXTUREINFO
 {
@@ -396,11 +402,14 @@ public:
 	void FS_CalcDisplay();
 	ERRORCODE FS_InitVP(CFile *fp,VP_HEADER *vp_header,VP_INFO *vp_info,BOOL fillexplorer);
 	void FS_ReadFSVP(int game);
-	void FS_LoadPCXData2();
+	void FS_LoadTextureData2();
 	ERRORCODE FS_LoadVPContent(CString filename);
 	ERRORCODE FS_Walk(void *StartAt,int module,int StartByte);
 	ERRORCODE FS_ReadPOF(CFile *fp,int VpNum);
-	ERRORCODE FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL bFastload);
+	ERRORCODE locatetexture(char* texturename, int texturenum, int current_tex);
+	void loadPCXtexture(TEXTUREINFO* t_info, FS_BITMAPDATA* bitmap_data, BOOL bFastload);
+	void loadANItexture(TEXTUREINFO* t_info, FS_BITMAPDATA* bitmap_data, BOOL bFastload);
+	ERRORCODE FS_LoadTextureData(unsigned int ActivePM,BOOL bAniLoad,BOOL bFastload);
 	void FS_PreparePOF();
 	void FS_BuildGunGroups();
 	CString FS_MakeSubsystemDesc(CString x1,CString x2);

@@ -829,7 +829,7 @@ void CMainFrame::OnViewRendermodeTextured()
 {
 	GetCurrentView()->m_RenderMode=RENDER_TEXTURED;
 	if(GetDocument()->m_Game==GAME_FS)
-		GetDocument()->FS_LoadPCXData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
+		GetDocument()->FS_LoadTextureData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
 	UpdateMainDisplay();
 	GetCurrentView()->InvalidateRect(NULL);
 }
@@ -908,14 +908,14 @@ void CMainFrame::OnUpdateViewShowthruster(CCmdUI* pCmdUI)
 void CMainFrame::OnViewShowthruster() 
 {
 	GetCurrentView()->m_ShowThruster=!GetCurrentView()->m_ShowThruster;
-	GetDocument()->FS_LoadPCXData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
+	GetDocument()->FS_LoadTextureData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
 	GetCurrentView()->InvalidateRect(NULL);
 }
 
 void CMainFrame::OnViewFasttextureload() 
 {
 	GetCurrentView()->m_FastTextureLoad=!GetCurrentView()->m_FastTextureLoad;
-	GetDocument()->FS_LoadPCXData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
+	GetDocument()->FS_LoadTextureData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
 	GetCurrentView()->InvalidateRect(NULL);
 }
 

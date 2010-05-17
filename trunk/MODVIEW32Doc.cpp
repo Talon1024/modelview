@@ -32,6 +32,8 @@ static char THIS_FILE[]=__FILE__;
 
 
 
+
+
 /////////////////////////////////////////////////////////////////////////////
 // CMODVIEW32Doc
 
@@ -274,7 +276,7 @@ void CMODVIEW32Doc::Serialize(CArchive& ar)
 		if(m_ErrorCode==ERROR_GEN_NOERROR)
 		{
 			viewFrame->GameBarFS();
-			FS_LoadPCXData2();	//Load textures from main .VP file
+			FS_LoadTextureData2();	//Load textures from main .VP file
 		}
 	}
 
@@ -460,13 +462,508 @@ void CMODVIEW32Doc::ExplorerGoTop()
 // FreeSpace stuff
 ////////////////////////////////////////////////////////////////////////////////////////
 
-ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL bFastload)
-{
-	unsigned int xsize,ysize;
-	unsigned int xreal,yreal;         
-	unsigned char XScale,YScale;
+unsigned int xsize,ysize;
+unsigned int xreal,yreal; 
+unsigned char XScale,YScale;
+unsigned int MaxSize;
+
+ERRORCODE CMODVIEW32Doc::locatetexture(char* texturename, int texturenum, int current_tex) {
+
+	// check first for a pcx file
+	char Filename[50];
+	char* extension;
+	char* type;
+	bool unknownfiletype = true;
+	
+	for (int filetype = 1; filetype < MAXTEXTURETYPES; filetype++) {
+	
+		switch(filetype) {
+			case TEXTUREINFOFILETYPE_DDS:
+				extension = ".dds";
+				type = "DDS Texture";
+				break;
+			case TEXTUREINFOFILETYPE_TGA:
+				extension = ".tga";
+				type = "TGA Texture";
+				break;
+			case TEXTUREINFOFILETYPE_PCX:
+				extension = ".pcx";
+				type = "PCX Texture";
+				break;
+			case TEXTUREINFOFILETYPE_EFF:
+				extension = ".eff";
+				type = "EFF animation";
+				break;
+			case TEXTUREINFOFILETYPE_ANI:
+				extension = ".ani";
+				type = "ANI animation";
+				break;
+		}
+		
+		strcpy_s(Filename, texturename);
+		strcat_s(Filename, extension);
+		TRACE("Trying to load %s",texturename);
+		
+		if(!m_InfoMode)
+		{
+			char str[256];
+			sprintf_s(str,"Loading %s...",Filename);
+			SetStatusBarText(str);
+		}
+
+		//Get local directory
+		CString localdirectory="";
+		{
+			char x[FNAMELEN];
+			strcpy_s(x,m_CurFile);
+			removefilename((char *)&x);
+			localdirectory=x;
+		}
+
+		//Search process #1: Current directory
+		{
+			CString localfilename=localdirectory;
+			localfilename+=Filename;
+			CFile fcheck;
+			if(fcheck.Open(localfilename,CFile::modeRead))
+			{
+				unknownfiletype=FALSE;
+				TRACE(/*extension +*/ "...Found in current directory!\n");
+				m_Textures[current_tex].Location="Current directory";
+				m_Textures[current_tex].Type= type;
+				m_Textures[current_tex].FileType=filetype;
+				m_Textures[current_tex].InFilename=localfilename;
+				m_Textures[current_tex].InOffset=0;
+				m_Textures[current_tex].InSize=fcheck.GetLength();
+				m_Textures[current_tex].Valid=TRUE;
+			}
+		}
+
+		//Search process #2: Current .VP file
+		if(unknownfiletype && m_FS_CurrVP_Loaded)
+		{
+			unsigned int j=0;
+			while((j<m_FS_CurrVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
+				j++;
+
+			if(j<m_FS_CurrVP_Header.dirnumber)
+			{
+				CFile fcheck;
+				if(!fcheck.Open(m_FS_CurrVP_Filename,CFile::modeRead))
+				{
+					m_ErrorString=ERROR_FS_CANTOPENCURVP_TEXT;
+					return ERROR_FS_CANTOPENCURVP;
+				}
+				//File_end=m_FS_CurrVP_Dir[j].offset + m_FS_CurrVP_Dir[j].size;
+				//File_start=m_FS_CurrVP_Dir[j].offset;
+				unknownfiletype=FALSE;
+				TRACE(/*extension +*/ "...Found in current VP!\n");
+				m_Textures[current_tex].Location= "Current VP";
+				m_Textures[current_tex].Type= type;
+				m_Textures[current_tex].FileType=filetype;
+				m_Textures[current_tex].InFilename=m_FS_CurrVP_Filename;
+				m_Textures[current_tex].InOffset=m_FS_CurrVP_Dir[j].offset;
+				m_Textures[current_tex].InSize=m_FS_CurrVP_Dir[j].size;
+				m_Textures[current_tex].Valid=TRUE;
+			}
+		}
+
+		//Search process #3: /data/maps
+		if(unknownfiletype)
+		{
+			CString mapsdirectory;
+			COptionsDlg dlg;
+			if(m_FS_CurrVP_FreeSpaceVersion==1)
+				mapsdirectory=dlg.GetF1Path();
+			else
+				mapsdirectory=dlg.GetF2Path();
+			CString mapsfilename=mapsdirectory;
+			if(mapsfilename.Right(1)!="\\")
+				mapsfilename+="\\";
+			mapsfilename+="data\\maps\\";
+			mapsfilename+=Filename;
+			
+			CFile fcheck;
+			if(fcheck.Open(mapsfilename,CFile::modeRead))
+			{
+				unknownfiletype=FALSE;
+				TRACE(/*extension +*/ "...Found in FreeSpace /data/maps directory!\n");
+				m_Textures[current_tex].Location="/data/maps directory";
+				m_Textures[current_tex].Type=type;
+				m_Textures[current_tex].FileType=filetype;
+				m_Textures[current_tex].InFilename=mapsfilename;
+				m_Textures[current_tex].InOffset=0;
+				m_Textures[current_tex].InSize=fcheck.GetLength();
+				m_Textures[current_tex].Valid=TRUE;
+			}
+		}
+
+		//Search process #4: Main .VP file
+		if(unknownfiletype && m_FS_MainVP_Loaded)
+		{
+			unsigned int j=0;
+			while((j<m_FS_MainVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
+				j++;
+
+			if(j<m_FS_MainVP_Header.dirnumber)
+			{
+				CFile fcheck;
+				if(!fcheck.Open(m_FS_MainVP_Filename,CFile::modeRead))
+					return ERROR_FS_CANTOPENFSVP;
+				unknownfiletype=FALSE;
+				TRACE(/*extension + */"...Found in main VP!\n");
+				m_Textures[current_tex].Location = "Main FreeSpace VP";
+				m_Textures[current_tex].Type = type;
+				m_Textures[current_tex].FileType = filetype;
+				m_Textures[current_tex].InFilename=m_FS_MainVP_Filename;
+				m_Textures[current_tex].InOffset=m_FS_MainVP_Dir[j].offset;
+				m_Textures[current_tex].InSize=m_FS_MainVP_Dir[j].size;
+				m_Textures[current_tex].Valid=TRUE;
+			} 
+		}
+
+		//Search process FAILED!
+		if(unknownfiletype)
+		{
+			m_FS_BitmapData.pic[texturenum].valid=0;	// not ani or pcx...
+			TRACE("No Texture found\n");
+			m_Textures[current_tex].Location="<Not found>";
+			m_Textures[current_tex].Type="<Unknown>";
+			m_Textures[current_tex].Valid=FALSE;
+			m_Textures[current_tex].Error="Not found";
+		}
+	}
+	
+	return ERROR_GEN_NOERROR;
+}
+
+void CMODVIEW32Doc::loadPCXtexture(TEXTUREINFO* t_info, FS_BITMAPDATA* bitmap_data, BOOL bFastload) {
+
 	GLint MaxTextureSize[4];
-	unsigned int MaxSize;
+
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE,MaxTextureSize);
+	MaxSize=MaxTextureSize[0];
+
+	CFile f;
+	//Header
+	PCXHEADER header;
+	f.Read(&header,sizeof(PCXHEADER));
+	if(header.Version!=5)
+	{
+		bitmap_data->valid=0;
+		t_info->Valid=FALSE;
+		t_info->Error="Invalid PCX version";
+		return;
+	}
+
+	xreal=header.Xmax-header.Xmin+1;
+	yreal=header.Ymax-header.Ymin+1;
+	t_info->Width=xreal;
+	t_info->Height=yreal;
+
+	unsigned int kb;
+	kb=2; while(kb<xreal) kb*=2; xsize=kb;
+	kb=2; while(kb<yreal) kb*=2; ysize=kb;
+
+	//Palette
+	if(header.Version==5)
+	{
+		unsigned char byte1;
+		f.Seek(t_info->InOffset + t_info->InSize-769,CFile::begin);
+		f.Read(&byte1,1);
+		if(byte1==0x0C)
+		{
+			for(int j=0;j<256;j++)
+			{
+				f.Read(&t_info->Palette[0][j],1); //Red
+				f.Read(&t_info->Palette[1][j],1); //Green
+				f.Read(&t_info->Palette[2][j],1); //Blue
+				t_info->PaletteLong[j] = t_info->Palette[0][j]+(t_info->Palette[1][j]<<8)+(t_info->Palette[2][j]<<16)+(255<<24);
+			}
+		}
+	}
+	f.Seek(t_info->InOffset+128,CFile::begin);
+
+	if(xreal*yreal>1024*2048)
+	{
+		bitmap_data->valid=0;
+		t_info->Valid=FALSE;
+		t_info->Error="PCX Texture too big (>2097152 pixels)";
+		return;
+	}
+
+	#ifdef _WITHTXVIEW
+	int x_clusterize2=xreal;
+	if(x_clusterize2%2!=0)
+		x_clusterize2+=2-(xreal%2);
+	int x_clusterize4=xreal;
+	if(x_clusterize4%4!=0)
+		x_clusterize4+=4-(xreal%4);
+
+	t_info->Flags=TEXTUREINFOFLAG_TEXTURELOADED;
+
+	unsigned char *tmpbuffer;
+	try {
+		t_info->Bitmap=new unsigned char[x_clusterize4*yreal];
+		tmpbuffer=new unsigned char[x_clusterize2*yreal];
+	}
+	catch (CMemoryException e) {
+		t_info->Valid=FALSE;
+		t_info->Error="Out of Memory";
+		bitmap_data->valid=0;
+		return;
+	}
+	#endif
+
+	//Bitmap
+	XScale=0;
+	YScale=0;
+	unsigned char XScaleTest=0;
+	unsigned char YScaleTest=0;
+	if(bFastload)
+	{
+		while(MaxSize<(xsize>>XScale))
+		{
+			XScale++;
+			XScaleTest=XScaleTest<<1;
+			XScaleTest++;
+		}
+		while(MaxSize<(ysize>>YScale))
+		{
+			YScale++;
+			YScaleTest=YScaleTest<<1;
+			YScaleTest++;
+		}
+	}
+
+	unsigned char runcount=0;
+	unsigned char runvalue=0;
+	unsigned int runoffset=0;
+	for(unsigned int j=0;j<yreal;j++)
+	{
+		unsigned int offset;
+		if(bFastload)
+			offset=(j>>YScale)*(xsize>>XScale);
+		else
+			offset=j*xreal;
+		for(unsigned int k=0;k<(xreal+(xreal&1));k++)
+		{
+			if(runcount>0)
+				runcount--;
+			else {
+				f.Read(&runvalue,1);
+				if((runvalue & 0xC0)==0xC0)
+				{
+					runcount=(runvalue & 0x3F) - 1;
+					f.Read(&runvalue,1);
+				}
+			}
+			if(((j & YScaleTest)+(k & XScaleTest))==0)
+				m_FS_RGBAtexture2[offset++]=t_info->PaletteLong[runvalue];
+			
+	#ifdef _WITHTXVIEW
+			if(runoffset<x_clusterize4*yreal) //Just to be sure
+				tmpbuffer[runoffset]=runvalue;
+	#endif
+			runoffset++;
+		}	
+	}
+	#ifdef _WITHTXVIEW
+	for(unsigned int j=0;j<yreal;j++)
+		memcpy(&t_info->Bitmap[j*x_clusterize4],&tmpbuffer[j*x_clusterize2],xreal);
+	delete[] tmpbuffer;
+	#endif
+	for(unsigned int j=0;j<yreal;j++)
+	{
+		if(bFastload)
+		{
+			unsigned int offset=(j>>YScale)*(xsize>>XScale) + (xreal>>XScale);
+			for(unsigned int k=xreal;k<xsize;k++)
+			{	// fill out the extra
+				if((k&XScaleTest)==0)
+				{
+					//RGBAtexture2[offset]=0xff00ff00;
+					m_FS_RGBAtexture2[offset]=m_FS_RGBAtexture2[offset-(xreal>>XScale)];
+					offset++;
+
+				}
+			}
+		}
+	}
+
+	if(bFastload)
+	{
+		for(unsigned int j=yreal;j<ysize;j++)
+		{			// fill out the extra
+			unsigned int offset=(j>>YScale)*(xsize>>XScale);
+			for(unsigned int k=0;k<xsize;k++)
+			{
+				if((k&XScaleTest)==0)
+				{
+					//RGBAtexture2[offset]=0xff0000ff;
+					m_FS_RGBAtexture2[offset]=m_FS_RGBAtexture2[offset-(yreal>>YScale)*(xsize>>XScale)];
+					offset++;
+				}
+			}
+		}
+	}
+	t_info->Error="<ok>";
+}
+
+void CMODVIEW32Doc::loadANItexture(TEXTUREINFO* t_info, FS_BITMAPDATA* bitmap_data, BOOL bFastload) 
+{
+	GLint MaxTextureSize[4];
+
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE,MaxTextureSize);
+	MaxSize=MaxTextureSize[0];
+
+	CFile f;
+
+	//Header
+	ANIHEADER header;
+	f.Read(&header,sizeof(ANIHEADER));
+	if(header.version!=2)
+	{
+		bitmap_data->valid=0;
+		t_info->Valid=FALSE;
+		t_info->Error="Invalid ANI version";
+		return;
+	}
+	if(header.id!=0)
+	{
+		bitmap_data->valid=0;
+		t_info->Valid=FALSE;
+		t_info->Error="Invalid ANI file id";
+		return;
+	}
+
+	xreal=header.w;
+	yreal=header.h;
+	t_info->Width=xreal;
+	t_info->Height=yreal;
+
+	unsigned int jb;
+	jb=2; while(jb<xreal) jb*=2; xsize=jb;
+	jb=2; while(jb<yreal) jb*=2; ysize=jb;
+
+	//Palette
+	for(int j=0;j<256;j++)
+	{
+		t_info->Palette[0][j]=header.palette[j*3+0]; //Red
+		t_info->Palette[1][j]=header.palette[j*3+1]; //Green
+		t_info->Palette[2][j]=header.palette[j*3+2]; //Blue
+		t_info->PaletteLong[j]=m_Textures[m_TexturesNum].Palette[0][j]+(m_Textures[m_TexturesNum].Palette[1][j]<<8)+(m_Textures[m_TexturesNum].Palette[2][j]<<16)+(255<<24);
+	}
+
+	if(xreal*yreal>1024*2048)
+	{
+		bitmap_data->valid=0;
+		t_info->Valid=FALSE;
+		t_info->Error="PCX Texture too big (>2097152 pixels).";
+		return;
+	}
+
+	#ifdef _WITHTXVIEW
+	int size=xreal*yreal;
+	t_info->Flags=TEXTUREINFOFLAG_TEXTURELOADED;
+	t_info->Bitmap=new unsigned char[size];
+	#endif
+
+	//Bitmap
+	XScale=0;
+	YScale=0;
+	unsigned char XScaleTest=0;
+	unsigned char YScaleTest=0;
+	if(bFastload)
+	{
+		while(MaxSize<(xsize>>XScale))
+		{
+			XScale++;
+			XScaleTest=XScaleTest<<1;
+			XScaleTest++;
+		}
+		while(MaxSize<(ysize>>YScale))
+		{
+			YScale++;
+			YScaleTest=YScaleTest<<1;
+			YScaleTest++;
+		}
+	}
+
+	unsigned char byte1;
+	unsigned short byte2;
+	unsigned int byte4;
+	f.Read(&byte2,2);
+	f.Read(&byte4,4);
+	f.Read(&byte4,4);
+	f.Read(&byte1,1);
+
+	//Read just the 1st frame... thats all we need
+	unsigned char runcount=0;
+	unsigned char runvalue=0;
+	int runoffset=0;
+	for(unsigned int j=0;j<yreal;j++)
+	{
+		for(unsigned int k=0;k<xreal;k++)
+		{
+			if(runcount>0)
+				runcount--;
+			else {
+				f.Read(&runvalue,1);
+				if(runvalue==header.packer_code)
+				{
+					f.Read(&runcount,1);
+					f.Read(&runvalue,1);
+				}
+			}
+			if(((j&YScaleTest)+(k&XScaleTest))==0)
+			{
+				unsigned int offset;
+				if(bFastload)
+					offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
+				else
+					offset=j*xreal + k;
+				m_FS_RGBAtexture2[offset]=t_info->PaletteLong[runvalue];
+			}
+	#ifdef _WITHTXVIEW
+			t_info->Bitmap[runoffset]=runvalue;
+			runoffset++;
+	#endif
+		}
+		for(unsigned int k=xreal;k<xsize;k++)
+		{	//fill out the extra
+			if(((j&YScaleTest)+(k&XScaleTest))==0)
+			{
+				unsigned int offset;
+				if(bFastload)
+					offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
+				else
+					offset=j*xreal+k;
+				m_FS_RGBAtexture2[offset]=0xff00ff00;
+			}
+		}
+	}               
+	for(unsigned int j=yreal;j<ysize;j++)
+	{			// fill out the extra
+		for(unsigned int k=0;k<xsize;k++)
+		{
+			if(((j&YScaleTest)+(k&XScaleTest))==0)
+			{
+				unsigned int offset;
+				if(bFastload)
+					offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
+				else
+					offset=j*xreal+k;
+				m_FS_RGBAtexture2[offset]=0xff00ff00;
+			}
+		}
+	}
+	t_info->Error="<ok>";
+}
+
+ERRORCODE CMODVIEW32Doc::FS_LoadTextureData(unsigned int ActivePM,BOOL bAniLoad,BOOL bFastload)
+{
+	GLint MaxTextureSize[4];
 
 	ASSERT(m_Game==GAME_FS);
 
@@ -524,249 +1021,252 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 					m_Textures[m_TexturesNum].Used++;
 			}
 
-			// check first for a pcx file
-			char Filename[50];
-			m_FS_BitmapData.pic[i].name;
-			strcpy_s(Filename,m_FS_BitmapData.pic[i].name);
-			strcat_s(Filename,".pcx");
-			TRACE("Trying to load %s",m_FS_BitmapData.pic[i].name);
-			
-			if(!m_InfoMode)
-			{
-				char str[256];
-				sprintf_s(str,"Loading %s...",Filename);
-				SetStatusBarText(str);
-			}
+			locatetexture(m_FS_BitmapData.pic[i].name, i, m_TexturesNum);
 
-			//Get local directory
-			CString localdirectory="";
-			{
-				char x[FNAMELEN];
-				strcpy_s(x,m_CurFile);
-				removefilename((char *)&x);
-				localdirectory=x;
-			}
+			//// check first for a pcx file
+			//char Filename[50];
+			///*m_FS_BitmapData.pic[i].name;*/
+			//strcpy_s(Filename,m_FS_BitmapData.pic[i].name);
+			//strcat_s(Filename,".pcx");
+			//TRACE("Trying to load %s",m_FS_BitmapData.pic[i].name);
+			//
+			//if(!m_InfoMode)
+			//{
+			//	char str[256];
+			//	sprintf_s(str,"Loading %s...",Filename);
+			//	SetStatusBarText(str);
+			//}
 
-			//PCX Search process #1: Current directory
-			{
-				CString localfilename=localdirectory;
-				localfilename+=Filename;
-				CFile fcheck;
-				if(fcheck.Open(localfilename,CFile::modeRead))
-				{
-					unknownfiletype=FALSE;
-					TRACE(".pcx...Found in current directory!\n");
-					m_Textures[m_TexturesNum].Location="Current directory";
-					m_Textures[m_TexturesNum].Type="PCX Texture";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
-					m_Textures[m_TexturesNum].InFilename=localfilename;
-					m_Textures[m_TexturesNum].InOffset=0;
-					m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				}
-			}
+			////Get local directory
+			//CString localdirectory="";
+			//{
+			//	char x[FNAMELEN];
+			//	strcpy_s(x,m_CurFile);
+			//	removefilename((char *)&x);
+			//	localdirectory=x;
+			//}
 
-			//PCX Search process #2: Current .VP file
-			if(unknownfiletype && m_FS_CurrVP_Loaded)
-			{
-				unsigned int j=0;
-				while((j<m_FS_CurrVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
-					j++;
+			////PCX Search process #1: Current directory
+			//{
+			//	CString localfilename=localdirectory;
+			//	localfilename+=Filename;
+			//	CFile fcheck;
+			//	if(fcheck.Open(localfilename,CFile::modeRead))
+			//	{
+			//		unknownfiletype=FALSE;
+			//		TRACE(".pcx...Found in current directory!\n");
+			//		m_Textures[m_TexturesNum].Location="Current directory";
+			//		m_Textures[m_TexturesNum].Type="PCX Texture";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
+			//		m_Textures[m_TexturesNum].InFilename=localfilename;
+			//		m_Textures[m_TexturesNum].InOffset=0;
+			//		m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	}
+			//}
 
-				if(j<m_FS_CurrVP_Header.dirnumber)
-				{
-					CFile fcheck;
-					if(!fcheck.Open(m_FS_CurrVP_Filename,CFile::modeRead))
-					{
-						m_ErrorString=ERROR_FS_CANTOPENCURVP_TEXT;
-						return ERROR_FS_CANTOPENCURVP;
-					}
-					//File_end=m_FS_CurrVP_Dir[j].offset + m_FS_CurrVP_Dir[j].size;
-					//File_start=m_FS_CurrVP_Dir[j].offset;
-					unknownfiletype=FALSE;
-					TRACE(".pcx...Found in current VP!\n");
-					m_Textures[m_TexturesNum].Location="Current VP";
-					m_Textures[m_TexturesNum].Type="PCX Texture";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
-					m_Textures[m_TexturesNum].InFilename=m_FS_CurrVP_Filename;
-					m_Textures[m_TexturesNum].InOffset=m_FS_CurrVP_Dir[j].offset;
-					m_Textures[m_TexturesNum].InSize=m_FS_CurrVP_Dir[j].size;
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				}
-			}
+			////PCX Search process #2: Current .VP file
+			//if(unknownfiletype && m_FS_CurrVP_Loaded)
+			//{
+			//	unsigned int j=0;
+			//	while((j<m_FS_CurrVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
+			//		j++;
 
-			//PCX Search process #3: /data/maps
-			if(unknownfiletype)
-			{
-				CString mapsdirectory;
-				COptionsDlg dlg;
-				if(m_FS_CurrVP_FreeSpaceVersion==1)
-					mapsdirectory=dlg.GetF1Path();
-				else
-					mapsdirectory=dlg.GetF2Path();
-				CString mapsfilename=mapsdirectory;
-				if(mapsfilename.Right(1)!="\\")
-					mapsfilename+="\\";
-				mapsfilename+="data\\maps\\";
-				mapsfilename+=Filename;
-				
-				CFile fcheck;
-				if(fcheck.Open(mapsfilename,CFile::modeRead))
-				{
-					unknownfiletype=FALSE;
-					TRACE(".pcx...Found in FreeSpace /data/maps directory!\n");
-					m_Textures[m_TexturesNum].Location="/data/maps directory";
-					m_Textures[m_TexturesNum].Type="PCX Texture";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
-					m_Textures[m_TexturesNum].InFilename=mapsfilename;
-					m_Textures[m_TexturesNum].InOffset=0;
-					m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				}
-			}
+			//	if(j<m_FS_CurrVP_Header.dirnumber)
+			//	{
+			//		CFile fcheck;
+			//		if(!fcheck.Open(m_FS_CurrVP_Filename,CFile::modeRead))
+			//		{
+			//			m_ErrorString=ERROR_FS_CANTOPENCURVP_TEXT;
+			//			return ERROR_FS_CANTOPENCURVP;
+			//		}
+			//		//File_end=m_FS_CurrVP_Dir[j].offset + m_FS_CurrVP_Dir[j].size;
+			//		//File_start=m_FS_CurrVP_Dir[j].offset;
+			//		unknownfiletype=FALSE;
+			//		TRACE(".pcx...Found in current VP!\n");
+			//		m_Textures[m_TexturesNum].Location="Current VP";
+			//		m_Textures[m_TexturesNum].Type="PCX Texture";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
+			//		m_Textures[m_TexturesNum].InFilename=m_FS_CurrVP_Filename;
+			//		m_Textures[m_TexturesNum].InOffset=m_FS_CurrVP_Dir[j].offset;
+			//		m_Textures[m_TexturesNum].InSize=m_FS_CurrVP_Dir[j].size;
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	}
+			//}
 
-			//PCX Search process #4: Main .VP file
-			if(unknownfiletype && m_FS_MainVP_Loaded)
-			{
-				unsigned int j=0;
-				while((j<m_FS_MainVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
-					j++;
+			////PCX Search process #3: /data/maps
+			//if(unknownfiletype)
+			//{
+			//	CString mapsdirectory;
+			//	COptionsDlg dlg;
+			//	if(m_FS_CurrVP_FreeSpaceVersion==1)
+			//		mapsdirectory=dlg.GetF1Path();
+			//	else
+			//		mapsdirectory=dlg.GetF2Path();
+			//	CString mapsfilename=mapsdirectory;
+			//	if(mapsfilename.Right(1)!="\\")
+			//		mapsfilename+="\\";
+			//	mapsfilename+="data\\maps\\";
+			//	mapsfilename+=Filename;
+			//	
+			//	CFile fcheck;
+			//	if(fcheck.Open(mapsfilename,CFile::modeRead))
+			//	{
+			//		unknownfiletype=FALSE;
+			//		TRACE(".pcx...Found in FreeSpace /data/maps directory!\n");
+			//		m_Textures[m_TexturesNum].Location="/data/maps directory";
+			//		m_Textures[m_TexturesNum].Type="PCX Texture";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
+			//		m_Textures[m_TexturesNum].InFilename=mapsfilename;
+			//		m_Textures[m_TexturesNum].InOffset=0;
+			//		m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	}
+			//}
 
-				if(j<m_FS_MainVP_Header.dirnumber)
-				{
-					CFile fcheck;
-					if(!fcheck.Open(m_FS_MainVP_Filename,CFile::modeRead))
-						return ERROR_FS_CANTOPENFSVP;
-					unknownfiletype=FALSE;
-					TRACE(".pcx...Found in main VP!\n");
-					m_Textures[m_TexturesNum].Location="Main FreeSpace VP";
-					m_Textures[m_TexturesNum].Type="PCX Texture";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
-					m_Textures[m_TexturesNum].InFilename=m_FS_MainVP_Filename;
-					m_Textures[m_TexturesNum].InOffset=m_FS_MainVP_Dir[j].offset;
-					m_Textures[m_TexturesNum].InSize=m_FS_MainVP_Dir[j].size;
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				} 
-			}
+			////PCX Search process #4: Main .VP file
+			//if(unknownfiletype && m_FS_MainVP_Loaded)
+			//{
+			//	unsigned int j=0;
+			//	while((j<m_FS_MainVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
+			//		j++;
 
-			//ANI Search process #1: Current directory
-			if(unknownfiletype)
-			{		   // no pcx file... check for ani file
-				strcpy_s(Filename,m_FS_BitmapData.pic[i].name);
-				strcat_s(Filename,".ani");
+			//	if(j<m_FS_MainVP_Header.dirnumber)
+			//	{
+			//		CFile fcheck;
+			//		if(!fcheck.Open(m_FS_MainVP_Filename,CFile::modeRead))
+			//			return ERROR_FS_CANTOPENFSVP;
+			//		unknownfiletype=FALSE;
+			//		TRACE(".pcx...Found in main VP!\n");
+			//		m_Textures[m_TexturesNum].Location="Main FreeSpace VP";
+			//		m_Textures[m_TexturesNum].Type="PCX Texture";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_PCX;
+			//		m_Textures[m_TexturesNum].InFilename=m_FS_MainVP_Filename;
+			//		m_Textures[m_TexturesNum].InOffset=m_FS_MainVP_Dir[j].offset;
+			//		m_Textures[m_TexturesNum].InSize=m_FS_MainVP_Dir[j].size;
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	} 
+			//}
 
-				CFile fcheck;
-				if(fcheck.Open(Filename,CFile::modeRead))
-				{
-					unknownfiletype=FALSE;
-					TRACE(".ani...Found in current directory!\n");
-					m_Textures[m_TexturesNum].Location="Current Directory";
-					m_Textures[m_TexturesNum].Type="ANI Animation";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
-					m_Textures[m_TexturesNum].InFilename=Filename;
-					m_Textures[m_TexturesNum].InOffset=0;
-					m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				} 
-			}
-			
-			//ANI Search process #2: Current .VP
-			if(unknownfiletype && m_FS_CurrVP_Loaded)
-			{
-				unsigned int j=0;
-				while((j<m_FS_CurrVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
-					j++;
-				if(j<m_FS_CurrVP_Header.dirnumber)
-				{
-					CFile fcheck;
-					if(!fcheck.Open(m_FS_CurrVP_Filename,CFile::modeRead))
-						return ERROR_FS_CANTOPENCURVP;
-					unknownfiletype=FALSE;
-					TRACE(".ani...Found in current VP!\n");
-					m_Textures[m_TexturesNum].Location="Current VP";
-					m_Textures[m_TexturesNum].Type="ANI Animation";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
-					m_Textures[m_TexturesNum].InFilename=m_FS_CurrVP_Filename;
-					m_Textures[m_TexturesNum].InOffset=m_FS_CurrVP_Dir[j].offset;
-					m_Textures[m_TexturesNum].InSize=m_FS_CurrVP_Dir[j].size;
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				}
-			}
+			////ANI Search process #1: Current directory
+			//if(unknownfiletype)
+			//{		   // no pcx file... check for ani file
+			//	strcpy_s(Filename,m_FS_BitmapData.pic[i].name);
+			//	strcat_s(Filename,".ani");
 
-			//ANI Search process #3: /data/maps
-			if(unknownfiletype)
-			{
-				CString mapsdirectory;
-				COptionsDlg dlg;
-				if(m_FS_CurrVP_FreeSpaceVersion==1)
-					mapsdirectory=dlg.GetF1Path();
-				else
-					mapsdirectory=dlg.GetF2Path();
-				CString mapsfilename=mapsdirectory;
-				if(mapsfilename.Right(1)!="\\")
-					mapsfilename+="\\";
-				mapsfilename+="data\\maps\\";
-				mapsfilename+=Filename;
+			//	CFile fcheck;
+			//	if(fcheck.Open(Filename,CFile::modeRead))
+			//	{
+			//		unknownfiletype=FALSE;
+			//		TRACE(".ani...Found in current directory!\n");
+			//		m_Textures[m_TexturesNum].Location="Current Directory";
+			//		m_Textures[m_TexturesNum].Type="ANI Animation";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
+			//		m_Textures[m_TexturesNum].InFilename=Filename;
+			//		m_Textures[m_TexturesNum].InOffset=0;
+			//		m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	} 
+			//}
+			//
+			////ANI Search process #2: Current .VP
+			//if(unknownfiletype && m_FS_CurrVP_Loaded)
+			//{
+			//	unsigned int j=0;
+			//	while((j<m_FS_CurrVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_CurrVP_Dir[j].filename) !=0))
+			//		j++;
+			//	if(j<m_FS_CurrVP_Header.dirnumber)
+			//	{
+			//		CFile fcheck;
+			//		if(!fcheck.Open(m_FS_CurrVP_Filename,CFile::modeRead))
+			//			return ERROR_FS_CANTOPENCURVP;
+			//		unknownfiletype=FALSE;
+			//		TRACE(".ani...Found in current VP!\n");
+			//		m_Textures[m_TexturesNum].Location="Current VP";
+			//		m_Textures[m_TexturesNum].Type="ANI Animation";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
+			//		m_Textures[m_TexturesNum].InFilename=m_FS_CurrVP_Filename;
+			//		m_Textures[m_TexturesNum].InOffset=m_FS_CurrVP_Dir[j].offset;
+			//		m_Textures[m_TexturesNum].InSize=m_FS_CurrVP_Dir[j].size;
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	}
+			//}
 
-				CFile fcheck;
-				if(fcheck.Open(mapsfilename,CFile::modeRead))
-				{
-					unknownfiletype=FALSE;
-					TRACE(".ani...Found in FreeSpace /data/maps directory!\n");
-					m_Textures[m_TexturesNum].Location="/data/maps directory";
-					m_Textures[m_TexturesNum].Type="ANI Animation";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
-					m_Textures[m_TexturesNum].InFilename=mapsfilename;
-					m_Textures[m_TexturesNum].InOffset=0;
-					m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				}
-			}
+			////ANI Search process #3: /data/maps
+			//if(unknownfiletype)
+			//{
+			//	CString mapsdirectory;
+			//	COptionsDlg dlg;
+			//	if(m_FS_CurrVP_FreeSpaceVersion==1)
+			//		mapsdirectory=dlg.GetF1Path();
+			//	else
+			//		mapsdirectory=dlg.GetF2Path();
+			//	CString mapsfilename=mapsdirectory;
+			//	if(mapsfilename.Right(1)!="\\")
+			//		mapsfilename+="\\";
+			//	mapsfilename+="data\\maps\\";
+			//	mapsfilename+=Filename;
 
-			//ANI Search process #4: Main .VP file
-			if(unknownfiletype && m_FS_MainVP_Loaded)
-			{
-				unsigned int j=0;
-				while((j<m_FS_MainVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
-					j++;
-				if(j<m_FS_MainVP_Header.dirnumber)
-				{
-					CFile fcheck;
-					if(!fcheck.Open(m_FS_MainVP_Filename,CFile::modeRead))
-						return ERROR_FS_CANTOPENFSVP;
-					unknownfiletype=FALSE;
-					TRACE(".ani...Found in main VP!\n");
-					m_Textures[m_TexturesNum].Location="Main FreeSpace VP";
-					m_Textures[m_TexturesNum].Type="ANI Animation";
-					m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
-					m_Textures[m_TexturesNum].InFilename=m_FS_MainVP_Filename;
-					m_Textures[m_TexturesNum].InOffset=m_FS_MainVP_Dir[j].offset;
-					m_Textures[m_TexturesNum].InSize=m_FS_MainVP_Dir[j].size;
-					m_Textures[m_TexturesNum].Valid=TRUE;
-				}
-			}
+			//	CFile fcheck;
+			//	if(fcheck.Open(mapsfilename,CFile::modeRead))
+			//	{
+			//		unknownfiletype=FALSE;
+			//		TRACE(".ani...Found in FreeSpace /data/maps directory!\n");
+			//		m_Textures[m_TexturesNum].Location="/data/maps directory";
+			//		m_Textures[m_TexturesNum].Type="ANI Animation";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
+			//		m_Textures[m_TexturesNum].InFilename=mapsfilename;
+			//		m_Textures[m_TexturesNum].InOffset=0;
+			//		m_Textures[m_TexturesNum].InSize=fcheck.GetLength();
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	}
+			//}
 
-			//ANI Search process #: Skip if turned off
-			if((!bAniLoad) && (m_Textures[m_TexturesNum].FileType==TEXTUREINFOFILETYPE_ANI))
-			{
-				m_FS_BitmapData.pic[i].valid=0;    
-				m_Textures[m_TexturesNum].Valid=FALSE;
-				TRACE("Above ANI SKIPPED due to user setting!\n");
-				/*TOREMOVE*/
-			}
+			////ANI Search process #4: Main .VP file
+			//if(unknownfiletype && m_FS_MainVP_Loaded)
+			//{
+			//	unsigned int j=0;
+			//	while((j<m_FS_MainVP_Header.dirnumber)&(_strcmpi(Filename,m_FS_MainVP_Dir[j].filename) !=0))
+			//		j++;
+			//	if(j<m_FS_MainVP_Header.dirnumber)
+			//	{
+			//		CFile fcheck;
+			//		if(!fcheck.Open(m_FS_MainVP_Filename,CFile::modeRead))
+			//			return ERROR_FS_CANTOPENFSVP;
+			//		unknownfiletype=FALSE;
+			//		TRACE(".ani...Found in main VP!\n");
+			//		m_Textures[m_TexturesNum].Location="Main FreeSpace VP";
+			//		m_Textures[m_TexturesNum].Type="ANI Animation";
+			//		m_Textures[m_TexturesNum].FileType=TEXTUREINFOFILETYPE_ANI;
+			//		m_Textures[m_TexturesNum].InFilename=m_FS_MainVP_Filename;
+			//		m_Textures[m_TexturesNum].InOffset=m_FS_MainVP_Dir[j].offset;
+			//		m_Textures[m_TexturesNum].InSize=m_FS_MainVP_Dir[j].size;
+			//		m_Textures[m_TexturesNum].Valid=TRUE;
+			//	}
+			//}
 
-			//Search process FAILED!
-			if(unknownfiletype)
-			{
-				m_FS_BitmapData.pic[i].valid=0;	// not ani or pcx...
-				TRACE(".pcx/.ani...NOT FOUND!\n");
-				m_Textures[m_TexturesNum].Location="<Not found>";
-				m_Textures[m_TexturesNum].Type="<Unknown>";
-				m_Textures[m_TexturesNum].Valid=FALSE;
-				m_Textures[m_TexturesNum].Error="Not found";
-			}
+			////ANI Search process #: Skip if turned off
+			//if((!bAniLoad) && (m_Textures[m_TexturesNum].FileType==TEXTUREINFOFILETYPE_ANI))
+			//{
+			//	m_FS_BitmapData.pic[i].valid=0;    
+			//	m_Textures[m_TexturesNum].Valid=FALSE;
+			//	TRACE("Above ANI SKIPPED due to user setting!\n");
+			//	/*TOREMOVE*/
+			//}
+
+			////Search process FAILED!
+			//if(unknownfiletype)
+			//{
+			//	m_FS_BitmapData.pic[i].valid=0;	// not ani or pcx...
+			//	TRACE(".pcx/.ani...NOT FOUND!\n");
+			//	m_Textures[m_TexturesNum].Location="<Not found>";
+			//	m_Textures[m_TexturesNum].Type="<Unknown>";
+			//	m_Textures[m_TexturesNum].Valid=FALSE;
+			//	m_Textures[m_TexturesNum].Error="Not found";
+			//}
 
 			//Load file
+
 			if(m_Textures[m_TexturesNum].Valid)
 			{
 				CFile f;
@@ -776,317 +1276,14 @@ ERRORCODE CMODVIEW32Doc::FS_LoadPCXData(unsigned int ActivePM,BOOL bAniLoad,BOOL
 				{
 				case TEXTUREINFOFILETYPE_PCX:
 				{
-					//Header
-					PCXHEADER header;
-					f.Read(&header,sizeof(PCXHEADER));
-					if(header.Version!=5)
-					{
-						m_FS_BitmapData.pic[i].valid=0;
-						m_Textures[m_TexturesNum].Valid=FALSE;
-						m_Textures[m_TexturesNum].Error="Invalid PCX version";
-						break;
-					}
-
-					xreal=header.Xmax-header.Xmin+1;
-					yreal=header.Ymax-header.Ymin+1;
-					m_Textures[m_TexturesNum].Width=xreal;
-					m_Textures[m_TexturesNum].Height=yreal;
-
-					unsigned int kb;
-					kb=2; while(kb<xreal) kb*=2; xsize=kb;
-					kb=2; while(kb<yreal) kb*=2; ysize=kb;
-
-					//Palette
-					if(header.Version==5)
-					{
-						unsigned char byte1;
-						f.Seek(m_Textures[m_TexturesNum].InOffset+m_Textures[m_TexturesNum].InSize-769,CFile::begin);
-						f.Read(&byte1,1);
-						if(byte1==0x0C)
-						{
-							for(int j=0;j<256;j++)
-							{
-								f.Read(&m_Textures[m_TexturesNum].Palette[0][j],1); //Red
-								f.Read(&m_Textures[m_TexturesNum].Palette[1][j],1); //Green
-								f.Read(&m_Textures[m_TexturesNum].Palette[2][j],1); //Blue
-								m_Textures[m_TexturesNum].PaletteLong[j]=m_Textures[m_TexturesNum].Palette[0][j]+(m_Textures[m_TexturesNum].Palette[1][j]<<8)+(m_Textures[m_TexturesNum].Palette[2][j]<<16)+(255<<24);
-							}
-						}
-					}
-					f.Seek(m_Textures[m_TexturesNum].InOffset+128,CFile::begin);
-
-					if(xreal*yreal>1024*2048)
-					{
-						m_FS_BitmapData.pic[i].valid=0;
-						m_Textures[m_TexturesNum].Valid=FALSE;
-						m_Textures[m_TexturesNum].Error="PCX Texture too big (>2097152 pixels)";
-						break;
-					}
-	
-#ifdef _WITHTXVIEW
-					int x_clusterize2=xreal;
-					if(x_clusterize2%2!=0)
-						x_clusterize2+=2-(xreal%2);
-					int x_clusterize4=xreal;
-					if(x_clusterize4%4!=0)
-						x_clusterize4+=4-(xreal%4);
-
-					m_Textures[m_TexturesNum].Flags=TEXTUREINFOFLAG_TEXTURELOADED;
-					
-					unsigned char *tmpbuffer;
-					try {
-						m_Textures[m_TexturesNum].Bitmap=new unsigned char[x_clusterize4*yreal];
-						tmpbuffer=new unsigned char[x_clusterize2*yreal];
-					}
-					catch (CMemoryException e) {
-						m_Textures[m_TexturesNum].Valid=FALSE;
-						m_Textures[m_TexturesNum].Error="Out of Memory";
-						m_FS_BitmapData.pic[m_TexturesNum].valid=0;
-						break;
-					}
-#endif
-
-					//Bitmap
-					XScale=0;
-					YScale=0;
-					unsigned char XScaleTest=0;
-					unsigned char YScaleTest=0;
-					if(bFastload)
-					{
-						while(MaxSize<(xsize>>XScale))
-						{
-							XScale++;
-							XScaleTest=XScaleTest<<1;
-							XScaleTest++;
-						}
-						while(MaxSize<(ysize>>YScale))
-						{
-							YScale++;
-							YScaleTest=YScaleTest<<1;
-							YScaleTest++;
-						}
-					}
-	
-					unsigned char runcount=0;
-					unsigned char runvalue=0;
-					unsigned int runoffset=0;
-					for(unsigned int j=0;j<yreal;j++)
-					{
-						unsigned int offset;
-						if(bFastload)
-							offset=(j>>YScale)*(xsize>>XScale);
-						else
-							offset=j*xreal;
-						for(unsigned int k=0;k<(xreal+(xreal&1));k++)
-						{
-							if(runcount>0)
-								runcount--;
-							else {
-								f.Read(&runvalue,1);
-								if((runvalue & 0xC0)==0xC0)
-								{
-									runcount=(runvalue & 0x3F) - 1;
-									f.Read(&runvalue,1);
-								}
-							}
-							if(((j & YScaleTest)+(k & XScaleTest))==0)
-								m_FS_RGBAtexture2[offset++]=m_Textures[m_TexturesNum].PaletteLong[runvalue];
-							
-#ifdef _WITHTXVIEW
-							if(runoffset<x_clusterize4*yreal) //Just to be sure
-								tmpbuffer[runoffset]=runvalue;
-#endif
-							runoffset++;
-						}	
-					}
-#ifdef _WITHTXVIEW
-					for(unsigned int j=0;j<yreal;j++)
-						memcpy(&m_Textures[m_TexturesNum].Bitmap[j*x_clusterize4],&tmpbuffer[j*x_clusterize2],xreal);
-					delete[] tmpbuffer;
-#endif
-					for(unsigned int j=0;j<yreal;j++)
-					{
-						if(bFastload)
-						{
-							unsigned int offset=(j>>YScale)*(xsize>>XScale) + (xreal>>XScale);
-							for(unsigned int k=xreal;k<xsize;k++)
-							{	// fill out the extra
-								if((k&XScaleTest)==0)
-								{
-									//RGBAtexture2[offset]=0xff00ff00;
-									m_FS_RGBAtexture2[offset]=m_FS_RGBAtexture2[offset-(xreal>>XScale)];
-									offset++;
-	
-								}
-							}
-						}
-					}
-
-					if(bFastload)
-					{
-						for(unsigned int j=yreal;j<ysize;j++)
-						{			// fill out the extra
-							unsigned int offset=(j>>YScale)*(xsize>>XScale);
-							for(unsigned int k=0;k<xsize;k++)
-							{
-								if((k&XScaleTest)==0)
-								{
-									//RGBAtexture2[offset]=0xff0000ff;
-									m_FS_RGBAtexture2[offset]=m_FS_RGBAtexture2[offset-(yreal>>YScale)*(xsize>>XScale)];
-									offset++;
-								}
-							}
-						}
-					}
-					m_Textures[m_TexturesNum].Error="<ok>";
+					loadPCXtexture(&m_Textures[m_TexturesNum], &m_FS_BitmapData.pic[i], bFastload);
+					break; 
 				}
-				break;
-
 				case TEXTUREINFOFILETYPE_ANI:
 				{
-					//Header
-					ANIHEADER header;
-					f.Read(&header,sizeof(ANIHEADER));
-					if(header.version!=2)
-					{
-						m_FS_BitmapData.pic[i].valid=0;
-						m_Textures[m_TexturesNum].Valid=FALSE;
-						m_Textures[m_TexturesNum].Error="Invalid ANI version";
-						break;
-					}
-					if(header.id!=0)
-					{
-						m_FS_BitmapData.pic[i].valid=0;
-						m_Textures[m_TexturesNum].Valid=FALSE;
-						m_Textures[m_TexturesNum].Error="Invalid ANI file id";
-						break;
-					}
-
-					xreal=header.w;
-					yreal=header.h;
-					m_Textures[m_TexturesNum].Width=xreal;
-					m_Textures[m_TexturesNum].Height=yreal;
-
-					unsigned int jb;
-					jb=2; while(jb<xreal) jb*=2; xsize=jb;
-					jb=2; while(jb<yreal) jb*=2; ysize=jb;
-
-					//Palette
-					for(int j=0;j<256;j++)
-					{
-						m_Textures[m_TexturesNum].Palette[0][j]=header.palette[j*3+0]; //Red
-						m_Textures[m_TexturesNum].Palette[1][j]=header.palette[j*3+1]; //Green
-						m_Textures[m_TexturesNum].Palette[2][j]=header.palette[j*3+2]; //Blue
-						m_Textures[m_TexturesNum].PaletteLong[j]=m_Textures[m_TexturesNum].Palette[0][j]+(m_Textures[m_TexturesNum].Palette[1][j]<<8)+(m_Textures[m_TexturesNum].Palette[2][j]<<16)+(255<<24);
-					}
-
-					if(xreal*yreal>1024*2048)
-					{
-						m_FS_BitmapData.pic[i].valid=0;
-						m_Textures[m_TexturesNum].Valid=FALSE;
-						m_Textures[m_TexturesNum].Error="PCX Texture too big (>2097152 pixels).";
-						break;
-					}
-					
-#ifdef _WITHTXVIEW
-					int size=xreal*yreal;
-					m_Textures[m_TexturesNum].Flags=TEXTUREINFOFLAG_TEXTURELOADED;
-					m_Textures[m_TexturesNum].Bitmap=new unsigned char[size];
-#endif
-
-					//Bitmap
-					XScale=0;
-					YScale=0;
-					unsigned char XScaleTest=0;
-					unsigned char YScaleTest=0;
-					if(bFastload)
-					{
-						while(MaxSize<(xsize>>XScale))
-						{
-							XScale++;
-							XScaleTest=XScaleTest<<1;
-							XScaleTest++;
-						}
-						while(MaxSize<(ysize>>YScale))
-						{
-							YScale++;
-							YScaleTest=YScaleTest<<1;
-							YScaleTest++;
-						}
-					}
-
-					unsigned char byte1;
-					unsigned short byte2;
-					unsigned int byte4;
-					f.Read(&byte2,2);
-					f.Read(&byte4,4);
-					f.Read(&byte4,4);
-					f.Read(&byte1,1);
-
-					//Read just the 1st frame... thats all we need
-					unsigned char runcount=0;
-					unsigned char runvalue=0;
-					int runoffset=0;
-					for(unsigned int j=0;j<yreal;j++)
-					{
-						for(unsigned int k=0;k<xreal;k++)
-						{
-							if(runcount>0)
-								runcount--;
-							else {
-								f.Read(&runvalue,1);
-								if(runvalue==header.packer_code)
-								{
-									f.Read(&runcount,1);
-									f.Read(&runvalue,1);
-								}
-							}
-							if(((j&YScaleTest)+(k&XScaleTest))==0)
-							{
-								unsigned int offset;
-								if(bFastload)
-									offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
-								else
-									offset=j*xreal + k;
-								m_FS_RGBAtexture2[offset]=m_Textures[m_TexturesNum].PaletteLong[runvalue];
-							}
-#ifdef _WITHTXVIEW
-							m_Textures[m_TexturesNum].Bitmap[runoffset]=runvalue;
-							runoffset++;
-#endif
-						}
-						for(unsigned int k=xreal;k<xsize;k++)
-						{	//fill out the extra
-							if(((j&YScaleTest)+(k&XScaleTest))==0)
-							{
-								unsigned int offset;
-								if(bFastload)
-									offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
-								else
-									offset=j*xreal+k;
-								m_FS_RGBAtexture2[offset]=0xff00ff00;
-							}
-						}
-					}               
-					for(unsigned int j=yreal;j<ysize;j++)
-					{			// fill out the extra
-						for(unsigned int k=0;k<xsize;k++)
-						{
-							if(((j&YScaleTest)+(k&XScaleTest))==0)
-							{
-								unsigned int offset;
-								if(bFastload)
-									offset=(j>>YScale)*(xsize>>XScale)+(k>>XScale);
-								else
-									offset=j*xreal+k;
-								m_FS_RGBAtexture2[offset]=0xff00ff00;
-							}
-						}
-					}
-					m_Textures[m_TexturesNum].Error="<ok>";
+					loadANItexture(&m_Textures[m_TexturesNum], &m_FS_BitmapData.pic[i], bFastload);
+					break; 
 				}
-				break;
-
 				default:
 					ASSERT(FALSE);
 				}
@@ -2331,7 +2528,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadVPContent(CString filename)
 	fp.Close();
 	
 	if(m_ErrorCode==ERROR_GEN_NOERROR)
-		FS_LoadPCXData2();
+		FS_LoadTextureData2();
 
 	if(!m_InfoMode)
 	{
@@ -2350,7 +2547,7 @@ ERRORCODE CMODVIEW32Doc::FS_LoadVPContent(CString filename)
 	return m_ErrorCode;
 }
 
-void CMODVIEW32Doc::FS_LoadPCXData2()
+void CMODVIEW32Doc::FS_LoadTextureData2()
 {
 	POSITION pos=GetFirstViewPosition();	
 	CMODVIEW32View *m_view=(CMODVIEW32View *)GetNextView(pos);
