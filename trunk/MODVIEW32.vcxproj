@@ -151,7 +151,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AW_CMultiViewSplitter.cpp" />
-    <ClCompile Include="BCMenu.cpp" />
     <ClCompile Include="CompilerErrorDlg.cpp" />
     <ClCompile Include="DataSafe.cpp" />
     <ClCompile Include="Details.cpp" />
@@ -214,7 +213,6 @@
     <ClInclude Include="Fs-extra.h" />
     <ClInclude Include="glext.h" />
     <ClInclude Include="AW_CMultiViewSplitter.h" />
-    <ClInclude Include="BCMenu.h" />
     <ClInclude Include="CompilerErrorDlg.h" />
     <ClInclude Include="DataSafe.h" />
     <ClInclude Include="Details.h" />

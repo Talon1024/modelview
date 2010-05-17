@@ -10,7 +10,6 @@
 #include "MODVIEW32Doc.h"
 #include "MODVIEW32View.h"
 #include "Explorer.h"
-//#include "dm_tools.h"
 #include "SplashNew.h"
 #include "welcome.h"
 #include "DM_Reg.h"
@@ -150,17 +149,6 @@ END_CATCH
 	}
 #endif
 
-	//Initialize BCMenu (menus with icons)
-	CMenu* pMenu = m_pMainWnd->GetMenu();
-	if (pMenu)pMenu->DestroyMenu();
-	HMENU hMenu = ((CMainFrame*) m_pMainWnd)->NewMenu();
-	pMenu = CMenu::FromHandle( hMenu );
-	m_pMainWnd->SetMenu(pMenu);
-	((CMainFrame*)m_pMainWnd)->m_hMenuDefault = hMenu;
-	
-	// The one and only window has been initialized, so show and update it.
-	//::SendMessage(m_pMainWnd->m_hWnd,WM_SYSCOMMAND,SC_MAXIMIZE,0); //Maximize main window
-	// I really don't like apps that grab the entire screen on startup. -- The E
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
 

@@ -43,9 +43,10 @@ void CVPFileDialogSubWnd::OnGameButton()
 	/*if(m_PopupMenu.m_XPMode==0)
 		m_PopupMenu.LoadToolbar(IDR_MENU16);
 	else*/
-		m_PopupMenu.LoadToolbar(IDR_MENU20);
+		//m_PopupMenu.LoadToolbar(IDR_MENU20);
+		m_PopupMenu.LoadMenu(IDR_MENU20);
 	ClientToScreen(&point);
-	BCMenu *psub = (BCMenu *)m_PopupMenu.GetSubMenu(0);
+	CMenu *psub = (CMenu *)m_PopupMenu.GetSubMenu(0);
 	psub->TrackPopupMenu(TPM_LEFTALIGN|TPM_RIGHTBUTTON,point.x,point.y,AfxGetMainWnd());
 	m_PopupMenu.DestroyMenu();
 

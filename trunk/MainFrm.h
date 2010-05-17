@@ -18,7 +18,7 @@
 #include "TXViewModeToolbar.h"
 #include "SilentSplitterWnd.h"
 #include "splitterex.h"
-#include "BCMenu.h"
+//#include "BCMenu.h"
 #include "AW_CMultiViewSplitter.h"
 #include "VPFileDialog.h"
 
@@ -82,7 +82,7 @@ public:
 	int ExplorerOpenSubFile(char *filename);
 	//BCMenu
 	HMENU NewMenu(int menu=0);
-	BCMenu m_menu;
+	CMenu m_menu;
 
 	int m_ExplorerVisible;
 	float m_ZoomLevel;
