@@ -14,19 +14,11 @@
 #define _WITHTXVIEW		// enable support for texture pane (added in Beta 05)
 #define _WITHHTVIEW		// enable support for HTML task view (added in Beta 05)
 
-
-#include "D2-extra.h"
-#include "D3-extra.h"
 #include "FS-extra.h"
-#include "RF-extra.h"
 #include "FSChunk.h"
 
 #define GAME_NONE 0
-#define GAME_D1	1	//Descent 1 (unsupported)
-#define GAME_D2 2	//Descent 2
-#define GAME_D3 3	//Descent 3
-#define GAME_FS 6	//FreeSpace 1/2
-#define GAME_RF	11	//Red Faction 1 (partially implemented)
+#define GAME_FS 1	//FreeSpace 1/2
 
 
 #define MAX_TEXTURES	128
@@ -49,64 +41,64 @@
 #define ERROR_GEN_INVALIDHOGFILE_TEXT "Invalid HOG file (file was neither recognized as Descent 1/2 HOG nor as Descent 3 HOG2 file)."
 #define ERROR_GEN_TOOMANYGUNS 5
 #define ERROR_GEN_TOOMANYGUNS_TEXT "Too many gun points."
+//
+//#define ERROR_D2_INVALIDTEXTUREID 2003
+//#define ERROR_D2_INVALIDTEXTUREID_TEXT "Cotains a polygon with an invalid texture ID."
+//#define ERROR_D2_TOOMANYSEGMENTS 2005
+//#define ERROR_D2_TOOMANYSEGMENTS_TEXT "Too many segments."
+//#define ERROR_D2_TOOHIGHVCOUNT 2008
+//#define ERROR_D2_TOOHIGHVCOUNT_TEXT "Too many vertices defined."
+//#define ERROR_D2_TOOMANYPOINTSINPOLY 2010
+//#define ERROR_D2_TOOMANYPOINTSINPOLY_TEXT "Contains a polygon with too many points."
+//#define ERROR_D2_TOOMANYPOLYGONS 2011
+//#define ERROR_D2_TOOMANYPOLYGONS_TEXT "Too many polygons."
+//#define ERROR_D2_BADPOLYMODELDATA 2012
+//#define ERROR_D2_BADPOLYMODELDATA_TEXT "Bad polymodel data."
+//#define ERROR_D2_HOGUNSUPPORTED 2013
+//#define ERROR_D2_HOGUNSUPPORTED_TEXT "Descent 1/2 HOG files are not yet supported."
+//#define ERROR_D2_HOARDHAMUNSUPPORTED 2014
+//#define ERROR_D2_HOARDHAMUNSUPPORTED_TEXT "HOARD.HAM (from Descent 2 Vertigo Series) does not contain any model data and is therefore not supported."
 
-#define ERROR_D2_INVALIDTEXTUREID 2003
-#define ERROR_D2_INVALIDTEXTUREID_TEXT "Cotains a polygon with an invalid texture ID."
-#define ERROR_D2_TOOMANYSEGMENTS 2005
-#define ERROR_D2_TOOMANYSEGMENTS_TEXT "Too many segments."
-#define ERROR_D2_TOOHIGHVCOUNT 2008
-#define ERROR_D2_TOOHIGHVCOUNT_TEXT "Too many vertices defined."
-#define ERROR_D2_TOOMANYPOINTSINPOLY 2010
-#define ERROR_D2_TOOMANYPOINTSINPOLY_TEXT "Contains a polygon with too many points."
-#define ERROR_D2_TOOMANYPOLYGONS 2011
-#define ERROR_D2_TOOMANYPOLYGONS_TEXT "Too many polygons."
-#define ERROR_D2_BADPOLYMODELDATA 2012
-#define ERROR_D2_BADPOLYMODELDATA_TEXT "Bad polymodel data."
-#define ERROR_D2_HOGUNSUPPORTED 2013
-#define ERROR_D2_HOGUNSUPPORTED_TEXT "Descent 1/2 HOG files are not yet supported."
-#define ERROR_D2_HOARDHAMUNSUPPORTED 2014
-#define ERROR_D2_HOARDHAMUNSUPPORTED_TEXT "HOARD.HAM (from Descent 2 Vertigo Series) does not contain any model data and is therefore not supported."
-
-#define ERROR_D3_TOOMANYTEXTURES 3003
-#define ERROR_D3_TOOMANYTEXTURES_TEXT "Too many textures."
-#define ERROR_D3_INVALIDTEXTURENAME 3004
-#define ERROR_D3_INVALIDTEXTURENAME_TEXT "Invalid texture name (too many characters)."
-#define ERROR_D3_TOOHIGHVCOUNT 3008
-#define ERROR_D3_TOOHIGHVCOUNT_TEXT "Too many vertices defined."
-#define ERROR_D3_TOOMANYPOINTSINPOLY 3010
-#define ERROR_D3_TOOMANYPOINTSINPOLY_TEXT "Too many points in polygon (>20)."
-#define ERROR_D3_TOOMANYPOLYGONS 3011
-#define ERROR_D3_TOOMANYPOLYGONS_TEXT "Too many polygons."
-#define ERROR_D3_HOGTOOMANYFILES 3013
-#define ERROR_D3_HOGTOOMANYFILES_TEXT "Too many files in HOG."
-#define ERROR_D3_NOFILESINHOG 3014
-#define ERROR_D3_NOFILESINHOG_TEXT "No .OOF model files in HOG."
-#define ERROR_D3_TOOMANYANINUMBERKEYSTHRUSTERS 3016
-#define ERROR_D3_TOOMANYANINUMBERKEYSTHRUSTERS_TEXT "Too many keys in animation block."
-#define ERROR_D3_TOOMANYATCHPOINTS 3017
-#define ERROR_D3_TOOMANYATCHPOINTS_TEXT "Too many attachment points."
-#define ERROR_D3_TOOMANYNATHPOINTS 3018
-#define ERROR_D3_TOOMANYNATHPOINTS_TEXT "Too many attachment normals."
-#define ERROR_D3_TOOMANYGRNDPOINTS 3019
-#define ERROR_D3_TOOMANYGRNDPOINTS_TEXT "Too many ground points."
-#define ERROR_D3_TOOMANYGPNTPOINTS 3020
-#define ERROR_D3_TOOMANYGPNTPOINTS_TEXT "Too many gun points."
-#define ERROR_D3_TOOMANYSPCLPOINTS 3021
-#define ERROR_D3_TOOMANYSPCLPOINTS_TEXT "Too many special points."
-#define ERROR_D3_TOOMANYWBATPOINTS 3022
-#define ERROR_D3_TOOMANYWBATPOINTS_TEXT "Too many weapon batteries."
-#define ERROR_D3_TOOMANYWBATNUMGUNPOINTS 3023
-#define ERROR_D3_TOOMANYWBATNUMGUNPOINTS_TEXT "Too many guns in weapon battery."
-#define ERROR_D3_TOOMANYWBATNUMEYEPOINTS 3024
-#define ERROR_D3_TOOMANYWBATNUMEYEPOINTS_TEXT "Too many eye points in weapon battery."
-#define ERROR_D3_PINFTEXTTOOLONG 3025
-#define ERROR_D3_PINFTEXTTOOLONG_TEXT "PINF block contains too long text."
-#define ERROR_D3_INVALIDCHUNK 3026
-#define ERROR_D3_INVALIDCHUNK_TEXT "Invalid chunk."
-#define ERROR_D3_INVALIDCHUNKLENGTH 3027 //(Unused)
-#define ERROR_D3_INVALIDCHUNKLENGTH_TEXT "Invalid chunk length."
-#define ERROR_D3_INVALIDOOFHEADER 3028
-#define ERROR_D3_INVALIDOOFHEADER_TEXT "Invalid file header."
+//#define ERROR_D3_TOOMANYTEXTURES 3003
+//#define ERROR_D3_TOOMANYTEXTURES_TEXT "Too many textures."
+//#define ERROR_D3_INVALIDTEXTURENAME 3004
+//#define ERROR_D3_INVALIDTEXTURENAME_TEXT "Invalid texture name (too many characters)."
+//#define ERROR_D3_TOOHIGHVCOUNT 3008
+//#define ERROR_D3_TOOHIGHVCOUNT_TEXT "Too many vertices defined."
+//#define ERROR_D3_TOOMANYPOINTSINPOLY 3010
+//#define ERROR_D3_TOOMANYPOINTSINPOLY_TEXT "Too many points in polygon (>20)."
+//#define ERROR_D3_TOOMANYPOLYGONS 3011
+//#define ERROR_D3_TOOMANYPOLYGONS_TEXT "Too many polygons."
+//#define ERROR_D3_HOGTOOMANYFILES 3013
+//#define ERROR_D3_HOGTOOMANYFILES_TEXT "Too many files in HOG."
+//#define ERROR_D3_NOFILESINHOG 3014
+//#define ERROR_D3_NOFILESINHOG_TEXT "No .OOF model files in HOG."
+//#define ERROR_D3_TOOMANYANINUMBERKEYSTHRUSTERS 3016
+//#define ERROR_D3_TOOMANYANINUMBERKEYSTHRUSTERS_TEXT "Too many keys in animation block."
+//#define ERROR_D3_TOOMANYATCHPOINTS 3017
+//#define ERROR_D3_TOOMANYATCHPOINTS_TEXT "Too many attachment points."
+//#define ERROR_D3_TOOMANYNATHPOINTS 3018
+//#define ERROR_D3_TOOMANYNATHPOINTS_TEXT "Too many attachment normals."
+//#define ERROR_D3_TOOMANYGRNDPOINTS 3019
+//#define ERROR_D3_TOOMANYGRNDPOINTS_TEXT "Too many ground points."
+//#define ERROR_D3_TOOMANYGPNTPOINTS 3020
+//#define ERROR_D3_TOOMANYGPNTPOINTS_TEXT "Too many gun points."
+//#define ERROR_D3_TOOMANYSPCLPOINTS 3021
+//#define ERROR_D3_TOOMANYSPCLPOINTS_TEXT "Too many special points."
+//#define ERROR_D3_TOOMANYWBATPOINTS 3022
+//#define ERROR_D3_TOOMANYWBATPOINTS_TEXT "Too many weapon batteries."
+//#define ERROR_D3_TOOMANYWBATNUMGUNPOINTS 3023
+//#define ERROR_D3_TOOMANYWBATNUMGUNPOINTS_TEXT "Too many guns in weapon battery."
+//#define ERROR_D3_TOOMANYWBATNUMEYEPOINTS 3024
+//#define ERROR_D3_TOOMANYWBATNUMEYEPOINTS_TEXT "Too many eye points in weapon battery."
+//#define ERROR_D3_PINFTEXTTOOLONG 3025
+//#define ERROR_D3_PINFTEXTTOOLONG_TEXT "PINF block contains too long text."
+//#define ERROR_D3_INVALIDCHUNK 3026
+//#define ERROR_D3_INVALIDCHUNK_TEXT "Invalid chunk."
+//#define ERROR_D3_INVALIDCHUNKLENGTH 3027 //(Unused)
+//#define ERROR_D3_INVALIDCHUNKLENGTH_TEXT "Invalid chunk length."
+//#define ERROR_D3_INVALIDOOFHEADER 3028
+//#define ERROR_D3_INVALIDOOFHEADER_TEXT "Invalid file header."
 
 #define ERROR_FS_CANTOPENCURVP 6000
 #define ERROR_FS_CANTOPENCURVP_TEXT "Can't open VP file."
@@ -212,12 +204,12 @@
 #define TEXTUREINFOFLAG_TEXTUREIS24BIT	2 //Palette or RGBA-texture
 
 #define TEXTUREINFOFILETYPE_UNKNOWN	0
-#define TEXTUREINFOFILETYPE_OGF		1 //Descent 3 texture
-#define TEXTUREINFOFILETYPE_OAF		2 //Descent 3 animation
-#define TEXTUREINFOFILETYPE_PCX		3 //FreeSpace 1/2 texture
-#define TEXTUREINFOFILETYPE_ANI		4 //FreeSpace 1/2 animation
-#define TEXTUREINFOFILETYPE_D2U		5 //Descent 2 texture (uncompressed)
-#define TEXTUREINFOFILETYPE_D2C		6 //Descent 2 texture (RLE-compressed)
+//#define TEXTUREINFOFILETYPE_OGF		1 //Descent 3 texture
+//#define TEXTUREINFOFILETYPE_OAF		2 //Descent 3 animation
+#define TEXTUREINFOFILETYPE_PCX		1 //FreeSpace 1/2 texture
+#define TEXTUREINFOFILETYPE_ANI		2 //FreeSpace 1/2 animation
+//#define TEXTUREINFOFILETYPE_D2U		5 //Descent 2 texture (uncompressed)
+//#define TEXTUREINFOFILETYPE_D2C		6 //Descent 2 texture (RLE-compressed)
 
 typedef struct TEXTUREINFO
 {
@@ -258,8 +250,8 @@ protected: // create from serialization only
 typedef struct GUNS
 {
 	int Num;
-	D3_VPNT Gun[MAX_GUNS];
-	D3_VPNT GunDirection[MAX_GUNS];
+	vms_vector Gun[MAX_GUNS];
+	vms_vector GunDirection[MAX_GUNS];
 	int InSubModel[MAX_GUNS];
 	int GunType[MAX_GUNS];
 	int GunBank[MAX_GUNS];
@@ -307,8 +299,8 @@ typedef struct FS_DOCK
 	int num_spline_paths;
 	int path_number[MAX_FS_SPLINE_PATHS];
 	int num_points;
-	D3_VPNT position[MAX_FS_DOCK_POINTS];
-	D3_VPNT normal[MAX_FS_DOCK_POINTS];
+	vms_vector position[MAX_FS_DOCK_POINTS];
+	vms_vector normal[MAX_FS_DOCK_POINTS];
 } fs_dock;
 
 
@@ -356,63 +348,63 @@ public:
 	BLOCK m_Blocks[MAX_BLOCKS];
 
 	//Descent 2 attributes
-	int			m_D2_Robots_Num;
-	ULONGLONG	m_D2_MO_RobotInfo[MAX_D2_ROBOT_TYPES];
-	int			m_D2_Models_Num;
-	char		m_D2_CurrHAXM_Filename[MAX_FILENAMELEN];
-	D2_MODEL		m_D2_Model;
-	D2_MODELBITMAPS	m_D2_BitmapData;
-	GLuint		m_D2_ModelTexture[MAX_D2_TEXTURE];
-	UINT16		m_D2_ObjBitmapPtr[625];
-	D2_BITMAP_INDEX		m_D2_ObjBitmap[625];
-	D2_BITMAP_INDEX		m_D2_HxmObjBitmap[625];
-	CString		m_D2_PM_Desc[MAX_D2_POLYGON_MODELS];
-	int			m_D2_PolType[MAX_D2_POLYGON_MODELS];
-	int			m_D2_MyRobot[MAX_D2_POLYGON_MODELS];
-	//int			m_D2_MyReact[MAX_D2_POLYGON_MODELS];
-	BOOL		m_D2_AmLores[MAX_D2_POLYGON_MODELS];
-	D2_JOINTPOS				m_D2_JointPos[MAX_D2_ROBOT_JOINTS];
-	D2_ROBOT_INFO			m_D2_Robots[MAX_D2_ROBOT_TYPES];
-	D2_REACTOR				m_D2_Reactors[MAX_D2_REACTORS];
-	D2_PLAYER_SHIP			m_D2_PlayerShip;
-	int						m_D2_ModelLoadnr_to_ID[MAX_D2_POLYGON_MODELS];
-	byte m_D2_Palettes[4608];
-	D2_WEAPON_INFO m_D2_Weapons[MAX_D2_WEAPON_TYPES];
-	BOOL m_D2_MainHAMLoaded;
-	int m_D2_PIGNumTextures;
-	int m_D2_Marker_ModelNum;
-	D2_POLYMODELINFO m_D2_PolygonModels[MAX_D2_POLYGON_MODELS];
-	int m_D2_TextureSet;
+	//int			m_D2_Robots_Num;
+	//ULONGLONG	m_D2_MO_RobotInfo[MAX_D2_ROBOT_TYPES];
+	//int			m_D2_Models_Num;
+	//char		m_D2_CurrHAXM_Filename[MAX_FILENAMELEN];
+	//D2_MODEL		m_D2_Model;
+	//D2_MODELBITMAPS	m_D2_BitmapData;
+	//GLuint		m_D2_ModelTexture[MAX_D2_TEXTURE];
+	//UINT16		m_D2_ObjBitmapPtr[625];
+	//D2_BITMAP_INDEX		m_D2_ObjBitmap[625];
+	//D2_BITMAP_INDEX		m_D2_HxmObjBitmap[625];
+	//CString		m_D2_PM_Desc[MAX_D2_POLYGON_MODELS];
+	//int			m_D2_PolType[MAX_D2_POLYGON_MODELS];
+	//int			m_D2_MyRobot[MAX_D2_POLYGON_MODELS];
+	////int			m_D2_MyReact[MAX_D2_POLYGON_MODELS];
+	//BOOL		m_D2_AmLores[MAX_D2_POLYGON_MODELS];
+	//D2_JOINTPOS				m_D2_JointPos[MAX_D2_ROBOT_JOINTS];
+	//D2_ROBOT_INFO			m_D2_Robots[MAX_D2_ROBOT_TYPES];
+	//D2_REACTOR				m_D2_Reactors[MAX_D2_REACTORS];
+	//D2_PLAYER_SHIP			m_D2_PlayerShip;
+	//int						m_D2_ModelLoadnr_to_ID[MAX_D2_POLYGON_MODELS];
+	//byte m_D2_Palettes[4608];
+	//D2_WEAPON_INFO m_D2_Weapons[MAX_D2_WEAPON_TYPES];
+	//BOOL m_D2_MainHAMLoaded;
+	//int m_D2_PIGNumTextures;
+	//int m_D2_Marker_ModelNum;
+	//D2_POLYMODELINFO m_D2_PolygonModels[MAX_D2_POLYGON_MODELS];
+	//int m_D2_TextureSet;
 
-	//Descent 3 attributes
-	CString		m_D3_MainHOG_Filename;
-	HOG2_HEADER	m_D3_MainHOG_Header;
-	HOG2_LOAD	m_D3_MainHOG_Dir[MAX_D3_FILESINHOG];
-	BOOL		m_D3_MainHOG_Loaded;
-	int			m_D3_MainHOG_MainTextureSet;
-	/*int			m_D3_MainHOG_OofNum;
-	int			m_D3_MainHOG_OofList[MAX_OOFFILESINHOG2];*/
-	CString		m_D3_CurrHOG_Filename;
-	HOG2_HEADER	m_D3_CurrHOG_Header;
-	HOG2_LOAD	m_D3_CurrHOG_Dir[MAX_D3_FILESINHOG];
-	int			m_D3_CurrHOG_OofList[MAX_D3_OOFFILESINHOG2];
-	int			m_D3_CurrHOG_OofNum;
-	D3_MODEL	m_D3_Model;
-	D3_DISPLAY	m_D3_Display;
-	unsigned int m_D3_CurSpcl;
-	unsigned int m_D3_CurXpnt;
-	unsigned int m_D3_CurPwin;
-	unsigned int m_D3_CurWbat;
-	unsigned int m_D3_CurSobj;
-	unsigned int m_D3_CurTexture;
-	BOOL m_D3_HiLiteSobj[MAX_D3_SOBJ];
-	BOOL m_D3_HiLiteCurSobj;
-	BOOL m_D3_OffTexture[MAX_D3_TEXTURE];
-	BOOL m_D3_OffTXTR;
-	float m_D3_Rstep[MAX_D3_SOBJ];
-	unsigned int m_D3_TotalTexture;
-	char m_D3_TextureList[MAX_D3_TEXTURE][36];
-	GLuint m_D3_ModelTexture[MAX_D3_TEXTURE];
+	////Descent 3 attributes
+	//CString		m_D3_MainHOG_Filename;
+	//HOG2_HEADER	m_D3_MainHOG_Header;
+	//HOG2_LOAD	m_D3_MainHOG_Dir[MAX_D3_FILESINHOG];
+	//BOOL		m_D3_MainHOG_Loaded;
+	//int			m_D3_MainHOG_MainTextureSet;
+	///*int			m_D3_MainHOG_OofNum;
+	//int			m_D3_MainHOG_OofList[MAX_OOFFILESINHOG2];*/
+	//CString		m_D3_CurrHOG_Filename;
+	//HOG2_HEADER	m_D3_CurrHOG_Header;
+	//HOG2_LOAD	m_D3_CurrHOG_Dir[MAX_D3_FILESINHOG];
+	//int			m_D3_CurrHOG_OofList[MAX_D3_OOFFILESINHOG2];
+	//int			m_D3_CurrHOG_OofNum;
+	//D3_MODEL	m_D3_Model;
+	//D3_DISPLAY	m_D3_Display;
+	//unsigned int m_D3_CurSpcl;
+	//unsigned int m_D3_CurXpnt;
+	//unsigned int m_D3_CurPwin;
+	//unsigned int m_D3_CurWbat;
+	//unsigned int m_D3_CurSobj;
+	//unsigned int m_D3_CurTexture;
+	//BOOL m_D3_HiLiteSobj[MAX_D3_SOBJ];
+	//BOOL m_D3_HiLiteCurSobj;
+	//BOOL m_D3_OffTexture[MAX_D3_TEXTURE];
+	//BOOL m_D3_OffTXTR;
+	//float m_D3_Rstep[MAX_D3_SOBJ];
+	//unsigned int m_D3_TotalTexture;
+	//char m_D3_TextureList[MAX_D3_TEXTURE][36];
+	//GLuint m_D3_ModelTexture[MAX_D3_TEXTURE];
 	
 	//FreeSpace attributes
 	FS_MODELBITMAPS		m_FS_BitmapData;
@@ -448,10 +440,10 @@ public:
 	FS_MODELINFO		m_FS_ModelInfo;
 
 	//Red Faction
-	RF_MODEL	m_RF_Model;
-	VPP_HEADER	m_RF_CurrVPP_Header;
-	VPP_LOAD	*m_RF_CurrVPP_Load;
-	CString m_RF_CurrVPP_Filename;
+	//RF_MODEL	m_RF_Model;
+	//VPP_HEADER	m_RF_CurrVPP_Header;
+	//VPP_LOAD	*m_RF_CurrVPP_Load;
+	//CString m_RF_CurrVPP_Filename;
 
 	//EditorFS
 	char test1[256];
@@ -500,9 +492,9 @@ public:
 public:
 	BOOL m_UntitledModel;
 	ERRORCODE RF_LoadVPPContent(CString filename);
-	void RF_InitVPP(CFile *fp,VPP_HEADER *vpp_header,VPP_LOAD **vpp_load,BOOL fillexplorer);
-	ERRORCODE ReadRFVPP();
-	ERRORCODE RF_ReadV3C(CFile *fp);
+//	void RF_InitVPP(CFile *fp,VPP_HEADER *vpp_header,VPP_LOAD **vpp_load,BOOL fillexplorer);
+	//ERRORCODE ReadRFVPP();
+	//ERRORCODE RF_ReadV3C(CFile *fp);
 	void OnFileSave2();
 	BOOL SaveModified2();
 	CString m_CurrentFile_FileName;
@@ -534,25 +526,25 @@ public:
 	void SetStatusBarText(char *txt);
 
 	//Descent 2 routines
-	void D2_ReadD2HAM();
-	int D2_InitHAM(CFile *fp, BOOL fillexplorer);
-	ERRORCODE D2_Walk(void *StartAt,int module);
-	ERRORCODE D2_LoadHAXMContent(int ModelNum);
-	ERRORCODE D2_ReadPOL(CFile *fp, int ModelNum);
-	int D2_ReadRLE(FILE *file,UINT32 i);
-	void D2_Index2RGBA(UINT32 i);
-	void D2_LoadPIGData(void);
-	CString D2_GenerateModelTypeName(int type);
-	ERRORCODE D2_ReadROB(CFile *fp, int RobotNum);
-	void D2_CalcDisplay();
+	//void D2_ReadD2HAM();
+	//int D2_InitHAM(CFile *fp, BOOL fillexplorer);
+	//ERRORCODE D2_Walk(void *StartAt,int module);
+	//ERRORCODE D2_LoadHAXMContent(int ModelNum);
+	//ERRORCODE D2_ReadPOL(CFile *fp, int ModelNum);
+	//int D2_ReadRLE(FILE *file,UINT32 i);
+	//void D2_Index2RGBA(UINT32 i);
+	//void D2_LoadPIGData(void);
+	//CString D2_GenerateModelTypeName(int type);
+	//ERRORCODE D2_ReadROB(CFile *fp, int RobotNum);
+	//void D2_CalcDisplay();
 
 	//Descent 3 routines
-	void D3_ReadD3HOG();
-	void D3_CalcDisplay();
-	ERRORCODE D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD *hog2_load,BOOL fillexplorer);
-	ERRORCODE D3_ReadOOF(CFile *fp,int OofNum);
-	void D3_LoadOGFData();
-	ERRORCODE D3_LoadHOGContent(CString filename);
+	//void D3_ReadD3HOG();
+	//void D3_CalcDisplay();
+	//ERRORCODE D3_InitHOG(CFile *fp,HOG2_HEADER *hog2_header,HOG2_LOAD *hog2_load,BOOL fillexplorer);
+	//ERRORCODE D3_ReadOOF(CFile *fp,int OofNum);
+	//void D3_LoadOGFData();
+	//ERRORCODE D3_LoadHOGContent(CString filename);
 
 	//FreeSpace routines
 	void FS_CalcDisplay();

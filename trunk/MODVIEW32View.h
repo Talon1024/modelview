@@ -109,12 +109,12 @@ public:
 	int m_EditorFS_TGUN_FiringPoint;
 	int m_EditorFS_MODEL_CurLight;
 	BOOL m_EditorFS_ShowModelInfo;
-	BOOL m_D2_SmoothPositionChange;
-	void D3_PreparePosition();
-	void D2_ResetPosAngleData_StepBit();
-	void D2_ResetPosAngleData_ShallBe();
-	void D2_ResetPosAngleData_Current();
-	BOOL D2_ParsePosAngle(short *cur,short *sha,short *stp);
+	//BOOL m_D2_SmoothPositionChange;
+	//void D3_PreparePosition();
+	//void D2_ResetPosAngleData_StepBit();
+	//void D2_ResetPosAngleData_ShallBe();
+	//void D2_ResetPosAngleData_Current();
+	//BOOL D2_ParsePosAngle(short *cur,short *sha,short *stp);
 	BOOL SetWindowPixelFormat(HDC hDC);
 	BOOL CreateViewGLContext(HDC hDC);
 	void ResetGeometry();
@@ -156,18 +156,18 @@ public:
 	CPoint m_MouseMovePos;
 
 
-	GLuint m_D2_TestModel;
-	int m_D2_Position;
-	D2_VMS_ANGVEC m_D2_PosAngle_ShallBe[MAX_D2_SUBMODELS];
-	D2_VMS_ANGVEC m_D2_PosAngle_Current[MAX_D2_SUBMODELS];
-	D2_VMS_ANGVEC m_D2_PosAngle_StepBit[MAX_D2_SUBMODELS];
-	int D2_RenderScene();
-	int D2_BuildScene();
-	void D2_BuildWireCube(D2_VMS_VECTOR min,D2_VMS_VECTOR max);
-	void D2_PreparePosition();
-	void D2_SetPosition(unsigned int pos);
+	//GLuint m_D2_TestModel;
+	//int m_D2_Position;
+	//D2_VMS_ANGVEC m_D2_PosAngle_ShallBe[MAX_D2_SUBMODELS];
+	//D2_VMS_ANGVEC m_D2_PosAngle_Current[MAX_D2_SUBMODELS];
+	//D2_VMS_ANGVEC m_D2_PosAngle_StepBit[MAX_D2_SUBMODELS];
+	//int D2_RenderScene();
+	//int D2_BuildScene();
+	//void D2_BuildWireCube(D2_VMS_VECTOR min,D2_VMS_VECTOR max);
+	//void D2_PreparePosition();
+	//void D2_SetPosition(unsigned int pos);
 	
-	BOOL m_RenderD3Flat;
+	/*BOOL m_RenderD3Flat;
 	BOOL m_RenderD3Smooth;
 	BOOL m_D3_Rotate;
 	unsigned int m_D3_Position;
@@ -183,13 +183,13 @@ public:
 	void D3_BuildSobj(unsigned short SobjNum);
 	void D3_BuildScene();
 	void D3_BuildArrays();
-	void D3_CrossPnt(D3_VPNT xhair);
-	void D3_CrossPntN(D3_VPNT xhair, D3_VPNT Dir);
+	void D3_CrossPnt(vms_vector xhair);
+	void D3_CrossPntN(vms_vector xhair, vms_vector Dir);
 	void D3_RenderScene();
 	void D3_SetPosition(unsigned int pos);
 	D3_POSANGLE m_D3_PosAngle_ShallBe[MAX_D3_SOBJ];
 	D3_POSANGLE m_D3_PosAngle_Current[MAX_D3_SOBJ];
-	D3_POSANGLE m_D3_PosAngle_StepBit[MAX_D3_SOBJ];
+	D3_POSANGLE m_D3_PosAngle_StepBit[MAX_D3_SOBJ];*/
 	
 	void FS_BuildScene();
 	void FS_SetDetailLevel(int mode);

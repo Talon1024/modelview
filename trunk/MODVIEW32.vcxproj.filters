@@ -78,16 +78,7 @@
     <ClCompile Include="FSChunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GamePaneD2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GamePaneD3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GamePaneFS.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GamePaneRF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Help_Using.cpp">
@@ -187,16 +178,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D2-extra.h">
-      <Filter>Header Files\Game definition Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D3-extra.h">
-      <Filter>Header Files\Game definition Files</Filter>
-    </ClInclude>
     <ClInclude Include="Fs-extra.h">
-      <Filter>Header Files\Game definition Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RF-Extra.h">
       <Filter>Header Files\Game definition Files</Filter>
     </ClInclude>
     <ClInclude Include="AW_CMultiViewSplitter.h">
@@ -259,16 +241,7 @@
     <ClInclude Include="FSChunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GamePaneD2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GamePaneD3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GamePaneFS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GamePaneRF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Help_Using.h">

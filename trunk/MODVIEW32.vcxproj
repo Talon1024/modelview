@@ -170,10 +170,7 @@
     <ClCompile Include="ExplorerBar.cpp" />
     <ClCompile Include="FolderDlg.cpp" />
     <ClCompile Include="FSChunk.cpp" />
-    <ClCompile Include="GamePaneD2.cpp" />
-    <ClCompile Include="GamePaneD3.cpp" />
     <ClCompile Include="GamePaneFS.cpp" />
-    <ClCompile Include="GamePaneRF.cpp" />
     <ClCompile Include="Help_Using.cpp" />
     <ClCompile Include="HTMLTaskView.cpp" />
     <ClCompile Include="ImportCOB.cpp" />
@@ -214,11 +211,8 @@
     <ResourceCompile Include="MODVIEW32.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D2-extra.h" />
-    <ClInclude Include="D3-extra.h" />
     <ClInclude Include="Fs-extra.h" />
     <ClInclude Include="glext.h" />
-    <ClInclude Include="RF-Extra.h" />
     <ClInclude Include="AW_CMultiViewSplitter.h" />
     <ClInclude Include="BCMenu.h" />
     <ClInclude Include="CompilerErrorDlg.h" />
@@ -239,10 +233,7 @@
     <ClInclude Include="ExplorerBar.h" />
     <ClInclude Include="FolderDlg.h" />
     <ClInclude Include="FSChunk.h" />
-    <ClInclude Include="GamePaneD2.h" />
-    <ClInclude Include="GamePaneD3.h" />
     <ClInclude Include="GamePaneFS.h" />
-    <ClInclude Include="GamePaneRF.h" />
     <ClInclude Include="Help_Using.h" />
     <ClInclude Include="HTMLTaskView.h" />
     <ClInclude Include="ImportCOB.h" />
