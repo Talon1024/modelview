@@ -70,11 +70,7 @@ typedef struct vms_vector
 
 #pragma pack(1)
 
-#define FS_VPNT vms_vector	//FreeSpace 1/2 points = Descent 3 points
-/*typedef struct FS_vpnt
-{
-	float  x,y,z;
-} FS_VPNT;*/
+#define FS_VPNT vms_vector	//FreeSpace 1/2 points
 
 typedef struct bbinfo
 {
@@ -234,10 +230,6 @@ typedef struct
 	unsigned int xsize,ysize;
 	unsigned int xreal,yreal;
 	char name[30];
-//  unsigned char bitmap[1024*1024];
-//  unsigned int *bitmap;
-//  unsigned char PcxVgaPal[256*3];
-//  unsigned int PcxPal[256];
 	short detail;
 } FS_BITMAPDATA;
 

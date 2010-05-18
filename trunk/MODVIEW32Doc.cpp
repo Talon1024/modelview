@@ -623,7 +623,7 @@ ERRORCODE CMODVIEW32Doc::locatetexture(char* texturename, int texturenum, int cu
 		}
 
 		//Search process FAILED!
-		if(unknownfiletype)
+		if(unknownfiletype && filetype == MAXTEXTURETYPES)
 		{
 			m_FS_BitmapData.pic[texturenum].valid=0;	// not ani or pcx...
 			TRACE("No Texture found\n");
@@ -645,6 +645,8 @@ void CMODVIEW32Doc::loadPCXtexture(TEXTUREINFO* t_info, FS_BITMAPDATA* bitmap_da
 	MaxSize=MaxTextureSize[0];
 
 	CFile f;
+	VERIFY(f.Open(t_info->InFilename,CFile::modeRead));
+	f.Seek(t_info->InOffset,CFile::begin);
 	//Header
 	PCXHEADER header;
 	f.Read(&header,sizeof(PCXHEADER));
@@ -818,6 +820,8 @@ void CMODVIEW32Doc::loadANItexture(TEXTUREINFO* t_info, FS_BITMAPDATA* bitmap_da
 	MaxSize=MaxTextureSize[0];
 
 	CFile f;
+	VERIFY(f.Open(t_info->InFilename,CFile::modeRead));
+	f.Seek(t_info->InOffset,CFile::begin);
 
 	//Header
 	ANIHEADER header;
@@ -1269,9 +1273,9 @@ ERRORCODE CMODVIEW32Doc::FS_LoadTextureData(unsigned int ActivePM,BOOL bAniLoad,
 
 			if(m_Textures[m_TexturesNum].Valid)
 			{
-				CFile f;
-				VERIFY(f.Open(m_Textures[m_TexturesNum].InFilename,CFile::modeRead));
-				f.Seek(m_Textures[m_TexturesNum].InOffset,CFile::begin);
+				//CFile f;
+				//VERIFY(f.Open(m_Textures[m_TexturesNum].InFilename,CFile::modeRead));
+				//f.Seek(m_Textures[m_TexturesNum].InOffset,CFile::begin);
 				switch(m_Textures[m_TexturesNum].FileType)
 				{
 				case TEXTUREINFOFILETYPE_PCX:
