@@ -1,0 +1,11 @@
+syntax: glob
+tags
+Debug
+Release
+*.swp
+*.ncb
+*.suo
+*~
+*.o
+*.obj
+*.vcproj.*
