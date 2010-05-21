@@ -126,8 +126,12 @@ void CTXList::FillTextureInfo(int mode)
 				switch(GetDocument()->m_Textures[i].FileType)
 				{
 				case TEXTUREINFOFILETYPE_UNKNOWN:	t="???"; break;
+				case TEXTUREINFOFILETYPE_OGF:		t="OGF"; break;
+				case TEXTUREINFOFILETYPE_OAF:		t="OAF"; break;
 				case TEXTUREINFOFILETYPE_PCX:		t="PCX"; break;
 				case TEXTUREINFOFILETYPE_ANI:		t="ANI"; break;
+				case TEXTUREINFOFILETYPE_D2U:		t="D2U"; break;
+				case TEXTUREINFOFILETYPE_D2C:		t="D2C"; break;
 				default:	/*ASSERT(FALSE);*/		t="???";
 				}
 

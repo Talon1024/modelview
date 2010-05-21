@@ -10,7 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // CVPFileDialogSubWnd window
 
-//#include "BCMenu.h"
+#include "BCMenu.h"
 
 class CVPFileDialogSubWnd : public CWnd
 {
@@ -25,7 +25,7 @@ public:
 public:
 
 protected:
-	CMenu m_PopupMenu;
+	BCMenu m_PopupMenu;
 
 // Overrides
 	// ClassWizard generated virtual function overrides

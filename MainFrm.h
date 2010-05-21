@@ -18,6 +18,7 @@
 #include "TXViewModeToolbar.h"
 #include "SilentSplitterWnd.h"
 #include "splitterex.h"
+#include "BCMenu.h"
 #include "AW_CMultiViewSplitter.h"
 #include "VPFileDialog.h"
 
@@ -77,9 +78,11 @@ public:
 	void FS_ShowThruster();
 	void DockControlBarLeftOf(CToolBar *Bar, CToolBar *LeftOf);
 	void ResizeToolbar(CToolBar *tb,BOOL alwayssmall=FALSE);
+	void GameBarD2();
 	int ExplorerOpenSubFile(char *filename);
+	//BCMenu
 	HMENU NewMenu(int menu=0);
-	CMenu m_menu;
+	BCMenu m_menu;
 
 	int m_ExplorerVisible;
 	float m_ZoomLevel;
@@ -101,6 +104,8 @@ public:
 	void ExplorerAddChild(char *filename,int typenr=-1);
 	virtual ~CMainFrame();
 	void GameBarNone();
+	//void GameBarD2();
+	void GameBarD3();
 	void GameBarFS();
 	float CalcPaneStep();
 	float CalcPaneDrag();
@@ -113,18 +118,15 @@ protected:  // control bar embedded members
 	CStatusBar  m_wndStatusBar;
 	CToolBar    m_wndToolBar;
 	CToolBar	m_wndToolbarNoModel;
+	CToolBar    m_wndToolBarD2;
+	CToolBar    m_wndToolBarD3;
 	CToolBar    m_wndToolBarFS;
 	CToolBar	m_wndToolBarEditorFS;
 	CToolBar	m_wndToolBarNavigation;
-	int m_paneFS,
-		m_paneWelcome,
-		m_paneEdFS_MODEL,
-		m_paneEdFS_SPCL,
-		m_paneEdFS_TGUN,
-		m_paneEdFS_GPNT,
-		m_paneEdFS_SHLD,
-		m_paneEdFS_SOBJ,
-		m_paneEdFS_FUEL;
+	//CGameBarD2	m_wndDlgBarD2;
+	//CGameBarD3	m_wndDlgBarD3;
+	//CGameBarFS	m_wndDlgBarFS;
+	int m_paneD2,m_paneD3,m_paneFS,m_paneRF,m_paneWelcome,m_paneEdFS_MODEL,m_paneEdFS_SPCL,m_paneEdFS_TGUN,m_paneEdFS_GPNT,m_paneEdFS_SHLD,m_paneEdFS_SOBJ,m_paneEdFS_FUEL;
 #ifdef _WITHHTVIEW
 	int m_paneMainHTML,m_paneMainView;
 #endif
@@ -141,6 +143,7 @@ protected:  // control bar embedded members
 
 public:
 	void UpdateMainDisplay();
+	void GameBarRF();
 	void ParseCmd(CString cmd);
 	void SetTypeOfView(int type);
 	int m_TXCurrent;
@@ -157,7 +160,6 @@ public:
 	int m_LastWidth;
 	int m_LastHeight;
 	void OnSize2();
-	void OnSelchangeTab1b();
 	BOOL AskForFileName();
 /*#ifdef _WITHEDITOR
 	CCreateContext * m_CreateContext;
@@ -176,7 +178,7 @@ public:
 	afx_msg void OnUpdateTXShowBlockList(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateTXShowLogFile(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateTXHide(CCmdUI* pCmdUI);
-	afx_msg void OnSelchangeTab1(NMHDR* _pnmtb, LRESULT *plr);
+	afx_msg void OnSelchangeTab1();
 	int TXGetCurrent();
 	void VPFileDialogJump(CString path);
 	CVPFileDialog* m_VPFileDialog;
@@ -245,6 +247,22 @@ protected:
 	afx_msg void OnUpdateModelNext(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateModelPrevious(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateNavigation(CCmdUI* pCmdUI);
+	afx_msg void OnViewSpecialdescent3settingsNextposition();
+	afx_msg void OnViewSpecialdescent3settingsPreviousposition();
+	afx_msg void OnUpdateViewSpecialdescent3settingsNextposition(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateViewSpecialdescent3settingsPreviousposition(CCmdUI* pCmdUI);
+	afx_msg void OnViewSpecialdescent2settingsMaintexturesetGroupa();
+	afx_msg void OnViewSpecialdescent2settingsMaintexturesetWater();
+	afx_msg void OnViewSpecialdescent2settingsMaintexturesetIce();
+	afx_msg void OnViewSpecialdescent2settingsMaintexturesetFire();
+	afx_msg void OnViewSpecialdescent2settingsMaintexturesetAlien2();
+	afx_msg void OnViewSpecialdescent2settingsMaintexturesetAlien1();
+	afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetFire(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetWater(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateViewSpecialdescent2settingsMaintexturesetIce(CCmdUI* pCmdUI);
 	afx_msg void OnModelModelcomparisontable();
 	afx_msg void OnViewShowguns();
 	afx_msg void OnUpdateViewShowguns(CCmdUI* pCmdUI);
@@ -298,6 +316,12 @@ protected:
 	afx_msg void OnEditorImportpoffrom3dfile();
 	afx_msg void OnFileOpennewversion();
 	afx_msg void OnUpdateEditorImportpoffrom3dfile(CCmdUI* pCmdUI);
+	afx_msg void OnVpfiledialogJumptodescent2directory();
+	afx_msg void OnUpdateVpfiledialogJumptodescent2directory(CCmdUI* pCmdUI);
+	afx_msg void OnVpfiledialogJumptodescent3directory();
+	afx_msg void OnUpdateVpfiledialogJumptodescent3directory(CCmdUI* pCmdUI);
+	afx_msg void OnVpfiledialogJumptofreespace1directory();
+	afx_msg void OnUpdateVpfiledialogJumptofreespace1directory(CCmdUI* pCmdUI);
 	afx_msg void OnVpfiledialogJumptofreespace2directory();
 	afx_msg void OnUpdateVpfiledialogJumptofreespace2directory(CCmdUI* pCmdUI);
 	//}}AFX_MSG

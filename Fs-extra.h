@@ -5,27 +5,27 @@
 //
 
 #define MAX_FS_TEXTURE     60
-#define MAX_FS_SOBJ        200
-#define MAX_FS_THRUSTERS	32
-#define MAX_FS_THRUSTERS_GLOWS	32
-#define MAX_FS_SHIELDFACES	48000
-#define MAX_FS_SHIELDVERTICES	24000
-#define MAX_FS_SUBMODEL_POINTS	30000
-#define MAX_FS_POLYGONS	160000
-#define MAX_FS_VERTICES	150000
-#define MAX_FS_NORMALS	320000
-#define MAX_FS_CROSSSECTIONS 256
-#define MAX_FS_LIGHTS 256
-#define MAX_FS_BBOXS 320000
-#define MAX_FS_FIRING_POINTS	128
-#define MAX_FS_DOCKS	1024
+#define MAX_FS_SOBJ        180
+#define MAX_FS_THRUSTERS	16
+#define MAX_FS_THRUSTERS_GLOWS	16
+#define MAX_FS_SHIELDFACES	4800
+#define MAX_FS_SHIELDVERTICES	2400
+#define MAX_FS_SUBMODEL_POINTS	8000
+#define MAX_FS_POLYGONS	32000
+#define MAX_FS_VERTICES	5000
+#define MAX_FS_NORMALS	16000
+#define MAX_FS_CROSSSECTIONS 64
+#define MAX_FS_LIGHTS 128
+#define MAX_FS_BBOXS 4000
+#define MAX_FS_FIRING_POINTS	64
+#define MAX_FS_DOCKS	32
 #define MAX_FS_SPLINE_PATHS	256
-#define MAX_FS_DOCK_POINTS	4096
-#define MAX_FS_TURRETS_BANKS	128
-#define MAX_FS_REALGUNS_SLOTS	128
-#define MAX_FS_FILESINVP 8000
-#define MAX_FS_POFFILESINVP 400
-#define MAX_FS_SUBSYSTEMS 1024
+#define MAX_FS_DOCK_POINTS	256
+#define MAX_FS_TURRETS_BANKS	64
+#define MAX_FS_REALGUNS_SLOTS	64
+#define MAX_FS_FILESINVP 4000
+#define MAX_FS_POFFILESINVP 200
+#define MAX_FS_SUBSYSTEMS 256
 
 //typedef signed char    char;
 //typedef signed short   short;
@@ -70,7 +70,11 @@ typedef struct vms_vector
 
 #pragma pack(1)
 
-#define FS_VPNT vms_vector	//FreeSpace 1/2 points
+#define FS_VPNT D3_VPNT	//FreeSpace 1/2 points = Descent 3 points
+/*typedef struct FS_vpnt
+{
+	float  x,y,z;
+} FS_VPNT;*/
 
 typedef struct bbinfo
 {
@@ -79,11 +83,11 @@ typedef struct bbinfo
 
 typedef struct FS_PINFO
 {
-	unsigned int Corners;
-	unsigned int Colors;
-	unsigned int Sobj;
-	unsigned int Ptype;
-	unsigned int detail;
+	unsigned long Corners;
+	unsigned long Colors;
+	unsigned long Sobj;
+	unsigned long Ptype;
+	unsigned long detail;
 	FS_VPNT Center;
 	FS_VPNT Normal;
 	short Vp[20];
@@ -101,9 +105,9 @@ typedef struct FS_shieldface
 
 typedef struct FS_shields
 {
-	unsigned int Vcount;
+	unsigned long Vcount;
 	float Vpoint[MAX_FS_SHIELDVERTICES][3];
-	unsigned int Fcount;
+	unsigned long Fcount;
 	FS_SHIELDFACE Face[MAX_FS_SHIELDFACES];
 } FS_SHIELDS;
 
@@ -118,14 +122,14 @@ typedef struct FS_thruster
 
 typedef struct FS_MODEL
 {
-	unsigned int Vcount;
+	unsigned long Vcount;
 	FS_VPNT Vpoint[MAX_FS_VERTICES];
 	short VSobj[MAX_FS_VERTICES];
-	unsigned int Ncount;
+	unsigned long Ncount;
 	FS_VPNT Npoint[MAX_FS_NORMALS];
-	unsigned int BBcount;
+	unsigned long BBcount;
 	BBINFO Bbox[MAX_FS_BBOXS];
-	unsigned int Pcount;
+	unsigned long Pcount;
 	FS_PINFO Poly[MAX_FS_POLYGONS];
 
 	int num_thrusters;
@@ -173,7 +177,7 @@ typedef struct FS_MODELINFO
 {
 	FS_VPNT ACenPoint;
 	
-	double mass;
+	float mass;
 	FS_VPNT mass_center;
 	float moment_inertia[3][3];
 
@@ -194,9 +198,9 @@ typedef struct FS_MODELINFO
 } FS_MODELINFOtag;
 
 typedef struct pminfo {
-	unsigned int n_models;
-	unsigned int n_detail,detail[6];
-	unsigned int n_debris,debris[64];
+	unsigned long n_models;
+	unsigned long n_detail,detail[6];
+	unsigned long n_debris,debris[64];
 } PMINFO;
 
 //
@@ -227,33 +231,37 @@ typedef struct pcxheader
 typedef struct
 {
 	unsigned char valid;
-	unsigned int xsize,ysize;
-	unsigned int xreal,yreal;
+	unsigned long xsize,ysize;
+	unsigned long xreal,yreal;
 	char name[30];
+//  unsigned char bitmap[1024*1024];
+//  unsigned long *bitmap;
+//  unsigned char PcxVgaPal[256*3];
+//  unsigned long PcxPal[256];
 	short detail;
 } FS_BITMAPDATA;
 
 typedef struct
 {
-	unsigned int count;
+	unsigned long count;
 	FS_BITMAPDATA pic[MAX_FS_TEXTURE];
 } FS_MODELBITMAPS;
 
 
 typedef struct
 {
-	unsigned int signature;
-	unsigned int version;
-	unsigned int diroffset;
-	unsigned int dirnumber;
+	unsigned long signature;
+	unsigned long version;
+	unsigned long diroffset;
+	unsigned long dirnumber;
 } VP_HEADER;
 
 typedef struct
 {
-	unsigned int offset;
-	unsigned int size;
+	unsigned long offset;
+	unsigned long size;
 	char filename[32];
-	unsigned int timestamp;
+	unsigned long timestamp;
 } VP_INFO;
 
 //

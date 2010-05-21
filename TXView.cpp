@@ -84,7 +84,7 @@ void CTXView::OnDraw(CDC* pDC)
 				}
 
 				SetDIBitsToDevice(*pDC,0,0,tx->Width,tx->Height,0,0,0,tx->Height,tx->Bitmap,psBmpInfo,DIB_RGB_COLORS);
-				delete[] psBmpInfo;
+				delete(psBmpInfo);
 			}
 			else
 			{
@@ -103,7 +103,7 @@ void CTXView::OnDraw(CDC* pDC)
 				psBmpInfo->bmiHeader.biClrImportant   = 0;
 
 				SetDIBitsToDevice(*pDC,0,0,tx->Width,tx->Height,0,0,0,tx->Height,tx->Bitmap,psBmpInfo,DIB_PAL_COLORS);
-				delete[] psBmpInfo;
+				delete(psBmpInfo);
 			}
 
 		}

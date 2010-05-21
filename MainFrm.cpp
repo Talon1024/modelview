@@ -21,7 +21,10 @@
 #include "TableList.h"
 #include "Help_Using.h"
 #include "WelcomePane.h"
+#include "GamePaneD2.h"
+#include "GamePaneD3.h"
 #include "GamePaneFS.h"
+#include "GamePaneRF.h"
 
 #ifdef _WITHHTVIEW
 #include "HTMLTaskView.h"
@@ -117,6 +120,22 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_MODEL_NEXT, OnUpdateModelNext)
 	ON_UPDATE_COMMAND_UI(ID_MODEL_PREVIOUS, OnUpdateModelPrevious)
 	ON_UPDATE_COMMAND_UI(ID_MODEL_LEFT, OnUpdateNavigation)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT3SETTINGS_NEXTPOSITION, OnViewSpecialdescent3settingsNextposition)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT3SETTINGS_PREVIOUSPOSITION, OnViewSpecialdescent3settingsPreviousposition)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT3SETTINGS_NEXTPOSITION, OnUpdateViewSpecialdescent3settingsNextposition)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT3SETTINGS_PREVIOUSPOSITION, OnUpdateViewSpecialdescent3settingsPreviousposition)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_GROUPA, OnViewSpecialdescent2settingsMaintexturesetGroupa)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_WATER, OnViewSpecialdescent2settingsMaintexturesetWater)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ICE, OnViewSpecialdescent2settingsMaintexturesetIce)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_FIRE, OnViewSpecialdescent2settingsMaintexturesetFire)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN2, OnViewSpecialdescent2settingsMaintexturesetAlien2)
+	ON_COMMAND(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN1, OnViewSpecialdescent2settingsMaintexturesetAlien1)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_GROUPA, OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_FIRE, OnUpdateViewSpecialdescent2settingsMaintexturesetFire)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN2, OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ALIEN1, OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_WATER, OnUpdateViewSpecialdescent2settingsMaintexturesetWater)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SPECIALDESCENT2SETTINGS_MAINTEXTURESET_ICE, OnUpdateViewSpecialdescent2settingsMaintexturesetIce)
 	ON_COMMAND(ID_MODEL_MODELCOMPARISONTABLE, OnModelModelcomparisontable)
 	ON_COMMAND(ID_VIEW_SHOWGUNS, OnViewShowguns)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SHOWGUNS, OnUpdateViewShowguns)
@@ -183,6 +202,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_AS, OnUpdateEditorSave)
 	ON_COMMAND(ID_HELP_USING2, OnHelpUsing)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, OnSelchangeTab1)
+	ON_COMMAND(ID_VPFILEDIALOG_JUMPTODESCENT2DIRECTORY, OnVpfiledialogJumptodescent2directory)
+	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTODESCENT2DIRECTORY, OnUpdateVpfiledialogJumptodescent2directory)
+	ON_COMMAND(ID_VPFILEDIALOG_JUMPTODESCENT3DIRECTORY, OnVpfiledialogJumptodescent3directory)
+	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTODESCENT3DIRECTORY, OnUpdateVpfiledialogJumptodescent3directory)
+	ON_COMMAND(ID_VPFILEDIALOG_JUMPTOFREESPACE1DIRECTORY, OnVpfiledialogJumptofreespace1directory)
+	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTOFREESPACE1DIRECTORY, OnUpdateVpfiledialogJumptofreespace1directory)
 	ON_COMMAND(ID_VPFILEDIALOG_JUMPTOFREESPACE2DIRECTORY, OnVpfiledialogJumptofreespace2directory)
 	ON_UPDATE_COMMAND_UI(ID_VPFILEDIALOG_JUMPTOFREESPACE2DIRECTORY, OnUpdateVpfiledialogJumptofreespace2directory)
 	ON_COMMAND(ID_MODEL_SHOWMODELDETAILS_TEXTURES,TXShowTextures)
@@ -247,8 +272,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	
 	EnableDocking(CBRS_ALIGN_ANY);
 
-
 	InitToolbars();
+
 	return 0;
 }
 
@@ -285,7 +310,10 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	m_wndSplitter.CreateView(0, 1, RUNTIME_CLASS(CMODVIEW32View), CSize(100, 100), pContext);
 #endif
 	m_paneWelcome=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CWelcomePane), pContext);
+	m_paneD2=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneD2), pContext);
+	m_paneD3=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneD3), pContext);
 	m_paneFS=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneFS), pContext);
+	m_paneRF=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CGamePaneRF), pContext);
 
 #ifdef _WITHEDITOR
 	m_paneEdFS_MODEL=m_wndSplitter.AddView(0, 2, RUNTIME_CLASS(CEditorFS_MODEL), pContext);
@@ -348,6 +376,33 @@ void CMainFrame::Dump(CDumpContext& dc) const
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame message handlers
 
+
+void CMainFrame::GameBarD2() 
+{
+	if(current_game!=GAME_D2)
+	{
+		GameBarNone();
+		m_wndSplitter.ShowView(m_paneD2);
+		ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
+		ShowControlBar(&m_wndToolBarD2,TRUE,FALSE);
+	}
+	current_game=GAME_D2;
+	((CGamePaneD2 *)GetGamePane())->Init();
+}
+
+void CMainFrame::GameBarD3()
+{
+	if(current_game!=GAME_D3)
+	{
+		GameBarNone();
+		m_wndSplitter.ShowView(m_paneD3);
+		ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
+		ShowControlBar(&m_wndToolBarD3,TRUE,FALSE);
+	}
+	current_game=GAME_D3;
+	((CGamePaneD3 *)GetGamePane())->Init();
+}
+
 void CMainFrame::GameBarFS() 
 {
 	if(current_game!=GAME_FS || m_EditorMode)
@@ -361,13 +416,26 @@ void CMainFrame::GameBarFS()
 	((CGamePaneFS *)GetGamePane())->Init();
 }
 
+void CMainFrame::GameBarRF()
+{
+	if(current_game!=GAME_RF)
+	{
+		GameBarNone();
+		m_wndSplitter.ShowView(m_paneRF);
+		//ShowControlBar(&m_wndToolbarNoModel,FALSE,FALSE);
+		//ShowControlBar(&m_wndToolBarRF,TRUE,FALSE);
+	}
+	current_game=GAME_RF;
+	((CGamePaneRF *)GetGamePane())->Init();
+}
+
 void CMainFrame::GameBarNone()
 {
 	current_game=GAME_NONE;
 
 	ShowControlBar(&m_wndToolbarNoModel,TRUE,FALSE);
-	//ShowControlBar(&m_wndToolBarD2,FALSE,FALSE);
-	//ShowControlBar(&m_wndToolBarD3,FALSE,FALSE);
+	ShowControlBar(&m_wndToolBarD2,FALSE,FALSE);
+	ShowControlBar(&m_wndToolBarD3,FALSE,FALSE);
 	ShowControlBar(&m_wndToolBarFS,FALSE,FALSE);
 
 	m_wndSplitter.ShowView(m_paneWelcome);
@@ -391,23 +459,27 @@ void CMainFrame::ExplorerClear()
 void CMainFrame::ExplorerAddRoot(char *text)
 {
 	CTreeCtrl *p=ExplorerCtrl();
-	CExplorer *e=ExplorerPane();
-
 	m_ExplorerLastRoot=p->InsertItem(text);
 	ExplorerPane()->m_NumModelsListed=0;
 	ExplorerPane()->m_RootName=text;
 
 	int curgame=GetDocument()->m_Game;
-	if( curgame==GAME_FS )
+	if(curgame==GAME_D3 || curgame==GAME_FS)
 	{
+		CExplorer *e=ExplorerPane();
+		CTreeCtrl *p=ExplorerCtrl();
+
 		CString gamecaption;
-		gamecaption="FreeSpace";
+		if(GetDocument()->m_Game==GAME_D3)
+			gamecaption="Descent3";
+		else
+			gamecaption="FreeSpace";
 
 		for(int typenr=0;typenr<MAX_TYPEROOTS;typenr++)
 		{
 			char capname[8192];
 			char typestr[8192];
-			sprintf_s(typestr,"%i",typenr);
+			sprintf(typestr,"%i",typenr);
 			GetPrivateProfileString(gamecaption,typestr,"$",(char *)&capname,8191,m_TypeRootsFile);
 			if(strcmp(capname,"$")!=0)
 			{
@@ -432,21 +504,47 @@ void CMainFrame::ExplorerAddChild(char *filename,int typenr/*=-1*/)
 		typenr=-1;
 	if(typenr==-1)
 		p->EnsureVisible(p->InsertItem(filename,m_ExplorerLastRoot));
-	else {		
+	else
+	{
+		if(e->typeroot[typenr]==NULL)
+		{
+			//Get name
+			if(GetDocument()->m_Game==GAME_D2)
+			{
+				CString capname=GetDocument()->D2_GenerateModelTypeName(typenr);
+				e->typeroot[typenr]=p->InsertItem(capname,m_ExplorerLastRoot);
+				p->EnsureVisible(e->typeroot[typenr]);
+				e->typeroot_str[typenr]=capname;
+				e->typeroot_num[typenr]=0;
+			}
+			else
+				ASSERT(FALSE);
+			/*{
+				char capname[8192];
+				char typestr[8192];
+				sprintf(typestr,"%i",typenr);
+				
+				CString gamecaption;
+				if(GetDocument()->m_Game==GAME_D3)
+					gamecaption="Descent3";
+				else
+					gamecaption="FreeSpace";
+				GetPrivateProfileString(gamecaption,typestr,"<unknown type>",(char *)&capname,8191,m_TypeRootsFile);
+				e->typeroot[typenr]=p->InsertItem(capname,m_ExplorerLastRoot);
+				p->EnsureVisible(e->typeroot[typenr]);
+				e->typeroot_str[typenr]=capname;
+				e->typeroot_num[typenr]=0;
+			}*/
+		}
+		
 		//Update num items
 		e->typeroot_num[typenr]++;
 		CString captext;
 		captext.Format("%s (%i)",e->typeroot_str[typenr],e->typeroot_num[typenr]);
-	
-		ASSERT(e->typeroot[typenr]);
-		ASSERT(captext);
-
-		if (e->typeroot[typenr] && captext)
-			p->SetItemText(e->typeroot[typenr],captext);
+		p->SetItemText(e->typeroot[typenr],captext);
 
 		//Add item
-		if (e->typeroot[typenr] && filename)
-			p->InsertItem(filename,e->typeroot[typenr]);
+		p->InsertItem(filename,e->typeroot[typenr]);
 	}
 
 	//Update total num items
@@ -526,7 +624,7 @@ int CMainFrame::ExplorerOpenSubFile(char *fname)
 			t->SelectItem(k);
 		}
 	}
-	delete[] pathname;
+	delete(pathname);
 	return 0;
 }
 
@@ -687,23 +785,29 @@ void CMainFrame::OnModelZoomout()
 	m_ZoomLevel = GetCurrentView()->m_xScaling;
 }
 
-#define PANESPEED 30.0f
-#define PANEDIV 3.0f
+#define PANESPEED 30.0
+#define PANEDIV 3.0
 
 float CMainFrame::CalcPaneStep()
 {
-	if (current_game == GAME_FS) 
-		return GetDocument()->m_FS_Model.MaxXYZ/PANEDIV;
-	else
-		return PANESPEED;
+	switch(current_game)
+	{
+	case GAME_D2:	return GetDocument()->m_D2_Model.MaxXYZ/PANEDIV;
+	case GAME_D3:	return GetDocument()->m_D3_Display.MaxXYZ/PANEDIV;
+	case GAME_FS:	return GetDocument()->m_FS_Model.MaxXYZ/PANEDIV;
+	default:		return (float)PANESPEED;
+	}
 }
 
 float CMainFrame::CalcPaneDrag()
 {
-	if (current_game == GAME_FS) 
-		return GetDocument()->m_FS_Model.MaxXYZ/100;
-	else
-		return 1.0f;
+	switch(current_game)
+	{
+	case GAME_D2:	return GetDocument()->m_D2_Model.MaxXYZ/100;
+	case GAME_D3:	return GetDocument()->m_D3_Display.MaxXYZ/50;
+	case GAME_FS:	return GetDocument()->m_FS_Model.MaxXYZ/100;
+	default:		return (float)1.0;
+	}
 }
 	
 
@@ -829,7 +933,7 @@ void CMainFrame::OnViewRendermodeTextured()
 {
 	GetCurrentView()->m_RenderMode=RENDER_TEXTURED;
 	if(GetDocument()->m_Game==GAME_FS)
-		GetDocument()->FS_LoadTextureData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
+		GetDocument()->FS_LoadPCXData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
 	UpdateMainDisplay();
 	GetCurrentView()->InvalidateRect(NULL);
 }
@@ -908,14 +1012,14 @@ void CMainFrame::OnUpdateViewShowthruster(CCmdUI* pCmdUI)
 void CMainFrame::OnViewShowthruster() 
 {
 	GetCurrentView()->m_ShowThruster=!GetCurrentView()->m_ShowThruster;
-	GetDocument()->FS_LoadTextureData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
+	GetDocument()->FS_LoadPCXData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
 	GetCurrentView()->InvalidateRect(NULL);
 }
 
 void CMainFrame::OnViewFasttextureload() 
 {
 	GetCurrentView()->m_FastTextureLoad=!GetCurrentView()->m_FastTextureLoad;
-	GetDocument()->FS_LoadTextureData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
+	GetDocument()->FS_LoadPCXData(GetCurrentView()->m_Detaillevel,GetCurrentView()->m_ShowThruster,GetCurrentView()->m_FastTextureLoad);
 	GetCurrentView()->InvalidateRect(NULL);
 }
 
@@ -985,14 +1089,14 @@ void CMainFrame::OnFileOpen()
 
 void CMainFrame::OnViewDorotation() 
 {
-	/*GetCurrentView()->m_D3_Rotate=!GetCurrentView()->m_D3_Rotate;*/
+	GetCurrentView()->m_D3_Rotate=!GetCurrentView()->m_D3_Rotate;
 	SetTimer(1,50,NULL);
 }
 
 void CMainFrame::OnUpdateViewDorotation(CCmdUI* pCmdUI) 
 {
 	pCmdUI->Enable(FALSE); //current_game==GAME_D3);
-	/*pCmdUI->SetCheck(GetCurrentView()->m_D3_Rotate);*/
+	pCmdUI->SetCheck(GetCurrentView()->m_D3_Rotate);
 }
 
 void CMainFrame::OnUpdateModelTexturelist(CCmdUI* pCmdUI) 
@@ -1066,6 +1170,40 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 {
 	CMODVIEW32Doc* pDoc=GetDocument();
 	CMODVIEW32View* pView=GetCurrentView();
+
+	switch(nIDEvent)
+	{
+	case 0:
+		if(current_game==GAME_D2 /* or game_d3*/)
+		{
+			int redraw=FALSE;
+			for(int i=0;i<MAX_D2_SUBMODELS;i++)
+			{
+				redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].p,&pView->m_D2_PosAngle_ShallBe[i].p,&pView->m_D2_PosAngle_StepBit[i].p);
+				redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].h,&pView->m_D2_PosAngle_ShallBe[i].h,&pView->m_D2_PosAngle_StepBit[i].h);
+				redraw|=pView->D2_ParsePosAngle(&pView->m_D2_PosAngle_Current[i].b,&pView->m_D2_PosAngle_ShallBe[i].b,&pView->m_D2_PosAngle_StepBit[i].b);
+			}
+			if(redraw)
+				pView->InvalidateRect(NULL);
+		}
+		break;
+
+	case 1:
+		if(current_game==GAME_D3)
+		{
+			OutputDebugString("D3\n");
+			if((pView->m_D3_Rotate)&(pDoc->m_D3_Display.PartsRotate))
+			{
+				for(unsigned long i=0;i<pDoc->m_D3_Model.Scount;i++)
+				{
+					if(pDoc->m_D3_Display.Rotate[i])
+						pDoc->m_D3_Rstep[i] = (float)((const int)(pDoc->m_D3_Rstep[i] + (18.0/pDoc->m_D3_Display.Rspeed[i]))%360);
+				}
+				pView->InvalidateRect(NULL);
+			}
+		}
+		break;
+	}	
 	CFrameWnd::OnTimer(nIDEvent);
 }
 
@@ -1100,6 +1238,7 @@ void CMainFrame::OnModelPrevious()
 }
 
 
+//************** BCMENU stuff START ****************
 HMENU CMainFrame::NewMenu(int menu/*=0*/)
 {
 	// Load the menu from the resources
@@ -1108,41 +1247,64 @@ HMENU CMainFrame::NewMenu(int menu/*=0*/)
 	else
 		m_menu.LoadMenu(IDR_EDITOR);
 
-	m_menu.LoadMenu(IDR_SMALL);
+  // Use ModifyODMenu to add a bitmap to a menu options.The first parameter
+  // is the menu option text string.If it's NULL, keep the current text
+  // string.The second option is the ID of the menu option to change.
+  // The third option is the resource ID of the bitmap.This can also be a
+  // toolbar ID in which case the class searches the toolbar for the
+  // appropriate bitmap.Only Bitmap and Toolbar resources are supported.
+  //m_menu.ModifyODMenu(NULL,ID,IDB_ZOOM);
 
-	return(m_menu.Detach());
+  // Another method for adding bitmaps to menu options is through the
+  // LoadToolbar member function.This method allows you to add all
+  // the bitmaps in a toolbar object to menu options (if they exist).
+  // The function parameter is an the toolbar id.
+  // There is also a function called LoadToolbars that takes an
+  // array of id's.
+  m_menu.LoadToolbar(IDR_SMALL);
+
+  return(m_menu.Detach());
 }
 
 //This handler ensure that the popup menu items are drawn correctly
 void CMainFrame::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct) 
 {
-	BOOL setflag=FALSE;
-	if(lpMeasureItemStruct->CtlType==ODT_MENU){
-		if(IsMenu((HMENU)lpMeasureItemStruct->itemID)){
-			CMenu* cmenu=CMenu::FromHandle((HMENU)lpMeasureItemStruct->itemID);
-			m_menu.MeasureItem(lpMeasureItemStruct);
-			setflag=TRUE;
-		}
-	}
-	if(!setflag)
-		CFrameWnd::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
+  BOOL setflag=FALSE;
+  if(lpMeasureItemStruct->CtlType==ODT_MENU){
+    if(IsMenu((HMENU)lpMeasureItemStruct->itemID)){
+      CMenu* cmenu=CMenu::FromHandle((HMENU)lpMeasureItemStruct->itemID);
+      if(m_menu.IsMenu(cmenu)){
+        m_menu.MeasureItem(lpMeasureItemStruct);
+        setflag=TRUE;
+      }
+    }
+  }
+  if(!setflag)
+	  CFrameWnd::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
 }
 
 
 //This handler ensures that keyboard shortcuts work
 LRESULT CMainFrame::OnMenuChar(UINT nChar, UINT nFlags, CMenu* pMenu) 
 {
-	LRESULT lresult;
-	lresult=CFrameWnd::OnMenuChar(nChar, nFlags, pMenu);
-	return(lresult);
+  LRESULT lresult;
+  if(m_menu.IsMenu(pMenu))
+    lresult=BCMenu::FindKeyboardShortcut(nChar, nFlags, pMenu);
+  else
+    lresult=CFrameWnd::OnMenuChar(nChar, nFlags, pMenu);
+  return(lresult);
 }
 
 
 //This handler updates the menus from time to time
 void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu) 
 {
+  CFrameWnd::OnInitMenuPopup(pPopupMenu, nIndex, bSysMenu);
+  if(!bSysMenu){
+    if(m_menu.IsMenu(pPopupMenu))
+      BCMenu::UpdateMenu(pPopupMenu);
+  }
 }
-
 //************** BCMENU stuff END ****************
 
 void CMainFrame::OnModelTexturelist() 
@@ -1151,6 +1313,7 @@ void CMainFrame::OnModelTexturelist()
 	int cur,min;
 	m_wndSplitterTX.GetRowInfo(1,cur,min);
 	if(cur<=0)
+	
 		TXPaneShow(); //Show
 	else
 		TXPaneHide(); //Hide
@@ -1277,6 +1440,50 @@ void CMainFrame::OnUpdateModelNext(CCmdUI* pCmdUI)
 	pCmdUI->Enable(ExplorerCtrl()->GetCount()!=0);
 }
 
+void CMainFrame::OnViewSpecialdescent3settingsNextposition() 
+{
+	CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+	int x=lbox->GetCurSel();
+	if(x<lbox->GetCount()-1)
+		x++;
+	lbox->SetCurSel(x);
+	((CGamePaneD3 *)GetGamePane())->OnPositionChange();
+}
+
+void CMainFrame::OnViewSpecialdescent3settingsPreviousposition() 
+{
+	CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+	int x=lbox->GetCurSel();
+	if(x>0)
+		x--;
+	lbox->SetCurSel(x);
+	((CGamePaneD3 *)GetGamePane())->OnPositionChange();
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent3settingsNextposition(CCmdUI* pCmdUI) 
+{
+	if(current_game==GAME_D3)
+	{
+		CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+		int x=lbox->GetCurSel();
+		pCmdUI->Enable(x<lbox->GetCount()-1);
+	}
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent3settingsPreviousposition(CCmdUI* pCmdUI) 
+{
+	if(current_game==GAME_D3)
+	{
+		CListBox *lbox=(CListBox *)((CGamePaneD3 *)GetGamePane())->GetDlgItem(IDC_D3_POSITIONS);
+		int x=lbox->GetCurSel();
+		pCmdUI->Enable(x>0);
+	}
+	else
+		pCmdUI->Enable(FALSE);
+}
+
 void CMainFrame::FS_ShowShield()
 {
 	OnViewShowshields();
@@ -1285,6 +1492,90 @@ void CMainFrame::FS_ShowShield()
 void CMainFrame::FS_ShowThruster()
 {
 	OnViewShowthruster();
+}
+
+void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetGroupa() 
+{
+	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_GROUPA;
+	GetDocument()->D2_LoadPIGData();
+	GetCurrentView()->InvalidateRect(NULL);
+	UpdateTextureBar();
+}
+
+void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetWater() 
+{
+	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_WATER;
+	GetDocument()->D2_LoadPIGData();
+	GetCurrentView()->InvalidateRect(NULL);
+	UpdateTextureBar();
+}
+
+void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetIce() 
+{
+	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ICE;
+	GetDocument()->D2_LoadPIGData();
+	GetCurrentView()->InvalidateRect(NULL);
+	UpdateTextureBar();
+}
+
+void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetFire() 
+{
+	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_FIRE;
+	GetDocument()->D2_LoadPIGData();
+	GetCurrentView()->InvalidateRect(NULL);
+	UpdateTextureBar();
+}
+
+void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetAlien2() 
+{
+	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ALIEN2;
+	GetDocument()->D2_LoadPIGData();
+	GetCurrentView()->InvalidateRect(NULL);
+	UpdateTextureBar();
+}
+
+void CMainFrame::OnViewSpecialdescent2settingsMaintexturesetAlien1() 
+{
+	GetDocument()->m_D2_TextureSet=D2_TEXTURESET_ALIEN1;
+	GetDocument()->D2_LoadPIGData();
+	GetCurrentView()->InvalidateRect(NULL);
+	UpdateTextureBar();
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetGroupa(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(current_game==GAME_D2);
+	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_GROUPA);
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetFire(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(current_game==GAME_D2);
+	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_FIRE);
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetAlien2(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(current_game==GAME_D2);
+	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ALIEN2);
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetAlien1(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(current_game==GAME_D2);
+	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ALIEN1);
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetWater(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(current_game==GAME_D2);
+	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_WATER);
+}
+
+void CMainFrame::OnUpdateViewSpecialdescent2settingsMaintexturesetIce(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(current_game==GAME_D2);
+	pCmdUI->SetCheck(GetDocument()->m_D2_TextureSet==D2_TEXTURESET_ICE);
 }
 
 void CMainFrame::OnModelModelcomparisontable() 
@@ -1313,7 +1604,7 @@ void CMainFrame::OnViewShowguns()
 void CMainFrame::OnUpdateViewShowguns(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(GetCurrentView()->m_ShowGuns);
-	pCmdUI->Enable(GetCurrentView()->m_DisplayGun==-1);
+	pCmdUI->Enable(GetCurrentView()->m_DisplayGun==-1 && current_game!=GAME_D3);
 }
 
 void CMainFrame::OnViewShowsegments() 
@@ -1325,7 +1616,7 @@ void CMainFrame::OnViewShowsegments()
 void CMainFrame::OnUpdateViewShowsegments(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(GetCurrentView()->m_ShowSegments);
-	pCmdUI->Enable(true);
+	pCmdUI->Enable(current_game!=GAME_D3);
 }
 
 void CMainFrame::FS_SetDetailLevel(int mode)
@@ -1348,13 +1639,13 @@ void CMainFrame::LoadOptions()
 	m_ToolBarSize=*(options+1);
 	m_SwapMouseButtons=*(options+2);
 	m_ExplorerIndex=*(options+3);
-	m_QuickRendering=*(options+4);
-	delete[] options;
+	m_QuickRendering=*(options+5);
+	delete(options);
 }
 
 void CMainFrame::InitToolbars()
 {
-	DWORD style = NULL;
+	DWORD style;
 	DWORD ctrlstyle;
 
 #define DEFAULTSTYLE WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC
@@ -1411,6 +1702,37 @@ void CMainFrame::InitToolbars()
 	SetButton(&m_wndToolBar,20,"","Zoom out");*/
 	ResizeToolbar(&m_wndToolBar);
 
+	//Descent 2 toolbar
+	m_wndToolBarD2.CreateEx(this, style, ctrlstyle);
+	if(m_ToolBarSize==TOOLBAR_SIZE_SMALL)
+		m_wndToolBarD2.LoadToolBar(IDR_DESCENT2_SMALL);
+	else
+		m_wndToolBarD2.LoadToolBar(IDR_DESCENT2);
+	m_wndToolBarD2.SetWindowText("Descent 2 toolbar");
+	SetButton(&m_wndToolBarD2,0,"","Open POG");
+	SetButton(&m_wndToolBarD2,1,"","Unload POG");
+	SetButton(&m_wndToolBarD2,3,"GROUPA","GROUPA.PIG");
+	SetButton(&m_wndToolBarD2,4,"WATER","WATER.PIG");
+	SetButton(&m_wndToolBarD2,5,"FIRE","FIRE.PIG");
+	SetButton(&m_wndToolBarD2,6,"ICE","ICE.PIG");
+	SetButton(&m_wndToolBarD2,7,"ALIEN1","ALIEN1.PIG");
+	SetButton(&m_wndToolBarD2,8,"ALIEN2","ALIEN2.PIG");
+	ResizeToolbar(&m_wndToolBarD2);
+	ShowControlBar(&m_wndToolBarD2,FALSE,FALSE);
+
+	//Descent 3 toolbar
+	m_wndToolBarD3.CreateEx(this, style, ctrlstyle);
+	if(m_ToolBarSize==TOOLBAR_SIZE_SMALL)
+		m_wndToolBarD3.LoadToolBar(IDR_DESCENT3_SMALL);
+	else
+		m_wndToolBarD3.LoadToolBar(IDR_DESCENT3);
+	m_wndToolBarD3.SetWindowText("Descent 3 toolbar");
+	SetButton(&m_wndToolBarD3,0,"Previous position","Prev. pos");
+	SetButton(&m_wndToolBarD3,1,"Next position","Next pos");
+	ResizeToolbar(&m_wndToolBarD3);
+	ShowControlBar(&m_wndToolBarD3,FALSE,FALSE);
+
+	//FreeSpace toolbar
 	m_wndToolBarFS.CreateEx(this,style, ctrlstyle);
 	if(m_ToolBarSize==TOOLBAR_SIZE_SMALL)
 		m_wndToolBarFS.LoadToolBar(IDR_FREESPACE_SMALL);
@@ -1536,6 +1858,36 @@ void CMainFrame::OnUpdateModelModelcomparisontable(CCmdUI* pCmdUI)
 void CMainFrame::OnEditor() 
 {
 	LoadEditor();
+/*#ifdef _WITHEDITOR
+	GameBarNone();
+
+	m_wndSplitter.SetColumnInfo(1,500,0);
+	m_wndSplitter.SetColumnInfo(2,140,0);
+
+	CWnd *pWnd=m_ed2Splitter.GetPane(0,0);
+	CEditorFS_Subsystems_1* pView = DYNAMIC_DOWNCAST(CEditorFS_Subsystems_1, pWnd);
+	pView->Init();
+	
+	CMenu* pMenu = GetMenu();
+	if(pMenu)
+		pMenu->DestroyMenu();
+	HMENU hMenu = NewMenu(1);
+	pMenu = CMenu::FromHandle( hMenu );
+	SetMenu(pMenu);
+	m_hMenuDefault = hMenu;
+	::SetMenu(m_hWnd,hMenu);
+	RedrawWindow();
+
+	//TODO: Modify acceleration keys
+
+	//TODO: Set new toolbar
+	//m_wndToolBar.
+
+	m_wndSplitter.RecalcLayout();
+#else
+	ASSERT(FALSE);
+	AfxAbort();
+#endif*/
 }
 
 
@@ -1683,6 +2035,24 @@ void CMainFrame::LoadEditor()
 	{
 		if(MessageBox("You cannot edit the POF file while it is inside a VP. Do you want to extract the file first? If you click 'Yes' you will be prompted for a file path and name next.","Extract POF",MB_YESNO)==IDNO)
 			return;
+				
+		/*//Get modelsdir
+		char mapsdirectory[8192];
+		COptionsDlg dlgo;
+		if(GetDocument()->m_FS_CurrVP_FreeSpaceVersion==1)
+			dlgo.GetF1Path((char *)&mapsdirectory);
+		else
+			dlgo.GetF2Path((char *)&mapsdirectory);
+		CString mapsfilename=mapsdirectory;
+		if(mapsfilename.Right(1)!="\\")
+			mapsfilename+="\\";
+		mapsfilename+="data\\models\\";
+		mapsfilename+=GetDocument()->m_CurrentFile_FileName;
+
+		//Prompt for POF dir/file
+		CFileDialog dlg(FALSE,"pof",mapsfilename,OFN_EXPLORER | OFN_NOREADONLYRETURN | OFN_OVERWRITEPROMPT,"POF files (*.pof)|*.pof||",NULL);
+		if(dlg.DoModal()==IDCANCEL)
+			return;*/
 
 		CString vpname=GetDocument()->GetPathName();
 		if(!AskForFileName())
@@ -1699,10 +2069,10 @@ void CMainFrame::LoadEditor()
 			return;
 		}
 		fvp.Seek(GetDocument()->m_CurrentFile_Offset,CFile::begin);
-		unsigned char *buffer=new unsigned char[(unsigned int) GetDocument()->m_CurrentFile_Size];
-		fvp.Read(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
-		fpof.Write(buffer,(UINT)GetDocument()->m_CurrentFile_Size);
-		delete[] buffer;
+		unsigned char *buffer=new unsigned char[GetDocument()->m_CurrentFile_Size];
+		fvp.Read(buffer,GetDocument()->m_CurrentFile_Size);
+		fpof.Write(buffer,GetDocument()->m_CurrentFile_Size);
+		delete(buffer);
 		fvp.Close();
 		fpof.Close();
 		GetDocument()->m_FS_CurrVP_Loaded=FALSE;
@@ -2194,13 +2564,7 @@ void CMainFrame::UpdateMainDisplay()
 
 //Texture pane stuff
 
-void CMainFrame::OnSelchangeTab1(NMHDR* _pnmtb, LRESULT *plr) 
-{
-	NMTOOLBAR *pnmtb = (NMTOOLBAR*)_pnmtb;
-	UpdateTextureBar();
-}
-
-void CMainFrame::OnSelchangeTab1b() 
+void CMainFrame::OnSelchangeTab1() 
 {
 	UpdateTextureBar();
 }
@@ -2326,6 +2690,36 @@ void CMainFrame::OnUpdateTXHide(CCmdUI* pCmdUI)
 
 
 //Open/Save dialog helper functions
+
+void CMainFrame::OnVpfiledialogJumptodescent2directory() 
+{
+	VPFileDialogJump(DMReg_GetGameDir("Descent 2"));
+}
+
+void CMainFrame::OnUpdateVpfiledialogJumptodescent2directory(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(DMReg_GetGameDir("Descent 2")!="");		
+}
+
+void CMainFrame::OnVpfiledialogJumptodescent3directory() 
+{
+	VPFileDialogJump(DMReg_GetGameDir("Descent 3"));
+}
+
+void CMainFrame::OnUpdateVpfiledialogJumptodescent3directory(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(DMReg_GetGameDir("Descent 3")!="");		
+}
+
+void CMainFrame::OnVpfiledialogJumptofreespace1directory() 
+{
+	VPFileDialogJump(DMReg_GetGameDir("FreeSpace 1"));
+}
+
+void CMainFrame::OnUpdateVpfiledialogJumptofreespace1directory(CCmdUI* pCmdUI) 
+{
+	pCmdUI->Enable(DMReg_GetGameDir("FreeSpace 1")!="");		
+}
 
 void CMainFrame::OnVpfiledialogJumptofreespace2directory() 
 {

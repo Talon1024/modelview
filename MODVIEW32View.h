@@ -109,6 +109,12 @@ public:
 	int m_EditorFS_TGUN_FiringPoint;
 	int m_EditorFS_MODEL_CurLight;
 	BOOL m_EditorFS_ShowModelInfo;
+	BOOL m_D2_SmoothPositionChange;
+	void D3_PreparePosition();
+	void D2_ResetPosAngleData_StepBit();
+	void D2_ResetPosAngleData_ShallBe();
+	void D2_ResetPosAngleData_Current();
+	BOOL D2_ParsePosAngle(short *cur,short *sha,short *stp);
 	BOOL SetWindowPixelFormat(HDC hDC);
 	BOOL CreateViewGLContext(HDC hDC);
 	void ResetGeometry();
@@ -129,7 +135,7 @@ public:
 	BOOL m_RenderZbuffer;
 	BOOL m_SkipBuild;
 	BOOL m_FastTextureLoad;
-	unsigned int m_Detaillevel;
+	unsigned long m_Detaillevel;
 	BOOL m_ShowThruster;
 	BOOL m_ShowShield;
 	BOOL m_FS_ShowDockingPoints;
@@ -148,6 +154,42 @@ public:
 #define MOUSEMOVEMODE_PANE		3
 	int m_MouseMoveMode;
 	CPoint m_MouseMovePos;
+
+
+	GLuint m_D2_TestModel;
+	int m_D2_Position;
+	D2_VMS_ANGVEC m_D2_PosAngle_ShallBe[MAX_D2_SUBMODELS];
+	D2_VMS_ANGVEC m_D2_PosAngle_Current[MAX_D2_SUBMODELS];
+	D2_VMS_ANGVEC m_D2_PosAngle_StepBit[MAX_D2_SUBMODELS];
+	int D2_RenderScene();
+	int D2_BuildScene();
+	void D2_BuildWireCube(D2_VMS_VECTOR min,D2_VMS_VECTOR max);
+	void D2_PreparePosition();
+	void D2_SetPosition(unsigned long pos);
+	
+	BOOL m_RenderD3Flat;
+	BOOL m_RenderD3Smooth;
+	BOOL m_D3_Rotate;
+	unsigned long m_D3_Position;
+	GLuint  m_D3_ModelSobj[60];
+	GLuint	m_D3_CrossPnts;
+	BOOL    m_D3_LoadedSobj[60];
+	D3_DISPLAYPOLY m_D3_Dpoly[4000];
+	D3_DISPLAYSOBJ m_D3_Dsobj[MAX_D3_SOBJ];
+	GLfloat m_D3_Dnorm[20000][3];
+	GLfloat m_D3_Dvert[20000][3];
+	GLfloat m_D3_Duv[20000][2];
+	void D3_BuildPnts(unsigned long SubM);
+	void D3_BuildSobj(unsigned short SobjNum);
+	void D3_BuildScene();
+	void D3_BuildArrays();
+	void D3_CrossPnt(D3_VPNT xhair);
+	void D3_CrossPntN(D3_VPNT xhair, D3_VPNT Dir);
+	void D3_RenderScene();
+	void D3_SetPosition(unsigned long pos);
+	D3_POSANGLE m_D3_PosAngle_ShallBe[MAX_D3_SOBJ];
+	D3_POSANGLE m_D3_PosAngle_Current[MAX_D3_SOBJ];
+	D3_POSANGLE m_D3_PosAngle_StepBit[MAX_D3_SOBJ];
 	
 	void FS_BuildScene();
 	void FS_SetDetailLevel(int mode);

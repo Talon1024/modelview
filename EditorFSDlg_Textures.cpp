@@ -86,7 +86,7 @@ void CEditorFSDlg_Textures::OnOK()
 	dlg.texname=m_TextureNames_List.GetItemText(nItem,0);
 	if(dlg.DoModal()==IDOK)
 	{
-		strcpy_s(GetDocument()->m_FS_BitmapData.pic[GetDocument()->m_FS_PofDataL[GetMainView()->m_Detaillevel]+nItem].name,dlg.texname);
+		strcpy(GetDocument()->m_FS_BitmapData.pic[GetDocument()->m_FS_PofDataL[GetMainView()->m_Detaillevel]+nItem].name,dlg.texname);
 		m_TextureNames_List.SetItemText(nItem,0,dlg.texname);
 		GetDocument()->SetModifiedFlag(TRUE);
 	}

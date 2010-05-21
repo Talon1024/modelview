@@ -178,14 +178,13 @@ void CEditorFS_GPNT::InitGunMode()
 {
 	int gunmode=m_GunMode.GetCurSel();
 	ASSERT(gunmode==0 || gunmode==1);
-	if (gunmode >= 2 ) return;
 
 	CString tp="Primary Gun";
 	if(gunmode==1)
 		tp="Secondary Gun";
 
 	m_List.ResetContent();
-	for(int i=0;(i<GetDocument()->m_FS_RealGuns[gunmode].Num);i++)
+	for(int i=0;i<GetDocument()->m_FS_RealGuns[gunmode].Num;i++)
 	{
 		CString x;
 		x.Format("%s with %i slots",tp,GetDocument()->m_FS_RealGuns[gunmode].Slot[i].num_guns);
@@ -426,17 +425,17 @@ void CEditorFS_GPNT::OnChangeData()
 		{
 			int f=GetCurrentFiringPointSelection();
 			m_FiringPoint_PosX.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.point[f].x=(float)atof(t);
+			GetDocument()->m_EditorFS_RealGun.point[f].x=atof(t);
 			m_FiringPoint_PosY.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.point[f].y=(float)atof(t);
+			GetDocument()->m_EditorFS_RealGun.point[f].y=atof(t);
 			m_FiringPoint_PosZ.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.point[f].z=(float)atof(t);
+			GetDocument()->m_EditorFS_RealGun.point[f].z=atof(t);
 			m_FiringPoint_NormX.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.normal[f].x=(float)atof(t);
+			GetDocument()->m_EditorFS_RealGun.normal[f].x=atof(t);
 			m_FiringPoint_NormY.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.normal[f].y=(float)atof(t);
+			GetDocument()->m_EditorFS_RealGun.normal[f].y=atof(t);
 			m_FiringPoint_NormZ.GetWindowText(t);
-			GetDocument()->m_EditorFS_RealGun.normal[f].z=(float)atof(t);
+			GetDocument()->m_EditorFS_RealGun.normal[f].z=atof(t);
 			//Update listview right away
 			t.Format("%.4f",GetDocument()->m_EditorFS_RealGun.point[f].x);
 			m_FiringPoints_List.SetItemText(f,1,t);
@@ -594,9 +593,8 @@ void CEditorFS_GPNT::DoDeleteItem()
 		return;
 
 	int m_CurrentItem=m_List.GetCurSel();
-	if (m_GunMode.GetCurSel() < 2)
-		for(int i=m_CurrentItem+1;(i<GetDocument()->m_FS_RealGuns[m_GunMode.GetCurSel()].Num) && (i < MAX_FS_REALGUNS_SLOTS);i++)
-			GetDocument()->m_FS_RealGuns[m_GunMode.GetCurSel()].Slot[i-1]=GetDocument()->m_FS_RealGuns[m_GunMode.GetCurSel()].Slot[i];
+	for(int i=m_CurrentItem+1;i<GetDocument()->m_FS_RealGuns[m_GunMode.GetCurSel()].Num;i++)
+		GetDocument()->m_FS_RealGuns[m_GunMode.GetCurSel()].Slot[i-1]=GetDocument()->m_FS_RealGuns[m_GunMode.GetCurSel()].Slot[i];
 	GetDocument()->m_FS_RealGuns[m_GunMode.GetCurSel()].Num--;
 
 	//Remove from list
@@ -649,8 +647,6 @@ void CEditorFS_GPNT::OnConvert()
 		return;
 
 	int cgm=m_GunMode.GetCurSel();
-	ASSERT(cgm < 2);
-	if (cgm >= 2) return;
 	int agm=1-cgm;
 	int ntm=GetDocument()->m_FS_RealGuns[agm].Num;
 
@@ -660,7 +656,7 @@ void CEditorFS_GPNT::OnConvert()
 
 	//Delete old item
 	int m_CurrentItem=m_List.GetCurSel();
-	for(int i=m_CurrentItem+1;(i<GetDocument()->m_FS_RealGuns[cgm].Num) && (i < MAX_FS_REALGUNS_SLOTS);i++)
+	for(int i=m_CurrentItem+1;i<GetDocument()->m_FS_RealGuns[cgm].Num;i++)
 		GetDocument()->m_FS_RealGuns[cgm].Slot[i-1]=GetDocument()->m_FS_RealGuns[cgm].Slot[i];
 	GetDocument()->m_FS_RealGuns[cgm].Num--;
 
@@ -713,7 +709,7 @@ void CEditorFS_GPNT::DoDeleteFiringPoint()
 		return;
 
 	int i2=GetCurrentFiringPointSelection();
-	for(int i=i2+1;(i<GetDocument()->m_EditorFS_RealGun.num_guns) && (i < MAX_FS_FIRING_POINTS);i++)
+	for(int i=i2+1;i<GetDocument()->m_EditorFS_RealGun.num_guns;i++)
 	{
 		GetDocument()->m_EditorFS_RealGun.point[i-1]=GetDocument()->m_EditorFS_RealGun.point[i];
 		GetDocument()->m_EditorFS_RealGun.normal[i-1]=GetDocument()->m_EditorFS_RealGun.normal[i];
@@ -756,7 +752,7 @@ void CEditorFS_GPNT::UpdateFiringPointsList()
 	for(int i=0;i<GetDocument()->m_EditorFS_RealGun.num_guns;i++)
 	{
 		char t2[256];
-		_itoa_s(i,t2,10);
+		itoa(i,t2,10);
 		VERIFY(m_FiringPoints_List.InsertItem(i,t2)==i);
 		fl.Format("%.4f",GetDocument()->m_EditorFS_RealGun.point[i].x);
 		m_FiringPoints_List.SetItemText(i,1,fl);

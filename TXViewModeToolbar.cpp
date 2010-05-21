@@ -94,7 +94,7 @@ int CTXViewModeToolbar::GetCurrent()
 void CTXViewModeToolbar::OnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	CMainFrame *m=static_cast<CMainFrame*>(GetParentFrame());
-	m->OnSelchangeTab1(pNMHDR, pResult);
+	m->OnSelchangeTab1();
 	*pResult = 0;
 }
 
@@ -104,7 +104,7 @@ void CTXViewModeToolbar::ShowTextures()
 	c->SetCurSel(0);
 
 	CMainFrame *m=static_cast<CMainFrame*>(GetParentFrame());
-	m->OnSelchangeTab1b();
+	m->OnSelchangeTab1();
 }
 
 void CTXViewModeToolbar::ShowBlockList()
@@ -113,7 +113,7 @@ void CTXViewModeToolbar::ShowBlockList()
 	c->SetCurSel(1);
 
 	CMainFrame *m=static_cast<CMainFrame*>(GetParentFrame());
-	m->OnSelchangeTab1b();
+	m->OnSelchangeTab1();
 }
 
 void CTXViewModeToolbar::ShowLogFile()
@@ -122,6 +122,6 @@ void CTXViewModeToolbar::ShowLogFile()
 	c->SetCurSel(2);
 
 	CMainFrame *m=static_cast<CMainFrame*>(GetParentFrame());
-	m->OnSelchangeTab1b();
+	m->OnSelchangeTab1();
 }
 

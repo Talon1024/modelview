@@ -95,7 +95,7 @@ void CEditorFS_SOBJ::Init()
 	int it=0;
 
 	m_TabSOBJ.DeleteAllItems();
-	for(unsigned int i=0;i<6;i++)
+	for(int i=0;i<6;i++)
 	{
 		if(GetDocument()->m_FS_PMinfo.n_detail>=i+1)
 		{

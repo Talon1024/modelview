@@ -79,18 +79,26 @@ BOOL CWelcome::OnInitDialog()
 	m_Games.SetImageList(pImageList,LVSIL_SMALL);
 	m_Games.InsertColumn(0,"Game",LVCFMT_LEFT,90);
 	m_Games.InsertColumn(1,"Directory",LVCFMT_LEFT,230);
-	m_Games.InsertItem(0,"FreeSpace 1",2);
-	m_Games.InsertItem(1,"FreeSpace 2",3);
+	m_Games.InsertItem(0,"Descent 2",0);
+	m_Games.InsertItem(1,"Descent 3",1);
+	m_Games.InsertItem(2,"FreeSpace 1",2);
+	m_Games.InsertItem(3,"FreeSpace 2",3);
 	m_Games.SetItemState(0,LVIS_SELECTED | LVIS_FOCUSED,LVIS_SELECTED | LVIS_FOCUSED);
 
 	//Read from INI file
 	COptionsDlg dlg;
+	m_Games.SetItemText(0,1,dlg.GetD2Path());
+	m_Games.SetItemText(1,1,dlg.GetD3Path());
 	m_Games.SetItemText(2,1,dlg.GetF1Path());
 	m_Games.SetItemText(3,1,dlg.GetF2Path());
 
 	//If something is not already configured in the INI file, try to use DVM and the registry
 	
 	//Associations
+	m_FileTypes.AddString("*.HAM files - Descent 2 model archives");
+	m_FileTypes.AddString("*.HXM files - Descent 2 add-on model archives");
+	m_FileTypes.AddString("*.POL files - Descent 2 models");
+	m_FileTypes.AddString("*.OOF files - Descent 3 models");
 	m_FileTypes.AddString("*.POF files - FreeSpace 1/2 models");
 	for(int i=0;i<5;i++)
 		m_FileTypes.SetCheck(i,TRUE);
@@ -189,14 +197,25 @@ void CWelcome::OnEdit()
 	
 	switch(nItem)
 	{
+	case 0:
+		game_title="Descent 2";
+		game_diniheader="Descent";
+		game_dinikey="D2Full";
+		break;
 
 	case 1:
+		game_title="Descent 3";
+		game_diniheader="Descent";
+		game_dinikey="D3Full";
+		break;
+
+	case 2:
 		game_title="FreeSpace 1";
 		game_diniheader="FreeSpace";
 		game_dinikey="F1Full";
 		break;
 
-	case 2:
+	case 3:
 		game_title="FreeSpace 2";
 		game_diniheader="FreeSpace";
 		game_dinikey="F2Full";
@@ -213,9 +232,9 @@ void CWelcome::OnEdit()
 	if(dlg.DoModal()==IDOK)
 	{
 		char *temp=new char[MAX_FILENAMELEN];
-		WritePrivateProfileString(game_diniheader,game_dinikey,dlg.GetPathName(),NULL);
+		WritePrivateProfileString(game_diniheader,game_dinikey,dlg.GetPathName(),Odlg.GetDescentINI(temp));
 		m_Games.SetItemText(nItem,1,dlg.GetPathName());
-		delete[] temp;
+		delete(temp);
 	}
 }
 
@@ -240,13 +259,25 @@ void CWelcome::OnDelete()
 	
 	switch(nItem)
 	{
+	case 0:
+		game_title="Descent 2";
+		game_diniheader="Descent";
+		game_dinikey="D2Full";
+		break;
+
 	case 1:
+		game_title="Descent 3";
+		game_diniheader="Descent";
+		game_dinikey="D3Full";
+		break;
+
+	case 2:
 		game_title="FreeSpace 1";
 		game_diniheader="FreeSpace";
 		game_dinikey="F1Full";
 		break;
 
-	case 2:
+	case 3:
 		game_title="FreeSpace 2";
 		game_diniheader="FreeSpace";
 		game_dinikey="F2Full";
@@ -260,8 +291,8 @@ void CWelcome::OnDelete()
 	if(MessageBox("Are you sure you want to remove the game directory information (note: this will NOT delete the game itself)?","Game Directory",MB_YESNO)==IDYES)
 	{
 		char *temp=new char[MAX_FILENAMELEN];
-		WritePrivateProfileString(game_diniheader,game_dinikey,"",NULL);
+		WritePrivateProfileString(game_diniheader,game_dinikey,"",Odlg.GetDescentINI(temp));
 		m_Games.SetItemText(nItem,1,"");
-		delete[] temp;
+		delete(temp);
 	}
 }

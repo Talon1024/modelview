@@ -14,7 +14,7 @@ class CProgressWnd : public CDialog
 {
 // Construction
 public:
-	int Create(CWnd* pParent);
+	Create(CWnd* pParent);
 	CProgressWnd(CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data

@@ -122,27 +122,27 @@ return(0);
 //
 ERRORCODE CImportCOB::ReadCOB(CFile *f)
 {
-	unsigned int i,j,Chunkend,texture;
+	unsigned long i,j,Chunkend,texture;
 	COB_HEADER cobheader;
 	CHUNK_HEADER chunkheader;
 	unsigned short Polhname;
 	unsigned short Polhn_string;
 	char Polhstring[100];
-	unsigned int position;
+	unsigned long position;
 	short identifier;
 	POLH_DATA Polhdata;
 	unsigned short Grouname;
 	unsigned short Groun_string;
 	char Groustring[100];
 	GROU_DATA Groudata[SOBJ_MAX];
-	unsigned int Parentid[SOBJ_MAX];
+	unsigned long Parentid[SOBJ_MAX];
 
-	unsigned int rd_flag,matltflag,GroupFlagError;
-	unsigned int n_vertix,n_uv,n_facehole;
-	unsigned int VStartSet,UVStartSet;
+	unsigned long rd_flag,matltflag,GroupFlagError;
+	unsigned long n_vertix,n_uv,n_facehole;
+	unsigned long VStartSet,UVStartSet;
 	CVPNT Vin;
 	char *pid;
-	unsigned int red,blue,green;
+	unsigned long red,blue,green;
 
 
 	LOGTEXT("Source file: %s\n",f->GetFilePath()); LOGDOIT;
@@ -203,9 +203,9 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 			Groustring[Groun_string]=0;
 			//LOGTEXT(" ,%d -",Grouname); LOGDOIT;
 			if(Groun_string!=0)
-				strcpy_s(Cmodel.Sname[Cmodel.Scount],Groustring);
+				strcpy(Cmodel.Sname[Cmodel.Scount],Groustring);
 			else
-				strcpy_s(Cmodel.Sname[Cmodel.Scount],"None");
+				strcpy(Cmodel.Sname[Cmodel.Scount],"None");
 			//LOGTEXT("  %s\n",Cmodel.Sname[Cmodel.Scount]); LOGDOIT;
 			f->Read(&Groudata[Cmodel.Scount], sizeof(GROU_DATA));
 
@@ -228,13 +228,13 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 			break;
 
 		case D_MAT1:
-			position=(unsigned int)f->GetPosition();
+			position=f->GetPosition();
 			f->Read(&Matldata[Matlcount], sizeof(MATL_DATA));
 			if(f->GetPosition()>=(position+chunkheader.Size))
 			{ // flatpoly
-				red=(unsigned int)(Matldata[Matlcount].red*0x00ff);
-				green=(unsigned int)(Matldata[Matlcount].green*0x00ff);
-				blue=(unsigned int)(Matldata[Matlcount].blue*0x00ff);
+				red=(unsigned long)(Matldata[Matlcount].red*0x00ff);
+				green=(unsigned long)(Matldata[Matlcount].green*0x00ff);
+				blue=(unsigned long)(Matldata[Matlcount].blue*0x00ff);
 				//LOGTEXT("  Flatpoly: red=%d, green=%d, blue=%d\n",red,green,blue); LOGDOIT;
 				green=green << 8;
 				blue=blue << 16;
@@ -334,7 +334,7 @@ ERRORCODE CImportCOB::ReadCOB(CFile *f)
 			break;
 
 		case D_POLH:
-			position=(unsigned int) f->GetPosition();
+			position=f->GetPosition();
 			//fseek(file,chunkheader.Size,SEEK_CUR);
 			if(Cmodel.Scount==0)
 			{
@@ -507,7 +507,7 @@ void CImportCOB::calcNormal(float v[3][3], float out[3])
 //
 void CImportCOB::ConvertCob2Model(void)
 {
-	unsigned int i,j,k,gotdetail,m,n,n_smooth;
+	unsigned long i,j,k,gotdetail,m,n,n_smooth;
 	float v[3][3];
 	float vout[3];
 	unsigned char SNum[SOBJ_MAX];
@@ -547,7 +547,7 @@ void CImportCOB::ConvertCob2Model(void)
 		FSModel.Soffset[i].y=(float)(Cmodel.Soffset[i].z*20.0);
 		FSModel.Soffset[i].z=(float)(Cmodel.Soffset[i].x*20.0);
 		FSModel.Sparent[i]=Cmodel.parent[i];
-		strcpy_s(FSModel.Sname[i],Cmodel.Sname[i]);
+		strcpy(FSModel.Sname[i],Cmodel.Sname[i]);
 	}
 	FSModel.Soffset[0].x=0;
 	FSModel.Soffset[0].y=0;
@@ -558,7 +558,7 @@ void CImportCOB::ConvertCob2Model(void)
 
 	for(i=0;i<FSModel.Scount;i++)
 	{
-		if(_strnicmp(FSModel.Sname[i],"debris",6)==0)
+		if(strnicmp(FSModel.Sname[i],"debris",6)==0)
 		{
 			FSModel.Sdebris[FSModel.Debriscount]=i;
 			FSModel.Debriscount++;
@@ -572,7 +572,7 @@ void CImportCOB::ConvertCob2Model(void)
 	gotdetail=0;
 	for(i=1;i<FSModel.Scount;i++)
 	{
-		if(_strnicmp(FSModel.Sname[i],"detail1",7)==0)
+		if(strnicmp(FSModel.Sname[i],"detail1",7)==0)
 		{
 			FSModel.Sdetail[FSModel.Detailcount]=i;
 			FSModel.Detailcount++;
@@ -589,7 +589,7 @@ void CImportCOB::ConvertCob2Model(void)
 	gotdetail=0;
 	for(i=1;i<FSModel.Scount;i++)
 	{
-		if(_strnicmp(FSModel.Sname[i],"detail2",7)==0)
+		if(strnicmp(FSModel.Sname[i],"detail2",7)==0)
 		{
 			FSModel.Sdetail[FSModel.Detailcount]=i;
 			FSModel.Detailcount++;
@@ -606,7 +606,7 @@ void CImportCOB::ConvertCob2Model(void)
 	gotdetail=0;
 	for(i=1;i<FSModel.Scount;i++)
 	{
-		if(_strnicmp(FSModel.Sname[i],"detail3",7)==0)
+		if(strnicmp(FSModel.Sname[i],"detail3",7)==0)
 		{
 			FSModel.Sdetail[FSModel.Detailcount]=i;
 			FSModel.Detailcount++;
@@ -624,7 +624,7 @@ void CImportCOB::ConvertCob2Model(void)
 	gotdetail=0;
 	for(i=1;i<FSModel.Scount;i++)
 	{
-		if(_strnicmp(FSModel.Sname[i],"shield",6)==0)
+		if(strnicmp(FSModel.Sname[i],"shield",6)==0)
 		{
 			FSModel.shield=i;
 			FSModel.Sparent[i]=-1;
@@ -851,7 +851,7 @@ void CImportCOB::ConvertCob2Model(void)
 
 #define wc(walker)(*((unsigned char *) (walker)))
 #define ws(walker)(*((unsigned short *) (walker)))
-#define wi(walker)(*((unsigned int *) (walker)))
+#define wi(walker)(*((unsigned long *) (walker)))
 #define wf(walker)(*((float *) (walker)))
 #define v(walker)(*((FS_VPNT *) (walker)))
 #define wp(walker) ((unsigned short *) (walker))
@@ -863,7 +863,7 @@ void CImportCOB::ConvertCob2Model(void)
 //*************************************************************
 void CImportCOB::ohdr(void)
 {
-	unsigned int i;
+	unsigned long i;
 	FS_VPNT Max,Min;
 	float minx,miny,minz,maxx,maxy,maxz,Radius,Radius2;
 	float tmpx,tmpy,tmpz;
@@ -990,7 +990,7 @@ void CImportCOB::ohdr(void)
 	OutputLength+=4;
 
 	FS_VPNT test1,Center;
-	unsigned int SizeAt,StartSize;
+	unsigned long SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	wi(walker+OutputLength)=0x01234567;
@@ -1088,7 +1088,7 @@ void CImportCOB::ohdr(void)
 //*************************************************************
 void CImportCOB::txtr(void)
 {
-	unsigned int j = 0, k = 0;
+	unsigned long h,i,j,k;
 	char tname[25];
 
 	GetDocument()->m_FS_BitmapData.count=numtextures;
@@ -1097,7 +1097,7 @@ void CImportCOB::txtr(void)
 		LOGTEXT(" Building chunk TXTR\n"); LOGDOIT;
 		
 		/*
-		unsigned int SizeAt,StartSize;
+		unsigned long SizeAt,StartSize;
 		unsigned char *walker=OutputData;
 		wi(walker+OutputLength)=ID_TXTR;
 		OutputLength+=4;
@@ -1110,18 +1110,18 @@ void CImportCOB::txtr(void)
 		wi(walker+OutputLength)=numtextures;
 		OutputLength+=4;*/
 
-		for(unsigned int h=0;h<numtextures;h++)
+		for(h=0;h<numtextures;h++)
 		{
-			for(unsigned int i=0;i<strlen(Matlname[h]);i++)
+			for(i=0;i<strlen(Matlname[h]);i++)
 			{
 				if(Matlname[h][i]=='\\') j=i+1;
 				if(Matlname[h][i]=='.') k=i;
 			}
-			strncpy_s(tname, Matlname[h]+j, k-j);
+			strncpy(tname, Matlname[h]+j, k-j);
 			tname[k-j]='\0';
 
 			if(strlen(tname)<30)
-				strcpy_s(GetDocument()->m_FS_BitmapData.pic[h].name,tname);
+				strcpy(GetDocument()->m_FS_BitmapData.pic[h].name,tname);
 			else
 				ASSERT(FALSE);
 			/*else
@@ -1164,12 +1164,12 @@ void CImportCOB::Dump0Data(void)
 //
 // SOBJ type 1 data
 //
-void CImportCOB::Dump1Data(unsigned int Segment)
+void CImportCOB::Dump1Data(unsigned long Segment)
 {
-	unsigned int i,j,k,SizeAt,StartSize;
+	unsigned long i,j,k,SizeAt,StartSize;
 //	VPNT Vtemp;
 	unsigned char *walker=OutputData;
-	unsigned int n_verts,n_norms;
+	unsigned long n_verts,n_norms;
 
 	n_verts=0;
 	n_norms=0;
@@ -1253,8 +1253,8 @@ void CImportCOB::Dump1Data(unsigned int Segment)
 //
 void CImportCOB::Dump23Data(int Polygon)
 {
-	unsigned int i,j;
-	unsigned int SizeAt,StartSize;
+	unsigned long i,j;
+	unsigned long SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	i=Polygon;
@@ -1313,7 +1313,7 @@ void CImportCOB::Dump23Data(int Polygon)
 //
 void CImportCOB::Dump4Data(FS_VPNT Normal, FS_VPNT Point, FS_VPNT Min, FS_VPNT Max)
 {
-	unsigned int SizeAt,StartSize;
+	unsigned long SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	//LOGTEXT("  doing 4: splitting\n"); LOGDOIT;
@@ -1358,7 +1358,7 @@ void CImportCOB::Dump4Data(FS_VPNT Normal, FS_VPNT Point, FS_VPNT Min, FS_VPNT M
 //
 void CImportCOB::Dump5Data(FS_VPNT Min, FS_VPNT Max)
 {
-	unsigned int SizeAt,StartSize;
+	unsigned long SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	//LOGTEXT("  doing 5: BoundBox\n"); LOGDOIT;
@@ -1389,13 +1389,13 @@ void CImportCOB::Dump5Data(FS_VPNT Min, FS_VPNT Max)
 //
 // split
 //
-void CImportCOB::split(FS_VPNT Min, FS_VPNT Max,unsigned int SobjNum)
+void CImportCOB::split(FS_VPNT Min, FS_VPNT Max,unsigned long SobjNum)
 {
-	unsigned int i,j,total,total1,total2,Polygon1,Polygon2;
+	unsigned long i,j,total,total1,total2,Polygon1,Polygon2;
 	FS_VPNT Max1,Min1,Max2,Min2,Max3,Min3,Max4,Min4;
 	FS_VPNT Normal,Point;
 	float testx,testy,testz;
-	unsigned int Type4At,Type5At,Front,Back,Prelist,Postlist,Online;
+	unsigned long Type4At,Type5At,Front,Back,Prelist,Postlist,Online;
 	unsigned char *walker=OutputData;
 
 
@@ -1631,58 +1631,56 @@ void CImportCOB::split(FS_VPNT Min, FS_VPNT Max,unsigned int SobjNum)
 //
 // SOBJ Setup
 //
-void CImportCOB::sobj(int SobjNum)
+void CImportCOB::sobj(unsigned long SobjNum)
 {
-	ASSERT(SobjNum < MAX_FS_SOBJ);
-	unsigned int i;
+	unsigned long i;
 	FS_VPNT test1,test2;
 	//FS_VPNT Offset,Center;
 	FS_VPNT Max,Min;
-	//unsigned int SizeAt,StartSize,SizeAt2,StartSize2;
+	//unsigned long SizeAt,StartSize,SizeAt2,StartSize2;
 	unsigned char *walker=OutputData;
 	float minx,miny,minz,maxx,maxy,maxz,Radius,Radius2;
 	double maxxyz;
 
-	if (SobjNum < MAX_FS_SOBJ) {
-		LOGTEXT(" Building chunk SOBJ #%i - ",SobjNum); LOGDOIT;
-		i=0;
-		while((i<FSModel.Vcount) & (FSModel.Vpntseg[i]!=SobjNum))
-			i++;
+	LOGTEXT(" Building chunk SOBJ #%i - ",SobjNum); LOGDOIT;
+	i=0;
+	while((i<FSModel.Vcount) & (FSModel.Vpntseg[i]!=SobjNum))
+		i++;
 
-		//Find bounding box
-		maxx=FSModel.Vpoint[i].x;
-		maxy=FSModel.Vpoint[i].y;	
-		maxz=FSModel.Vpoint[i].z;
-		minx=FSModel.Vpoint[i].x;
-		miny=FSModel.Vpoint[i].y;
-		minz=FSModel.Vpoint[i].z;
-		maxxyz=((FSModel.Vpoint[i].x*FSModel.Vpoint[i].x)+
-				(FSModel.Vpoint[i].y*FSModel.Vpoint[i].y)+
-				(FSModel.Vpoint[i].z*FSModel.Vpoint[i].z));
-		Radius=(float)sqrt(maxxyz);
-		for(i=0;i<FSModel.Vcount;i++)
+	//Find bounding box
+	maxx=FSModel.Vpoint[i].x;
+	maxy=FSModel.Vpoint[i].y;
+	maxz=FSModel.Vpoint[i].z;
+	minx=FSModel.Vpoint[i].x;
+	miny=FSModel.Vpoint[i].y;
+	minz=FSModel.Vpoint[i].z;
+	maxxyz=((FSModel.Vpoint[i].x*FSModel.Vpoint[i].x)+
+			(FSModel.Vpoint[i].y*FSModel.Vpoint[i].y)+
+			(FSModel.Vpoint[i].z*FSModel.Vpoint[i].z));
+	Radius=(float)sqrt(maxxyz);
+	for(i=0;i<FSModel.Vcount;i++)
+	{
+		if(FSModel.Vpntseg[i]==SobjNum)
 		{
-			if(FSModel.Vpntseg[i]==SobjNum)
-			{
-				if(FSModel.Vpoint[i].x>maxx)	 maxx=FSModel.Vpoint[i].x;
-				if(FSModel.Vpoint[i].y>maxy)	 maxy=FSModel.Vpoint[i].y;
-				if(FSModel.Vpoint[i].z>maxz)	 maxz=FSModel.Vpoint[i].z;
-				if(FSModel.Vpoint[i].x<minx)	 minx=FSModel.Vpoint[i].x;
-				if(FSModel.Vpoint[i].y<miny)	 miny=FSModel.Vpoint[i].y;
-				if(FSModel.Vpoint[i].z<minz)	 minz=FSModel.Vpoint[i].z;
-				maxxyz=((FSModel.Vpoint[i].x*FSModel.Vpoint[i].x)+
-						(FSModel.Vpoint[i].y*FSModel.Vpoint[i].y)+
-						(FSModel.Vpoint[i].z*FSModel.Vpoint[i].z));	
-				Radius2=(float)sqrt(maxxyz);
-				if(Radius<Radius2) Radius=Radius2;
-			}
+			if(FSModel.Vpoint[i].x>maxx)	 maxx=FSModel.Vpoint[i].x;
+			if(FSModel.Vpoint[i].y>maxy)	 maxy=FSModel.Vpoint[i].y;
+			if(FSModel.Vpoint[i].z>maxz)	 maxz=FSModel.Vpoint[i].z;
+			if(FSModel.Vpoint[i].x<minx)	 minx=FSModel.Vpoint[i].x;
+			if(FSModel.Vpoint[i].y<miny)	 miny=FSModel.Vpoint[i].y;
+			if(FSModel.Vpoint[i].z<minz)	 minz=FSModel.Vpoint[i].z;
+			maxxyz=((FSModel.Vpoint[i].x*FSModel.Vpoint[i].x)+
+					(FSModel.Vpoint[i].y*FSModel.Vpoint[i].y)+
+					(FSModel.Vpoint[i].z*FSModel.Vpoint[i].z));
+			Radius2=(float)sqrt(maxxyz);
+			if(Radius<Radius2) Radius=Radius2;
 		}
-		Max.x=maxx;
-		Max.y=maxy;
-		Max.z=maxz;
-		Min.x=minx;
-		Min.y=miny;
-		Min.z=minz;
+	}
+	Max.x=maxx;
+	Max.y=maxy;
+	Max.z=maxz;
+	Min.x=minx;
+	Min.y=miny;
+	Min.z=minz;
 
 //if (SobjNum==0)
 //	{
@@ -1718,62 +1716,62 @@ void CImportCOB::sobj(int SobjNum)
 //}
 
 	//Save to doc
-		if(FSModel.shield!=0)
-		{
-			if(FSModel.shield<(long)SobjNum)
-				GetDocument()->m_FS_SOBJ[SobjNum].submodel_number=SobjNum-1;
-			else
-				GetDocument()->m_FS_SOBJ[SobjNum].submodel_number=SobjNum;
-		} else
-			GetDocument()->m_FS_SOBJ[SobjNum].submodel_number=SobjNum;		// sobj 0
-	
-		if(FSModel.shield!=0)
-		{
-			if(FSModel.shield<FSModel.Sparent[SobjNum])
-				GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent=FSModel.Sparent[SobjNum]-1;
-			else
-				GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent=FSModel.Sparent[SobjNum];
-		} else
-			GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent=FSModel.Sparent[SobjNum];		 // parent
-	
-		if(SobjNum==0)
-		{
-			GetDocument()->m_FS_SOBJ[SobjNum].real_offset.x=0;
-			GetDocument()->m_FS_SOBJ[SobjNum].real_offset.y=0;
-			GetDocument()->m_FS_SOBJ[SobjNum].real_offset.z=0;
-		} else {										 // 7-30-99 didn't subtract the parent... ouch
-			GetDocument()->m_FS_SOBJ[SobjNum].real_offset.x=FSModel.Soffset[SobjNum].x-FSModel.Soffset[FSModel.Sparent[SobjNum]].x;
-			GetDocument()->m_FS_SOBJ[SobjNum].real_offset.y=FSModel.Soffset[SobjNum].y-FSModel.Soffset[FSModel.Sparent[SobjNum]].y;
-			GetDocument()->m_FS_SOBJ[SobjNum].real_offset.z=FSModel.Soffset[SobjNum].z-FSModel.Soffset[FSModel.Sparent[SobjNum]].z;
-		}
-		if(GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent!=-1)
-		{
-			GetDocument()->m_FS_SOBJ[SobjNum].offset.x+=GetDocument()->m_FS_SOBJ[GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent].offset.x; 
-			GetDocument()->m_FS_SOBJ[SobjNum].offset.y+=GetDocument()->m_FS_SOBJ[GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent].offset.y;
-			GetDocument()->m_FS_SOBJ[SobjNum].offset.z+=GetDocument()->m_FS_SOBJ[GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent].offset.z;
-		}
+	if(FSModel.shield!=0)
+	{
+		if(FSModel.shield<(long)SobjNum)
+			GetDocument()->m_FS_SOBJ[SobjNum].submodel_number=SobjNum-1;
 		else
-		{
-			GetDocument()->m_FS_SOBJ[SobjNum].offset.x=0;
-			GetDocument()->m_FS_SOBJ[SobjNum].offset.y=0;
-			GetDocument()->m_FS_SOBJ[SobjNum].offset.z=0;
-		}
-		GetDocument()->m_FS_SOBJ[SobjNum].radius=Radius;
-		GetDocument()->m_FS_SOBJ[SobjNum].geometric_center.x=0;
-		GetDocument()->m_FS_SOBJ[SobjNum].geometric_center.y=0;
-		GetDocument()->m_FS_SOBJ[SobjNum].geometric_center.z=0;
-		GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_min_point.x=Min.x;
-		GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_min_point.y=Min.y;
-		GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_min_point.z=Min.z;
-		GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_max_point.x=Max.x;
-		GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_max_point.y=Max.y;
-		GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_max_point.z=Max.z;
+			GetDocument()->m_FS_SOBJ[SobjNum].submodel_number=SobjNum;
+	} else
+		GetDocument()->m_FS_SOBJ[SobjNum].submodel_number=SobjNum;		// sobj 0
 
-		GetDocument()->m_FS_SOBJ[SobjNum].submodel_name=FSModel.Sname[SobjNum];
-		GetDocument()->m_FS_SOBJ[SobjNum].properties="";
-		GetDocument()->m_FS_SOBJ[SobjNum].movement_type=-1;
-		GetDocument()->m_FS_SOBJ[SobjNum].movement_axis=-1;
-		GetDocument()->m_FS_SOBJ[SobjNum].reserved=0;
+	if(FSModel.shield!=0)
+	{
+		if(FSModel.shield<FSModel.Sparent[SobjNum])
+			GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent=FSModel.Sparent[SobjNum]-1;
+		else
+			GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent=FSModel.Sparent[SobjNum];
+	} else
+		GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent=FSModel.Sparent[SobjNum];		 // parent
+	
+	if(SobjNum==0)
+	{
+		GetDocument()->m_FS_SOBJ[SobjNum].real_offset.x=0;
+		GetDocument()->m_FS_SOBJ[SobjNum].real_offset.y=0;
+		GetDocument()->m_FS_SOBJ[SobjNum].real_offset.z=0;
+	} else {										 // 7-30-99 didn't subtract the parent... ouch
+		GetDocument()->m_FS_SOBJ[SobjNum].real_offset.x=FSModel.Soffset[SobjNum].x-FSModel.Soffset[FSModel.Sparent[SobjNum]].x;
+		GetDocument()->m_FS_SOBJ[SobjNum].real_offset.y=FSModel.Soffset[SobjNum].y-FSModel.Soffset[FSModel.Sparent[SobjNum]].y;
+		GetDocument()->m_FS_SOBJ[SobjNum].real_offset.z=FSModel.Soffset[SobjNum].z-FSModel.Soffset[FSModel.Sparent[SobjNum]].z;
+	}
+	if(GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent!=-1)
+	{
+		GetDocument()->m_FS_SOBJ[SobjNum].offset.x+=GetDocument()->m_FS_SOBJ[GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent].offset.x; 
+		GetDocument()->m_FS_SOBJ[SobjNum].offset.y+=GetDocument()->m_FS_SOBJ[GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent].offset.y;
+		GetDocument()->m_FS_SOBJ[SobjNum].offset.z+=GetDocument()->m_FS_SOBJ[GetDocument()->m_FS_SOBJ[SobjNum].submodel_parent].offset.z;
+	}
+	else
+	{
+		GetDocument()->m_FS_SOBJ[SobjNum].offset.x=0;
+		GetDocument()->m_FS_SOBJ[SobjNum].offset.y=0;
+		GetDocument()->m_FS_SOBJ[SobjNum].offset.z=0;
+	}
+	GetDocument()->m_FS_SOBJ[SobjNum].radius=Radius;
+	GetDocument()->m_FS_SOBJ[SobjNum].geometric_center.x=0;
+	GetDocument()->m_FS_SOBJ[SobjNum].geometric_center.y=0;
+	GetDocument()->m_FS_SOBJ[SobjNum].geometric_center.z=0;
+	GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_min_point.x=Min.x;
+	GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_min_point.y=Min.y;
+	GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_min_point.z=Min.z;
+	GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_max_point.x=Max.x;
+	GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_max_point.y=Max.y;
+	GetDocument()->m_FS_SOBJ[SobjNum].bounding_box_max_point.z=Max.z;
+
+	GetDocument()->m_FS_SOBJ[SobjNum].submodel_name=FSModel.Sname[SobjNum];
+	GetDocument()->m_FS_SOBJ[SobjNum].properties="";
+	GetDocument()->m_FS_SOBJ[SobjNum].movement_type=-1;
+	GetDocument()->m_FS_SOBJ[SobjNum].movement_axis=-1;
+	GetDocument()->m_FS_SOBJ[SobjNum].reserved=0;
 
 	//Create chunk
 	/*
@@ -1863,34 +1861,34 @@ void CImportCOB::sobj(int SobjNum)
 
 	StartSize2=OutputLength;				 // start for the size stuff*/
 
-		OutputLength=0;
+	OutputLength=0;
 
-		test1.x=1;
-		test1.y=1;
-		test1.z=1;
-		test2.x=2;
-		test2.y=2;
-		test2.z=2;
+	test1.x=1;
+	test1.y=1;
+	test1.z=1;
+	test2.x=2;
+	test2.y=2;
+	test2.z=2;
 
-		Dump1Data(SobjNum);
+	Dump1Data(SobjNum);
 
-		Max.x+=DELTA;
-		Max.y+=DELTA;
-		Max.z+=DELTA;
-		Min.x-=DELTA;
-		Min.y-=DELTA;
-		Min.z-=DELTA;
+	Max.x+=DELTA;
+	Max.y+=DELTA;
+	Max.z+=DELTA;
+	Min.x-=DELTA;
+	Min.y-=DELTA;
+	Min.z-=DELTA;
 
-		split(Min,Max,SobjNum);
-		Dump0Data();
+	split(Min,Max,SobjNum);
+	Dump0Data();
 
-		GetDocument()->m_FS_SOBJ[SobjNum].bsp_data_size=OutputLength;
-		GetDocument()->m_FS_SOBJ[SobjNum].bsp_data=new unsigned char[GetDocument()->m_FS_SOBJ[SobjNum].bsp_data_size];		 //model data size
-		memcpy(GetDocument()->m_FS_SOBJ[SobjNum].bsp_data,OutputData,OutputLength);
+	GetDocument()->m_FS_SOBJ[SobjNum].bsp_data_size=OutputLength;
+	GetDocument()->m_FS_SOBJ[SobjNum].bsp_data=new unsigned char[GetDocument()->m_FS_SOBJ[SobjNum].bsp_data_size];		 //model data size
+	memcpy(GetDocument()->m_FS_SOBJ[SobjNum].bsp_data,OutputData,OutputLength);
 
-		VERIFY(GetDocument()->FS_Walk(GetDocument()->m_FS_SOBJ[SobjNum].bsp_data,SobjNum,GetDocument()->m_FS_Model.Vcount)==ERROR_GEN_NOERROR);
-		ASSERT(GetDocument()->m_FS_NumSOBJ<SobjNum+1);
-		GetDocument()->m_FS_NumSOBJ=SobjNum+1;
+	VERIFY(GetDocument()->FS_Walk(GetDocument()->m_FS_SOBJ[SobjNum].bsp_data,SobjNum,GetDocument()->m_FS_Model.Vcount)==ERROR_GEN_NOERROR);
+	ASSERT(GetDocument()->m_FS_NumSOBJ<SobjNum+1);
+	GetDocument()->m_FS_NumSOBJ=SobjNum+1;
 
 /*CFile f;
 CString x1; x1.Format("c:\\import%i",SobjNum);
@@ -1900,7 +1898,7 @@ f.Close();*/
 
 	/*wi(walker+SizeAt)=OutputLength-StartSize;
 	wi(walker+SizeAt2)=OutputLength-StartSize2;*/
-	}
+
 }
 
 
@@ -1910,9 +1908,9 @@ f.Close();*/
 //*************************************************************
 void CImportCOB::shld(void)
 {
-	unsigned int i,j,k; 
+	unsigned long i,j,k; 
 	unsigned char *walker=OutputData;
-	unsigned int n_verts,n_faces;
+	unsigned long n_verts,n_faces;
 	SINFO Sinfo;
 	short back[3]={2,0,1};
 
@@ -1995,7 +1993,6 @@ void CImportCOB::shld(void)
 		for(i=0;i<Sinfo.PScount;i++)
 		{
 			GetDocument()->m_FS_Model.shields.Face[i].Normal=FSModel.Poly[Sinfo.PSlist[i]].Normal;
-			if (FSModel.Poly[Sinfo.PSlist[i]].Vp[0] >= VEC_MAX || FSModel.Poly[Sinfo.PSlist[i]].Vp[1] >= VEC_MAX || FSModel.Poly[Sinfo.PSlist[i]].Vp[2] >= VEC_MAX) return;
 			GetDocument()->m_FS_Model.shields.Face[i].Vface[0]=FSModel.VSobj[FSModel.Poly[Sinfo.PSlist[i]].Vp[0]];
 			GetDocument()->m_FS_Model.shields.Face[i].Vface[1]=FSModel.VSobj[FSModel.Poly[Sinfo.PSlist[i]].Vp[1]];
 			GetDocument()->m_FS_Model.shields.Face[i].Vface[2]=FSModel.VSobj[FSModel.Poly[Sinfo.PSlist[i]].Vp[2]];
@@ -2008,7 +2005,7 @@ void CImportCOB::shld(void)
 		/*wi(walker+OutputLength)=ID_SHLD;
 		OutputLength+=4;
 
-		unsigned int SizeAt,StartSize;
+		unsigned long SizeAt,StartSize;
 
 		wi(walker+OutputLength)=0x01234567;
 		SizeAt=OutputLength;					// to fix the size at the end...
@@ -2059,7 +2056,8 @@ void CImportCOB::shld(void)
 //*************************************************************
 void CImportCOB::pinf(void)
 {
-	unsigned int SizeAt,StartSize;
+	unsigned long i;
+	unsigned long SizeAt,StartSize;
 	unsigned char *walker=OutputData;
 
 	LOGTEXT(" Building chunk PINF\n"); LOGDOIT;
@@ -2074,7 +2072,7 @@ void CImportCOB::pinf(void)
 	CString Version;
 	Version.Format("MODELVIEW32 COB2FS engine-Based on %s by Garry Knudson",COB2FS_VERSION);
 
-	for(int i=0;i<Version.GetLength();i++)
+	for(i=0;i<Version.GetLength();i++)
 	{
 		wc(walker+OutputLength)=Version.GetAt(i);
 		OutputLength+=1;
@@ -2091,7 +2089,7 @@ void CImportCOB::pinf(void)
 //*************************************************************
 void CImportCOB::MakePof(/*char *output*/)
 {
-	unsigned int i;
+	unsigned long i;
 
 	LOGTEXT("\n"); LOGDOIT;
 	LOGTEXT("Building POF file chunks ->\n"); LOGDOIT;
@@ -2183,7 +2181,7 @@ void CImportCOB::MakePof(/*char *output*/)
 		GetDocument()->m_FileVersion=2117;
 	}
 
-	GetDocument()->FS_LoadTextureData2();
+	GetDocument()->FS_LoadPCXData2();
 	GetDocument()->m_UntitledModel=TRUE;
 	GetDocument()->SetModifiedFlag(TRUE); //Document has been changed
 	GetDocument()->m_CurrentFile_Offset=0;

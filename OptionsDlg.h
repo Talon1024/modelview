@@ -22,6 +22,10 @@ public:
 	~COptionsDlg();
 	int RemoveFilename(char *path);
 	char * GetMainPath(char *path);
+	char * GetDescentINI(char *);
+	CString GetD3Path();
+	CString GetD2Path();
+	CString GetD1Path();
 	CString GetF2Path();
 	CString GetF1Path();
 
@@ -30,7 +34,7 @@ public:
 	enum { IDD = IDD_OPTIONS };
 	CButton	c_MenuStyle;
 	CButton	m_QuickRendering;
-	//CButton	m_D2_SmoothPositionChange;
+	CButton	m_D2_SmoothPositionChange;
 	CButton	m_ExplorerIndex;
 	CButton	m_SwapMouseButtons;
 	CComboBox	m_ToolBar_Text;
@@ -55,10 +59,6 @@ protected:
 	afx_msg void OnConfigure();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedMenuStyle();
-//	afx_msg void OnBnClickedQuickrendering();
-	afx_msg void OnBnClickedQuickrendering();
 };
 
 //{{AFX_INSERT_LOCATION}}

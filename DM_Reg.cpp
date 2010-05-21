@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "DM_Reg.h"
-#include "version.h"
 
 //[HKEY_LOCAL_MACHINE\Software\Descent Network\Descent Manager Tools\<name of module>]
 //"Path"= (incl. "\")
@@ -58,7 +57,7 @@ CString _ReadHKLM(CString path,CString key)
     long valuesize;
 	CString regkey=DMREG_LM+path;
 	valuesize=8191;
-	ret=RegOpenKeyEx(HKEY_CURRENT_USER,regkey,NULL,KEY_QUERY_VALUE,&hkey);
+	ret=RegOpenKeyEx(HKEY_LOCAL_MACHINE,regkey,NULL,KEY_QUERY_VALUE,&hkey);
 	ret=RegQueryValueEx(hkey,key,NULL,NULL,(LPBYTE)value,(LPDWORD)&valuesize);
 	if(ret!=ERROR_SUCCESS)
 		*value=0; //make sure value is empty, if an error occured
@@ -77,7 +76,7 @@ int _ReadHKLMint(CString path,CString key,int def=0)
     long valuesize;
 	CString regkey=DMREG_LM+path;
 	valuesize=4;
-	ret=RegOpenKeyEx(HKEY_CURRENT_USER,regkey,NULL,KEY_QUERY_VALUE,&hkey);
+	ret=RegOpenKeyEx(HKEY_LOCAL_MACHINE,regkey,NULL,KEY_QUERY_VALUE,&hkey);
 	ret=RegQueryValueEx(hkey,key,NULL,NULL,(LPBYTE)&value,(LPDWORD)&valuesize);
 	if(ret!=ERROR_SUCCESS)
 		value=def; //make sure value is 0, if an error occured
@@ -118,7 +117,7 @@ CString DMReg_ReadHKCU(CString key,CString def)
 	ret=RegOpenKeyEx(HKEY_CURRENT_USER,regkey,NULL,KEY_QUERY_VALUE,&hkey);
 	ret=RegQueryValueEx(hkey,key,NULL,NULL,(LPBYTE)&value,(LPDWORD)&valuesize);
 	if(ret!=ERROR_SUCCESS)
-		strcpy_s(value,def); //make sure value is default, if an error occured
+		strcpy(value,def); //make sure value is default, if an error occured
 	ret=RegCloseKey(hkey);
 	CString strValue=value;
 	delete sizedata;
@@ -131,27 +130,18 @@ BOOL _WriteHKLM(CString path,CString key,CString value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[8192];
-	
-	try {
-		memset(&kvalue,0,8192);
-		strcpy_s(kvalue,value);
-		long valuesize=value.GetLength()+1;
-		CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-		if(ret==ERROR_SUCCESS)
-			ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
-		if(ret==ERROR_SUCCESS)
-			ret=RegCloseKey(hkey);
-		delete sizedata;
-		delete res;
-		return ret==ERROR_SUCCESS;
-	} catch (char* str) {
-			delete sizedata;
-			delete res;
-			return ERROR_GEN_FAILURE;
-	}
-
+	memset(&kvalue,0,8192);
+	strcpy(kvalue,value);
+    long valuesize=value.GetLength()+1;
+	CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+	long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+	if(ret==ERROR_SUCCESS)
+		ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
+	if(ret==ERROR_SUCCESS)
+		ret=RegCloseKey(hkey);
 	delete sizedata;
+	delete res;
+	return ret==ERROR_SUCCESS;
 }
 
 BOOL _WriteHKLM(CString path,CString key,int value)
@@ -160,27 +150,18 @@ BOOL _WriteHKLM(CString path,CString key,int value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[4];
-	try {
-		memset(&kvalue,0,4);
-		memcpy(kvalue,&value,4);
-		long valuesize=4;
-		CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-		if(ret==ERROR_SUCCESS)
-			ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
-		if(ret==ERROR_SUCCESS)
-			ret=RegCloseKey(hkey);
-		delete sizedata;
-		delete res;
-		return ret==ERROR_SUCCESS;
-	}
-	catch (char* str) {
-			delete sizedata;
-			delete res;
-			return ERROR_GEN_FAILURE;
-	}
-
+	memset(&kvalue,0,4);
+	memcpy(kvalue,&value,4);
+    long valuesize=4;
+	CString regkey=DMREG_LM+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+	long ret=RegCreateKeyEx(HKEY_LOCAL_MACHINE,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+	if(ret==ERROR_SUCCESS)
+		ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
+	if(ret==ERROR_SUCCESS)
+		ret=RegCloseKey(hkey);
 	delete sizedata;
+	delete res;
+	return ret==ERROR_SUCCESS;
 }
 
 BOOL DMReg_WriteHKCU(CString key,CString value)
@@ -189,28 +170,19 @@ BOOL DMReg_WriteHKCU(CString key,CString value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[8192];
-	try {
-		memset(&kvalue,0,8192);
-		strcpy_s(kvalue,value);
-	    long valuesize=value.GetLength()+1;
-		CString path="\\Descent Manager MODELVIEW32\\Settings";
-		CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-		if(ret==ERROR_SUCCESS)
-			ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
-		if(ret==ERROR_SUCCESS)
-			ret=RegCloseKey(hkey);
-		delete sizedata;
-		delete res;
-		return ret==ERROR_SUCCESS; 
-	} 
-	catch (char* str) {
-			delete sizedata;
-			delete res;
-			return ERROR_GEN_FAILURE;
-	}
-
+	memset(&kvalue,0,8192);
+	strcpy(kvalue,value);
+    long valuesize=value.GetLength()+1;
+	CString path="\\Descent Manager MODELVIEW32\\Settings";
+	CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+	long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+	if(ret==ERROR_SUCCESS)
+		ret=RegSetValueEx(hkey,key,0,REG_SZ,(LPBYTE)kvalue,valuesize);
+	if(ret==ERROR_SUCCESS)
+		ret=RegCloseKey(hkey);
 	delete sizedata;
+	delete res;
+	return ret==ERROR_SUCCESS;
 }
 
 BOOL DMReg_WriteHKCU(CString key,int value)
@@ -219,28 +191,19 @@ BOOL DMReg_WriteHKCU(CString key,int value)
 	LPDWORD sizedata=(LPDWORD)new LPDWORD;
 	LPDWORD res=(LPDWORD)new LPDWORD;
 	char kvalue[4];
-	try {
-		memset(&kvalue,0,4);
-		memcpy(kvalue,&value,4);
-	    long valuesize=4;
-		CString path="\\Descent Manager MODELVIEW32\\Settings";
-		CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
-		long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
-		if(ret==ERROR_SUCCESS)
-			ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
-		if(ret==ERROR_SUCCESS)
-			ret=RegCloseKey(hkey);
-		delete sizedata;
-		delete res;
-		return ret==ERROR_SUCCESS;
-	} 
-	catch (char* str) {
-			delete sizedata;
-			delete res;
-			return ERROR_GEN_FAILURE;
-	}
-
+	memset(&kvalue,0,4);
+	memcpy(kvalue,&value,4);
+    long valuesize=4;
+	CString path="\\Descent Manager MODELVIEW32\\Settings";
+	CString regkey=DMREG_CU+path; //"Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Descent 3 Demo.Exe";
+	long ret=RegCreateKeyEx(HKEY_CURRENT_USER,regkey,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hkey,res);
+	if(ret==ERROR_SUCCESS)
+		ret=RegSetValueEx(hkey,key,0,REG_DWORD,(LPBYTE)kvalue,valuesize);
+	if(ret==ERROR_SUCCESS)
+		ret=RegCloseKey(hkey);
 	delete sizedata;
+	delete res;
+	return ret==ERROR_SUCCESS;
 }
 
 
@@ -268,7 +231,7 @@ void _Init_StIfMigrate()
 	//Read games dirs
 	if(_FileExists(descini))
 	{
-		/*VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1 Demo","Path",_GetPrivateProfileString("Descent","D1Full",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1 Demo","Path",_GetPrivateProfileString("Descent","D1Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1 OEM","Path",_GetPrivateProfileString("Descent","D1OEM",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 1","Path",_GetPrivateProfileString("Descent","D1Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 2 Demo","Path",_GetPrivateProfileString("Descent","D2Full",descini)));
@@ -276,16 +239,16 @@ void _Init_StIfMigrate()
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 2","Path",_GetPrivateProfileString("Descent","D2Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3 Demo","Path",_GetPrivateProfileString("Descent","D3Full",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3 OEM","Path",_GetPrivateProfileString("Descent","D3OEM",descini)));
-		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3","Path",_GetPrivateProfileString("Descent","D3Full",descini)));*/
-		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 Demo","Path",_GetPrivateProfileString("FreeSpace","FS1Demo",descini)));
-		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 OEM","Path",_GetPrivateProfileString("FreeSpace","FS1OEM",descini)));
-		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1","Path",_GetPrivateProfileString("FreeSpace","FS1Full",descini)));
-		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2 Demo","Path",_GetPrivateProfileString("FreeSpace","FS2Demo",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\Descent 3","Path",_GetPrivateProfileString("Descent","D3Full",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 Demo","Path",_GetPrivateProfileString("FreeSpace","FS1Demo",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1 OEM","Path",_GetPrivateProfileString("FreeSpace","FS1OEM",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 1","Path",_GetPrivateProfileString("FreeSpace","FS1Full",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2 Demo","Path",_GetPrivateProfileString("FreeSpace","FS2Demo",descini)));
 		//VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2 OEM","Path",_GetPrivateProfileString("FreeSpace","FS2OEM",descini)));
 		VERIFY(_WriteHKLM("\\Games Configuration\\FreeSpace 2","Path",_GetPrivateProfileString("FreeSpace","FS2Full",descini)));
-		//VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1 Demo","Path",_GetPrivateProfileString("Summoner","S1Demo",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1 Demo","Path",_GetPrivateProfileString("Summoner","S1Demo",descini)));
 		//VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1 OEM","Path",_GetPrivateProfileString("Summoner","S1OEM",descini)));
-		//VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1","Path",_GetPrivateProfileString("Summoner","S1Full",descini)));
+		VERIFY(_WriteHKLM("\\Games Configuration\\Summoner 1","Path",_GetPrivateProfileString("Summoner","S1Full",descini)));
 	}
 }
 
@@ -322,17 +285,27 @@ void _Init_RegisterModule()
 	CString version;
 	CString date;
 	CString coder;
-	int buildb = 0;
+	int build;
+	CString _moduldat=path+"dm_modul.dat";
+	if(_FileExists(_moduldat))
+	{
+		version=_GetPrivateProfileString("Module","Vers",_moduldat);
+		date=_GetPrivateProfileString("Module","Date",_moduldat);
+		coder=_GetPrivateProfileString("Module","Coder",_moduldat);
 
-	version = VERSION;
-	date = BUILDDATE;
-	coder = CODER;
-	buildb = BUILDNUM;
-#ifdef DEBUG
-	exename = "MODVIEW32d.exe";
-#else
-	exename = "MODVIEW32.exe";
-#endif
+		//Extract build number
+		pos=version.Find("Build ");
+		ASSERT(pos!=-1);
+		if(pos!=-1)
+		{
+			CString _build=version.Mid(pos+6);
+			_build.TrimRight();
+			_build.TrimRight(")");
+			build=atoi(_build);
+		}
+		else
+			build=0;
+	}
 
 	//Write everything into the registry
 	CString keyname="\\Descent Manager Tools\\Descent Manager MODELVIEW32";
@@ -340,13 +313,13 @@ void _Init_RegisterModule()
 	_WriteHKLM(keyname,"EXE",exe);
 	_WriteHKLM(keyname,"EXEName",exename);
 	_WriteHKLM(keyname,"Version",version);
-	_WriteHKLM(keyname,"Build",buildb);
+	_WriteHKLM(keyname,"Build",build);
 	_WriteHKLM(keyname,"Date",date);
 	_WriteHKLM(keyname,"Coder",coder);
 
 	_exepath=path;
 	_version=version;
-	_build=buildb;
+	_build=build;
 }
 
 
@@ -375,8 +348,12 @@ CString DMReg_GetGameDir(int GameType,int DistributionType)
 
 	switch(GameType)
 	{
+	case DMREG_GAMETYPE_DESCENT1:	key+="Descent 1"; break;
+	case DMREG_GAMETYPE_DESCENT2:	key+="Descent 2"; break;
+	case DMREG_GAMETYPE_DESCENT3:	key+="Descent 3"; break;
 	case DMREG_GAMETYPE_FREESPACE1:	key+="FreeSpace 1"; break;
 	case DMREG_GAMETYPE_FREESPACE2:	key+="FreeSpace 2"; break;
+	case DMREG_GAMETYPE_SUMMONER1:	key+="Summoner 1"; break;
 	default: ASSERT(FALSE);	return "<Internal error: Invalid GameType>";
 	}
 
@@ -403,8 +380,12 @@ BOOL DMReg_SetGameDir(int GameType,int DistributionType,CString path)
 
 	switch(GameType)
 	{
+	case DMREG_GAMETYPE_DESCENT1:	key+="Descent 1"; break;
+	case DMREG_GAMETYPE_DESCENT2:	key+="Descent 2"; break;
+	case DMREG_GAMETYPE_DESCENT3:	key+="Descent 3"; break;
 	case DMREG_GAMETYPE_FREESPACE1:	key+="FreeSpace 1"; break;
 	case DMREG_GAMETYPE_FREESPACE2:	key+="FreeSpace 2"; break;
+	case DMREG_GAMETYPE_SUMMONER1:	key+="Summoner 1"; break;
 	default: ASSERT(FALSE);	return FALSE;
 	}
 

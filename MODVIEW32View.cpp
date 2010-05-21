@@ -61,10 +61,21 @@ CMODVIEW32View::CMODVIEW32View()
 	m_AngleY=0.0f;
 	m_AngleZ=0.0f;
 	m_zTranslation=0;
+
+	/*CString ininame=AfxGetApp()->m_pszHelpFilePath;
+	ininame.TrimRight(".HLP");
+	ininame.TrimRight(".hlp");
+	ininame=ininame+".ini";*/
+
 	m_hDC=NULL;
 	m_hGLContext=NULL;
 	m_GLPixelIndex=0;
 	m_Detaillevel=0;
+	m_D2_Position=0;
+	m_D3_Position=0;
+	m_D3_Rotate=FALSE;
+	//m_RightButtonDown=FALSE;
+	//m_LeftButtonDown=FALSE;
 	m_MouseMoveMode=MOUSEMOVEMODE_NONE;
 	m_FS_DisplaySubsystem=-1;
 	m_QuickRenderMode=0;
@@ -77,12 +88,28 @@ CMODVIEW32View::CMODVIEW32View()
 	m_EditorFS_HighLight_Segment_1=-1;
 	m_EditorFS_HighLight_Segment_2=-1;
 	m_EditorFS_ShowModelInfo=FALSE;
+	for(int i=0;i<MAX_D2_SUBMODELS;i++)
+	{
+		m_D2_PosAngle_ShallBe[i].p=0;
+		m_D2_PosAngle_ShallBe[i].h=0;
+		m_D2_PosAngle_ShallBe[i].b=0;
+		m_D2_PosAngle_Current[i].p=0;
+		m_D2_PosAngle_Current[i].h=0;
+		m_D2_PosAngle_Current[i].b=0;
+	}
+
+	//*** LOAD SETTINGS ***
+
+	//Render smooth
 	m_RenderSmooth=TRUE;
 	m_RenderCull=FALSE;
+	m_RenderD3Smooth=TRUE;
+	m_RenderD3Flat=TRUE;
 	m_RenderZbuffer=TRUE;
 
 	//Render mode
 	m_RenderMode=DMReg_ReadHKCUint("RenderMode",RENDER_TEXTURED);
+	m_D2_SmoothPositionChange=DMReg_ReadHKCUint("D2_SmoothPositionChange",TRUE);
 	m_ShowGuns=DMReg_ReadHKCUint("ShowGuns",FALSE);
 	m_ShowSegments=DMReg_ReadHKCUint("ShowSegments",FALSE);
 	m_ShowShield=DMReg_ReadHKCUint("ShowShield",FALSE);
@@ -94,6 +121,11 @@ CMODVIEW32View::CMODVIEW32View()
 	m_ClearColorRed  =(DMReg_ReadHKCUint("BackgroundRed",0))  *1.0f;
 	m_ClearColorGreen=(DMReg_ReadHKCUint("BackgroundGreen",0))*1.0f;
 	m_ClearColorBlue =(DMReg_ReadHKCUint("BackgroundBlue",0)) *1.0f;
+
+	for(i=0;i<MAX_D3_SOBJ;i++)
+		m_D3_LoadedSobj[i]=FALSE;
+		//m_D3_HiLiteSobj[i]=FALSE;
+
 	m_SkipBuild=FALSE;
 }
 
@@ -263,7 +295,16 @@ void CMODVIEW32View::OnPaint()
 
 	if(pDoc->m_ModelJustLoaded)
 	{
+		m_D2_Position=0;
+		m_D3_Position=0;
 		m_DisplayTexture=-1;
+		D2_ResetPosAngleData_Current();
+		D2_ResetPosAngleData_ShallBe();
+		D2_ResetPosAngleData_StepBit();
+		if(pDoc->m_Game==GAME_RF)
+		{
+			m_zTranslation=-GetDocument()->m_RF_Model.radius*6;
+		}
 	}
 	pDoc->m_ModelJustLoaded=FALSE;
 	
@@ -293,13 +334,34 @@ void CMODVIEW32View::OnPaint()
 	//Render
 	if(pDoc->m_ModelLoaded)
 	{
-		if (pDoc->m_Game == GAME_FS)
+		switch(pDoc->m_Game)
 		{
+		case GAME_D2:
+			if(!SmartRenderEngine_SkipBuild())
+				D2_BuildScene();
+			D2_RenderScene();
+			glPopMatrix();
+			SwapBuffers(m_hDC);
+			break;
+
+		case GAME_D3:
+			{
+			BOOL mR=m_D3_Rotate;
+			m_D3_Rotate=FALSE;
+			if(!SmartRenderEngine_SkipBuild())
+				D3_BuildScene();
+			D3_RenderScene();
+			glPopMatrix();
+			SwapBuffers(m_hDC);
+			m_D3_Rotate=mR;
+			break;
+			}
+		case GAME_FS:
 			if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED && pDoc->m_NoTexturesFound)
 			{
 				GetMainFrame()->SetTypeOfView(TOV_MODELVIEWBUTNOTEXTURES);
-				//break;
-				//PaintErrorMessage("None of the textures could be found! Switch to wireframe or surface mode.");
+				break;
+				PaintErrorMessage("None of the textures could be found! Switch to wireframe or surface mode.");
 				//\r\nYou should switch to wireframe or surfaced render mode\to see anything at all.\nAlso check File|Options for the reason of the missing textures.");
 			}
 			else
@@ -311,7 +373,19 @@ void CMODVIEW32View::OnPaint()
 				glPopMatrix();
 				SwapBuffers(m_hDC);
 			}
-		} else ASSERT(FALSE);
+			break;
+
+		case GAME_RF:
+			if(!SmartRenderEngine_SkipBuild())
+				RF_BuildScene();
+			RF_RenderScene();
+			glPopMatrix();
+			SwapBuffers(m_hDC);
+			break;
+
+		default:
+			ASSERT(FALSE);
+		}
 	}
 	else
 	{
@@ -344,7 +418,7 @@ void CMODVIEW32View::PaintErrorMessage(CString x)
 {
 	char cBuffer[256];
 	RECT cRect;
-	strcpy_s(cBuffer,x);
+	strcpy(cBuffer,x);
 
 	//CFont fon;
 	//fon.CreateFont(-11,0,0,0,FW_NORMAL,FALSE,FALSE,FALSE,0,FALSE,FALSE,FALSE,DEFAULT_PITCH | FF_SWISS | TMPF_TRUETYPE,"Tahoma");
@@ -436,8 +510,8 @@ void CMODVIEW32View::ResetGeometry(void)
 	m_xTranslation=0;
 	m_yTranslation=0;
 	m_zTranslation=0;
-	//if(GetDocument()->m_Game==GAME_RF)
-	//	m_zTranslation=-GetDocument()->m_RF_Model.radius*3;
+	if(GetDocument()->m_Game==GAME_RF)
+		m_zTranslation=-GetDocument()->m_RF_Model.radius*3;
 }
 
 HPALETTE CMODVIEW32View::GetOpenGLPalette(HDC hDC)
@@ -467,44 +541,43 @@ HPALETTE CMODVIEW32View::GetOpenGLPalette(HDC hDC)
 	// Allocate space for a logical palette structure plus all the palette entries
 	pPal=(LOGPALETTE*)malloc(sizeof(LOGPALETTE) +nColors*sizeof(PALETTEENTRY));
 
-	if (pPal) {
-		// Fill in palette header
-		pPal->palVersion=0x300;		// Windows 3.0
-		pPal->palNumEntries=nColors; // table size
+	// Fill in palette header
+	pPal->palVersion=0x300;		// Windows 3.0
+	pPal->palNumEntries=nColors; // table size
 
-		// Build mask of all 1's.  This creates a number represented by having	
-		// the low order x bits set, where x=pfd.cRedBits, pfd.cGreenBits, and
-		// pfd.cBlueBits.
-		RedRange  =(1<<pfd.cRedBits)-1;
-		GreenRange=(1<<pfd.cGreenBits)-1;
-		BlueRange =(1<<pfd.cBlueBits)-1;
+	// Build mask of all 1's.  This creates a number represented by having
+	// the low order x bits set, where x=pfd.cRedBits, pfd.cGreenBits, and
+	// pfd.cBlueBits.
+	RedRange  =(1<<pfd.cRedBits)-1;
+	GreenRange=(1<<pfd.cGreenBits)-1;
+	BlueRange =(1<<pfd.cBlueBits)-1;
 
-		// Loop through all the palette entries
-		for(i=0; i<nColors; i++)
-		{
-			// Fill in the 8-bit equivalents for each component
-			pPal->palPalEntry[i].peRed=(i>>pfd.cRedShift) & RedRange;
-			pPal->palPalEntry[i].peRed=(unsigned char)(
-				(double) pPal->palPalEntry[i].peRed * 255.0 / RedRange);
+	// Loop through all the palette entries
+	for(i=0; i<nColors; i++)
+	{
+		// Fill in the 8-bit equivalents for each component
+		pPal->palPalEntry[i].peRed=(i>>pfd.cRedShift) & RedRange;
+		pPal->palPalEntry[i].peRed=(unsigned char)(
+			(double) pPal->palPalEntry[i].peRed * 255.0 / RedRange);
 
-			pPal->palPalEntry[i].peGreen=(i>>pfd.cGreenShift) & GreenRange;
-			pPal->palPalEntry[i].peGreen=(unsigned char)(
-				(double)pPal->palPalEntry[i].peGreen * 255.0 / GreenRange);
+		pPal->palPalEntry[i].peGreen=(i>>pfd.cGreenShift) & GreenRange;
+		pPal->palPalEntry[i].peGreen=(unsigned char)(
+			(double)pPal->palPalEntry[i].peGreen * 255.0 / GreenRange);
 
-			pPal->palPalEntry[i].peBlue=(i>>pfd.cBlueShift) & BlueRange;
-			pPal->palPalEntry[i].peBlue=(unsigned char)(
-				(double)pPal->palPalEntry[i].peBlue * 255.0 / BlueRange);
+		pPal->palPalEntry[i].peBlue=(i>>pfd.cBlueShift) & BlueRange;
+		pPal->palPalEntry[i].peBlue=(unsigned char)(
+			(double)pPal->palPalEntry[i].peBlue * 255.0 / BlueRange);
 
-			pPal->palPalEntry[i].peFlags=(unsigned char) NULL;
-		}
-
-			// Create the palette
-			hRetPal=CreatePalette(pPal);
-
-			// Go ahead and select and realize the palette for this device context
-			SelectPalette(hDC,hRetPal,FALSE);
-			RealizePalette(hDC);
+		pPal->palPalEntry[i].peFlags=(unsigned char) NULL;
 	}
+
+
+	// Create the palette
+	hRetPal=CreatePalette(pPal);
+
+	// Go ahead and select and realize the palette for this device context
+	SelectPalette(hDC,hRetPal,FALSE);
+	RealizePalette(hDC);
 
 	// Free the memory used for the logical palette structure
 	free(pPal);
@@ -519,15 +592,36 @@ void CMODVIEW32View::FS_SetDetailLevel(int mode)
 	CMODVIEW32Doc* pDoc=GetDocument();
 	m_Detaillevel=mode;
 	if(m_RenderMode==RENDER_TEXTURED)
-		pDoc->FS_LoadTextureData(mode,m_ShowThruster,m_FastTextureLoad);
+		pDoc->FS_LoadPCXData(mode,m_ShowThruster,m_FastTextureLoad);
 	CMainFrame *viewFrame=static_cast<CMainFrame*>(GetParentFrame());
 	viewFrame->FS_SetDetailLevel(mode);
 	InvalidateRect(NULL);
 }
 
+void CMODVIEW32View::D2_SetPosition(unsigned long pos)
+{
+	m_D2_Position=pos;
+	D2_PreparePosition();
+	CMainFrame *viewFrame=static_cast<CMainFrame*>(GetParentFrame());
+	viewFrame->RedrawWindow();
+}
+
+void CMODVIEW32View::D3_SetPosition(unsigned long pos)
+{
+	m_D3_Position=pos;
+	D3_PreparePosition();
+	CMainFrame *viewFrame=static_cast<CMainFrame*>(GetParentFrame());
+	viewFrame->RedrawWindow();
+}
+
+
+
+
+// Called to draw scene
 void CMODVIEW32View::FS_BuildScene(void)
 {
 	BOOL ValidTexture;
+	unsigned long i,j,k;
 	float v[35][3];
 	float n[35][3];
 	float uv[35][2];
@@ -551,13 +645,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-
-	glClearDepth(1.0f);									// Depth Buffer Setup
-	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
-	glEnable(GL_CULL_FACE);
-	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
-	glShadeModel(GL_SMOOTH);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);
 
 	//Subsystems stuff
 	ASSERT(pDoc->m_FS_NumSOBJ<MAX_FS_SOBJ);
@@ -572,7 +660,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 		}
 		glDisable(GL_TEXTURE_2D);
 		glRGB(FS_GUN_CROSSCOLOR_R,FS_GUN_CROSSCOLOR_G,FS_GUN_CROSSCOLOR_B);
-		vms_vector pnt=pDoc->m_EditorFS_Subsystem.Center;
+		D3_VPNT pnt=pDoc->m_EditorFS_Subsystem.Center;
 		float rad=pDoc->m_EditorFS_Subsystem.Radius;
 
 		float DIV=0.5;
@@ -667,7 +755,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 				gunpnt.z+=pDoc->m_FS_SOBJ[GetDocument()->m_EditorFS_Turret.sobj_parent].offset.z;
 			}
 
-			int mult=1;
+			float mult=1;
 			if(m_EditorFS_TGUN_FiringPoint!=i)
 				glRGB(FS_GUN_CROSSCOLOR_R,FS_GUN_CROSSCOLOR_G,FS_GUN_CROSSCOLOR_B);
 			else
@@ -700,7 +788,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			FS_VPNT gunpnt=GetDocument()->m_EditorFS_RealGun.point[i];
 			FS_VPNT gunnrm=GetDocument()->m_EditorFS_RealGun.normal[i];
 		
-			int mult=1;
+			float mult=1;
 			if(m_EditorFS_GPNT_FiringPoint!=i)
 				glRGB(FS_GUN_CROSSCOLOR_R,FS_GUN_CROSSCOLOR_G,FS_GUN_CROSSCOLOR_B);
 			else
@@ -770,7 +858,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 		//Lights
 		int mult;
-		for(int i=0;i<GetDocument()->m_EditorFS_Model.num_lights;i++)
+		for(i=0;i<GetDocument()->m_EditorFS_Model.num_lights;i++)
 		{
 			glDisable(GL_TEXTURE_2D);
 			if(i==m_EditorFS_MODEL_CurLight)
@@ -795,7 +883,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 	//Segments stuff
 	ASSERT(pDoc->m_FS_NumSOBJ<MAX_FS_SOBJ);
-	for (int i=0;i<pDoc->m_FS_NumSOBJ;i++)
+	for (i=0;i<pDoc->m_FS_NumSOBJ;i++)
 	{
 		int showthissubmodel=0;
 		if(m_ShowSegments && ((pDoc->m_FS_SOBJ[i].detail==(long)m_Detaillevel) &&((m_DisplaySubmodel==-1) || ((int)i==FS_CalcRealSubmodelNumber(m_DisplaySubmodel)))))
@@ -830,7 +918,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 			FS_BuildWireCube(boxpnt1,boxpnt2);
 			glBegin(GL_LINES);
-			for (int j=0;j<24;j++)
+			for (j=0;j<24;j++)
 				glVertex3fv(FS_WireCube[j]);
 			glEnd();
 			glPopMatrix();
@@ -848,8 +936,8 @@ void CMODVIEW32View::FS_BuildScene(void)
 				glDisable(GL_TEXTURE_2D);
 				glRGB(0,255,0);
 
-				vms_vector pnt1=pDoc->m_FS_Docks[i].position[m];
-				vms_vector pnt2=pDoc->m_FS_Docks[i].normal[m];
+				D3_VPNT pnt1=pDoc->m_FS_Docks[i].position[m];
+				D3_VPNT pnt2=pDoc->m_FS_Docks[i].normal[m];
 				pnt2.x*=100; pnt2.y*=100; pnt2.z*=100;
 				pnt2.x+=pnt1.x;	pnt2.y+=pnt1.y;	pnt2.z+=pnt1.z;
 
@@ -871,19 +959,19 @@ void CMODVIEW32View::FS_BuildScene(void)
 		glBegin(GL_TRIANGLES);
 
 		ASSERT(pDoc->m_FS_Model.shields.Fcount<MAX_FS_SHIELDFACES);
-		for (unsigned int j=0;j<pDoc->m_FS_Model.shields.Fcount;j++)
+		for (j=0;j<pDoc->m_FS_Model.shields.Fcount;j++)
 		{
 			normal[0]=pDoc->m_FS_Model.shields.Face[j].Normal.x;
 			normal[1]=pDoc->m_FS_Model.shields.Face[j].Normal.y;
 			normal[2]=pDoc->m_FS_Model.shields.Face[j].Normal.z;
-			for (int i=0;i<3;i++)
+			for (i=0;i<3;i++)
 			{
 				v[i][0]=pDoc->m_FS_Model.shields.Vpoint[pDoc->m_FS_Model.shields.Face[j].Vface[i]][0];
 				v[i][1]=pDoc->m_FS_Model.shields.Vpoint[pDoc->m_FS_Model.shields.Face[j].Vface[i]][1];
 				v[i][2]=pDoc->m_FS_Model.shields.Vpoint[pDoc->m_FS_Model.shields.Face[j].Vface[i]][2];
 			}
 			glNormal3fv(normal);
-			for (int i=0;i<3;i++)
+			for (i=0;i<3;i++)
 				glVertex3fv(v[i]);
 		}
 		glEnd();
@@ -906,14 +994,14 @@ void CMODVIEW32View::FS_BuildScene(void)
 				for(int j=0;j<pDoc->m_FS_Model.thrusters[i].num_glows;j++)
 				{
 					FS_VPNT p=pDoc->m_FS_Model.thrusters[i].glow_pos[j];
-					FS_VPNT m=pDoc->m_FS_Model.thrusters[i].glow_norm[j];
+					FS_VPNT n=pDoc->m_FS_Model.thrusters[i].glow_norm[j];
 					float r=pDoc->m_FS_Model.thrusters[i].glow_radius[j];
 
 					//EditorFS
 					if(m_FS_DisplayThruster==i)
 					{
 						p=pDoc->m_EditorFS_FUEL.glow_pos[j];
-						m=pDoc->m_EditorFS_FUEL.glow_norm[j];
+						n=pDoc->m_EditorFS_FUEL.glow_norm[j];
 						r=pDoc->m_EditorFS_FUEL.glow_radius[j];
 					}
 
@@ -924,15 +1012,15 @@ void CMODVIEW32View::FS_BuildScene(void)
 					glVertex3f(p.x,p.y-r,p.z);
 					glVertex3f(p.x,p.y+r,p.z);
 					glVertex3f(p.x,p.y,p.z);
-					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
+					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
 					glVertex3f(p.x-r,p.y,p.z);
-					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
+					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
 					glVertex3f(p.x+r,p.y,p.z);
-					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
+					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
 					glVertex3f(p.x,p.y-r,p.z);
-					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
+					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
 					glVertex3f(p.x,p.y+r,p.z);
-					glVertex3f(p.x+m.x,p.y+m.y,p.z+m.z);
+					glVertex3f(p.x+n.x,p.y+n.y,p.z+n.z);
 					glEnd();
 				}
 			}
@@ -948,7 +1036,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 	ASSERT(pDoc->m_FS_Model.Pcount<MAX_FS_POLYGONS);
 	ASSERT(pDoc->m_FS_Model.Vcount<MAX_FS_VERTICES);
 	ASSERT(pDoc->m_FS_Model.Ncount<MAX_FS_NORMALS);
-	for(unsigned int j=0;j<pDoc->m_FS_Model.Pcount;j++)
+	for(j=0;j<pDoc->m_FS_Model.Pcount;j++)
 	{			   // type 2 polygons
 		if((pDoc->m_FS_Model.Poly[j].Ptype==2)&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel))
 		{
@@ -969,7 +1057,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			normal[2]=pDoc->m_FS_Model.Poly[j].Normal.z;
 
 			ASSERT(pDoc->m_FS_Model.Poly[j].Corners<35);
-			for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+			for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 			{
 				v[i][0]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].x;
 				v[i][1]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].y;
@@ -977,7 +1065,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			}
 			if(m_RenderSmooth)
 			{
-				for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+				for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 				{
 					n[i][0]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].x;
 					n[i][1]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].y;
@@ -986,7 +1074,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 			} else
 				glNormal3fv(normal);
 
-			for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+			for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 			{
 				if(m_RenderSmooth)
 					glNormal3fv(n[i]);
@@ -1006,29 +1094,25 @@ void CMODVIEW32View::FS_BuildScene(void)
 	else
 		glDisable(GL_TEXTURE_2D);
 
-	ASSERT (m_Detaillevel < 200);
-	if (m_Detaillevel >= 200) 
-		return; //Sanity check
-	for(unsigned int k=pDoc->m_FS_PofDataL[m_Detaillevel]; (k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1)) && (k < MAX_FS_TEXTURE) ;k++)
+	for(k=pDoc->m_FS_PofDataL[m_Detaillevel]; k<(pDoc->m_FS_PofDataH[m_Detaillevel]+1) ;k++)
 	{
 		if((m_DisplayTexture==-1) | (m_DisplayTexture==(int)(k-pDoc->m_FS_PofDataL[m_Detaillevel])))
 		{
 			ValidTexture=FALSE;
 			if(k<pDoc->m_FS_BitmapData.count)
 			{
-				if((pDoc->m_FS_BitmapData.pic[k].valid==1) || (SmartRenderEngine_RenderMode()!=RENDER_TEXTURED))
+				if((pDoc->m_FS_BitmapData.pic[k].valid==1)|(SmartRenderEngine_RenderMode()!=RENDER_TEXTURED))
 				{
 					ValidTexture=TRUE;
 					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
 					{
 						glRGB(255,255,255);
 						glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-						for(unsigned int xv=0;xv<pDoc->m_FS_BitmapData.count;xv++) {
-							TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
-						}
+for(int xv=0;xv<pDoc->m_FS_BitmapData.count;xv++)
+{
+TRACE("%i,%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.pic[xv].valid,pDoc->m_FS_BitmapData.count,xv,pDoc->m_FS_LoadPCX[xv]);
+}
 //TRACE("%i|m_FS_LoadPCX[%i]=%i\n",pDoc->m_FS_BitmapData.count,k,pDoc->m_FS_LoadPCX[k]);
-						ASSERT (pDoc->m_FS_LoadPCX[k] < MAX_FS_TEXTURE);
-						if (pDoc->m_FS_LoadPCX[k] >= MAX_FS_TEXTURE) return; //More sanity checking
 						glCallList(pDoc->m_FS_ModelTexture[pDoc->m_FS_LoadPCX[k]]);
 					} else
 						glRGB(192,192,192);
@@ -1038,7 +1122,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 			if(ValidTexture)
 			{
-				for(unsigned int j=0;j<pDoc->m_FS_Model.Pcount;j++)
+				for(j=0;j<pDoc->m_FS_Model.Pcount;j++)
 				{			   // type 3 polygons
 					if((pDoc->m_FS_Model.Poly[j].Ptype==3)
 						&(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[j].Sobj].detail==(long)m_Detaillevel)
@@ -1056,7 +1140,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 							normal[1]=pDoc->m_FS_Model.Poly[j].Normal.y;
 							normal[2]=pDoc->m_FS_Model.Poly[j].Normal.z;
 
-							for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+							for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 							{
 								v[i][0]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].x;
 								v[i][1]=pDoc->m_FS_Model.Vpoint[pDoc->m_FS_Model.Poly[j].Vp[i]].y;
@@ -1064,7 +1148,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 							}
 							if(m_RenderSmooth)
 							{
-								for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									n[i][0]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].x;
 									n[i][1]=pDoc->m_FS_Model.Npoint[pDoc->m_FS_Model.Poly[j].Np[i]].y;
@@ -1074,7 +1158,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 
 							if(m_ShowThruster)
 							{
-								for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									uv[i][0]=pDoc->m_FS_Model.Poly[j].U[i] *
 											((float)pDoc->m_FS_BitmapData.pic[k].xreal/(float)pDoc->m_FS_BitmapData.pic[k].xsize);
@@ -1082,7 +1166,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 											((float)pDoc->m_FS_BitmapData.pic[k].yreal/(float)pDoc->m_FS_BitmapData.pic[k].ysize);
 								}
 							} else {
-								for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+								for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 								{
 									uv[i][0]=pDoc->m_FS_Model.Poly[j].U[i];
 									uv[i][1]=pDoc->m_FS_Model.Poly[j].V[i];
@@ -1090,7 +1174,7 @@ void CMODVIEW32View::FS_BuildScene(void)
 							}
 							if (!m_RenderSmooth)
 								glNormal3fv(normal);
-							for(unsigned int i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
+							for(i=0;i<pDoc->m_FS_Model.Poly[j].Corners;i++)
 							{
 								if (m_RenderSmooth)
 									glNormal3fv(n[i]);
@@ -1113,6 +1197,544 @@ void CMODVIEW32View::FS_BuildScene(void)
 		glDisable(GL_CULL_FACE);
 	//glEnable(GL_POLYGON_SMOOTH);
 }
+
+
+//Descent 3
+// Called to build a Sobj chunk for the model.
+void CMODVIEW32View::D3_BuildSobj(unsigned short SobjNum)
+{
+
+	unsigned long i,lastload;
+	CMODVIEW32Doc* pDoc=GetDocument();
+
+	if(m_D3_LoadedSobj[SobjNum])
+		glDeleteLists(m_D3_ModelSobj[SobjNum],1);
+	m_D3_LoadedSobj[SobjNum]=TRUE;
+
+	glNewList(m_D3_ModelSobj[SobjNum]=glGenLists(1), GL_COMPILE);
+
+
+	//Gun stuff
+	/*if(m_ShowGuns)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glRGB(FS_GUN_CROSSCOLOR_R,FS_GUN_CROSSCOLOR_G,FS_GUN_CROSSCOLOR_B);
+	
+		D3_VPNT gunpnt;
+		
+		for(int j=0;j<pDoc->m_Guns.Num;j++)
+		{
+			if(pDoc->m_Guns.InSubModel[j]==SobjNum)
+			{
+				gunpnt=pDoc->m_Guns.Gun[j];
+
+				//glTranslatef(pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].x,
+				//	 pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].y,
+				//	 pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].z);
+				gunpnt.x+=pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].x;
+				gunpnt.y+=pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].y;
+				gunpnt.z+=pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].z;
+
+				glBegin(GL_LINES);
+				glVertex3f(gunpnt.x+FS_GUN_CROSSLENGTH,gunpnt.y,gunpnt.z);
+				glVertex3f(gunpnt.x-FS_GUN_CROSSLENGTH,gunpnt.y,gunpnt.z);
+				glVertex3f(gunpnt.x,gunpnt.y+FS_GUN_CROSSLENGTH,gunpnt.z);
+				glVertex3f(gunpnt.x,gunpnt.y-FS_GUN_CROSSLENGTH,gunpnt.z);
+				glVertex3f(gunpnt.x,gunpnt.y,gunpnt.z+FS_GUN_CROSSLENGTH);
+				glVertex3f(gunpnt.x,gunpnt.y,gunpnt.z-FS_GUN_CROSSLENGTH);
+				glTranslatef(pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].x,
+					 pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].y,
+					 pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].z);
+				glEnd();
+			}
+		}
+	}*/
+	
+	//Segments stuff
+	/*if(m_ShowSegments)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glRGB(255,0,0);
+
+		int i=SobjNum;
+
+		D3_VPNT boxpnt1=pDoc->m_D3_Model._minbox;
+		D3_VPNT boxpnt2=pDoc->m_D3_Model._maxbox;
+
+		boxpnt1.x+=pDoc->m_D3_Model.Soffset[i].x;
+		boxpnt1.y+=pDoc->m_D3_Model.Soffset[i].y;
+		boxpnt1.z+=pDoc->m_D3_Model.Soffset[i].z;
+		boxpnt2.x+=pDoc->m_D3_Model.Soffset[i].x;
+		boxpnt2.y+=pDoc->m_D3_Model.Soffset[i].y;
+		boxpnt2.z+=pDoc->m_D3_Model.Soffset[i].z;
+
+		D3_BuildWireCube(boxpnt1,boxpnt2);
+		glBegin(GL_LINES);
+		for (int j=0;j<24;j++)
+			glVertex3fv(D3_WireCube[j]);
+		glEnd();
+	}*/
+	
+	
+	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	lastload=0x8000;
+
+	for(i=0;i<m_D3_Dsobj[SobjNum].numpoly;i++)
+	{
+		if((m_DisplayTexture==-1) | (m_DisplayTexture==m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].red))
+		{
+			if(m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].flag==0)
+			{
+				if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
+				{
+					glRGB(m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].red,
+						  m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].green,
+						m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].blue);
+				}
+				else
+					glRGB(192,192,192);
+			} else {
+				if(lastload==0x8000)
+				{
+					glAlphaFunc(GL_EQUAL,1.0);
+					glEnable(GL_ALPHA_TEST);
+					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
+						glEnable(GL_TEXTURE_2D);
+					else
+						glDisable(GL_TEXTURE_2D);
+					glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+				}
+				if(lastload!=m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].red)
+				{
+					lastload=m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].red;
+					if(pDoc->m_D3_Display.ClearFlag[lastload])
+					{
+						glRGB(0,0,0);
+						glEnable(GL_BLEND);
+					} else {
+						glDisable(GL_BLEND);
+						glRGB(255,255,255);
+					}
+					glCallList(pDoc->m_D3_ModelTexture[lastload]);
+				}
+			}
+
+			glDrawArrays(GL_POLYGON,m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].startpnt,m_D3_Dpoly[m_D3_Dsobj[SobjNum].startpoly+i].numpnt);
+		}
+	}
+	glEndList();
+}
+
+
+
+// Called to draw scene
+void CMODVIEW32View::D3_BuildScene(void)
+{
+	unsigned short i;
+	CMODVIEW32Doc* pDoc=GetDocument();
+
+	glClearColor(m_ClearColorRed, m_ClearColorGreen, m_ClearColorBlue, 1.0f);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+
+	if(pDoc->m_ModelLoaded)
+	{
+		D3_BuildArrays();
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3,GL_FLOAT,0,(const void*)&m_D3_Dvert);
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_FLOAT,0,(const void*)&m_D3_Dnorm);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2,GL_FLOAT,0,(const void*)&m_D3_Duv);
+
+		if(m_DisplaySubmodel==-1)
+		{
+			for(i=0;i<pDoc->m_D3_Model.Scount;i++)
+				D3_BuildSobj(i);
+		} else
+			D3_BuildSobj(m_DisplaySubmodel);
+		/*for(i=0;i<pDoc->m_D3_Model.Scount;i++)
+		{
+			if((m_DisplaySubmodel==-1) || (m_DisplaySubmodel==i))
+				glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+			D3_BuildSobj(m_DisplaySubmodel);
+		}*/
+	}
+}
+
+
+// Called to draw scene
+void CMODVIEW32View::D3_RenderScene()
+{
+	unsigned long i;
+	GLfloat GlowOff[]={0.0, 0.0, 0.0, 1.0};
+	CMODVIEW32Doc* pDoc=GetDocument();
+
+
+	// Turn culling on if flag is set
+	if(m_RenderCull)
+		glEnable(GL_CULL_FACE);
+	else
+		glDisable(GL_CULL_FACE);
+
+	// Enable Line or fill mode
+	if(SmartRenderEngine_RenderMode()!=RENDER_WIREFRAME)
+		glPolygonMode(GL_FRONT,GL_FILL);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
+	// Clear the window with current clearing color
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Save the matrix state and do the rotations
+	glPushMatrix();
+
+
+	//-------------------------
+	// Display polymodel
+	//-------------------------
+
+	glScalef(-1.0,1.0,1.0);
+	for(i=0;i<pDoc->m_D3_Model.Scount;i++)
+	{
+		if(m_DisplaySubmodel==-1 || m_DisplaySubmodel==(int)i)
+		{
+			glPushMatrix();
+
+			/*for(int j=0;j<pDoc->m_Guns.Num;j++)
+			{
+				if(pDoc->m_Guns.InSubModel[j]==i)
+				{
+					D3_VPNT gunpnt=pDoc->m_Guns.Gun[j];
+
+				//glTranslatef(pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].x,
+				//	 pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].y,
+				//	 pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].z);
+				//	gunpnt.x+=pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].x;
+				//	gunpnt.y+=pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].y;
+				//gunpnt.z+=pDoc->m_D3_Model.Soffset[pDoc->m_Guns.InSubModel[j]].z;
+
+					glDisable(GL_TEXTURE_2D);
+					glRGB(FS_GUN_CROSSCOLOR_R,FS_GUN_CROSSCOLOR_G,FS_GUN_CROSSCOLOR_B);
+					glBegin(GL_LINES);
+					glVertex3f(gunpnt.x+FS_GUN_CROSSLENGTH,gunpnt.y,gunpnt.z);
+					glVertex3f(gunpnt.x-FS_GUN_CROSSLENGTH,gunpnt.y,gunpnt.z);
+					glVertex3f(gunpnt.x,gunpnt.y+FS_GUN_CROSSLENGTH,gunpnt.z);
+					glVertex3f(gunpnt.x,gunpnt.y-FS_GUN_CROSSLENGTH,gunpnt.z);
+					glVertex3f(gunpnt.x,gunpnt.y,gunpnt.z+FS_GUN_CROSSLENGTH);
+					glVertex3f(gunpnt.x,gunpnt.y,gunpnt.z-FS_GUN_CROSSLENGTH);
+					glEnd();
+				}
+			}
+			glEnable(GL_TEXTURE_2D);*/
+			
+			//Prepare submodel
+			long base=-1;
+			long k=-1;
+			while(k!=(long)i)
+			{
+				k=i;
+				while(pDoc->m_D3_Model.Sparent[k]!=base)
+					k=pDoc->m_D3_Model.Sparent[k];
+				base=k;
+
+				if(m_D3_Position!=0)
+				{
+					if (m_D3_PosAngle_ShallBe[k].patav)
+					{
+						glTranslatef(m_D3_PosAngle_ShallBe[k].pat.x,
+									 m_D3_PosAngle_ShallBe[k].pat.y,
+									 m_D3_PosAngle_ShallBe[k].pat.z);
+					}
+				}
+				glTranslatef(pDoc->m_D3_Model.Soffset[k].x,
+							 pDoc->m_D3_Model.Soffset[k].y,
+							 pDoc->m_D3_Model.Soffset[k].z);
+
+				//Facing - not yet implemented
+				/*if((pDoc->m_D3_Display.Facing[k])&(bFacing))
+				{
+					//GLfloat Matrix[16],Matrix1[16];
+					ASSERT(FALSE);
+					glGetFloatv(GL_MODELVIEW_MATRIX, Matrix);
+					glPopMatrix();
+					glPushMatrix();
+					glGetFloatv(GL_MODELVIEW_MATRIX, Matrix1);
+					Matrix1[12]=Matrix[12];
+					Matrix1[13]=Matrix[13];
+					Matrix1[14]=Matrix[14];
+					glLoadMatrixf(Matrix1);
+
+					glRotatef(m_yRotation, 0.0f, 1.0f, 0.0f);
+					glRotatef(m_xRotation, -1.0f, 0.0f, 0.0f);
+					glRotatef(pDoc->m_D3_Display.Foffset[k][0],pDoc->m_D3_Display.Foffset[k][1],
+							  pDoc->m_D3_Display.Foffset[k][2],pDoc->m_D3_Display.Foffset[k][3]);
+				}*/
+
+				if(m_D3_Position!=0 && m_D3_PosAngle_ShallBe[k].ratav)
+				{
+					glRotatef(m_D3_PosAngle_ShallBe[k].angle,
+						m_D3_PosAngle_ShallBe[k].pnt.x,
+						m_D3_PosAngle_ShallBe[k].pnt.y,
+						m_D3_PosAngle_ShallBe[k].pnt.z);
+				}
+				
+				//Rotation - not yet implemented
+				/*if((pDoc->m_D3_Display.Rotate[k])&(m_D3_Rotate)&(pDoc->m_D3_Model.rknum[k]>0))
+				{
+					glRotatef(pDoc->m_D3_Rstep[k],
+						pDoc->m_D3_Model.rani[pDoc->m_D3_Model.rindex[k] + pDoc->m_D3_Model.rknum[k]-1].x,
+						pDoc->m_D3_Model.rani[pDoc->m_D3_Model.rindex[k] + pDoc->m_D3_Model.rknum[k]-1].y,
+						pDoc->m_D3_Model.rani[pDoc->m_D3_Model.rindex[k] + pDoc->m_D3_Model.rknum[k]-1].z);
+				}*/
+			}
+
+			if((pDoc->m_D3_Display.Glow[i])/*&(bGlow)*/)
+				glMaterialfv(GL_FRONT, GL_EMISSION, pDoc->m_D3_Display.Gset[i]);
+			glCallList(m_D3_ModelSobj[i]);
+			if((pDoc->m_D3_Display.Glow[i])/*&(bGlow)*/)
+				glMaterialfv(GL_FRONT, GL_EMISSION, GlowOff);
+			//if (bShowAllPnts|bShowPnt)
+				//D3_BuildPnts(i);
+			glPopMatrix();
+		}
+	}
+
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void CMODVIEW32View::D3_BuildArrays()
+{
+	unsigned long CurPoly=0;
+	unsigned long CurPnt=0;
+	CMODVIEW32Doc* pDoc=GetDocument();
+
+	for(unsigned long i=0;i<pDoc->m_D3_Model.Scount;i++)
+	{
+		m_D3_Dsobj[i].startpoly=CurPoly;
+
+		// start of the type 2 stuff...
+		for(unsigned long j=0;j<pDoc->m_D3_Model.Pcount;j++)
+		{		// flat polygons
+			if((pDoc->m_D3_Model.Poly[j].Type==0)&(pDoc->m_D3_Model.Poly[j].Sobj==i)&(m_RenderD3Flat)) {
+				m_D3_Dpoly[CurPoly].flag=0;
+				if(pDoc->m_D3_HiLiteSobj[i])
+				{
+					m_D3_Dpoly[CurPoly].red  =(char)0;
+					m_D3_Dpoly[CurPoly].green=(char)255;
+					m_D3_Dpoly[CurPoly].blue =(char)255;
+				} else {
+					m_D3_Dpoly[CurPoly].red  =pDoc->m_D3_Model.Poly[j].Red;
+					m_D3_Dpoly[CurPoly].green=pDoc->m_D3_Model.Poly[j].Green;
+					m_D3_Dpoly[CurPoly].blue =pDoc->m_D3_Model.Poly[j].Blue;
+				}
+				m_D3_Dpoly[CurPoly].startpnt=CurPnt;
+				for(unsigned long l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
+				{
+					if (m_RenderD3Smooth)
+					{
+						m_D3_Dnorm[CurPnt][0]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].x;
+						m_D3_Dnorm[CurPnt][1]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].y;
+						m_D3_Dnorm[CurPnt][2]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].z;
+					} else {
+						m_D3_Dnorm[CurPnt][0]=pDoc->m_D3_Model.Poly[j].Normal.x;
+						m_D3_Dnorm[CurPnt][1]=pDoc->m_D3_Model.Poly[j].Normal.y;
+						m_D3_Dnorm[CurPnt][2]=pDoc->m_D3_Model.Poly[j].Normal.z;
+					}
+
+					m_D3_Dvert[CurPnt][0]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].x;
+					m_D3_Dvert[CurPnt][1]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].y;
+					m_D3_Dvert[CurPnt][2]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].z;
+					CurPnt++;
+				}
+				m_D3_Dpoly[CurPoly].numpnt=CurPnt-m_D3_Dpoly[CurPoly].startpnt;
+				CurPoly++;
+			}
+		}
+
+
+		for(j=0;j<pDoc->m_D3_Model.Pcount;j++)
+		{
+			// flat polygons
+			if((pDoc->m_D3_Model.Poly[j].Type==1)&
+			   (pDoc->m_D3_Model.Poly[j].Sobj==i)&
+			   ((pDoc->m_D3_Display.TextureFlag[pDoc->m_D3_Model.Poly[j].Color]==FALSE)|
+				(pDoc->m_D3_OffTexture[pDoc->m_D3_Model.Poly[j].Color])|(pDoc->m_D3_HiLiteSobj[i])))
+			{
+				m_D3_Dpoly[CurPoly].flag=0;
+				if(pDoc->m_D3_HiLiteSobj[i]|pDoc->m_D3_OffTexture[pDoc->m_D3_Model.Poly[j].Color])
+				{
+					m_D3_Dpoly[CurPoly].red=  (char)0;
+					m_D3_Dpoly[CurPoly].green=(char)255;
+					m_D3_Dpoly[CurPoly].blue= (char)255;
+				} else {
+					m_D3_Dpoly[CurPoly].red=  (char)192;
+					m_D3_Dpoly[CurPoly].green=(char)192;
+					m_D3_Dpoly[CurPoly].blue= (char)192;
+				}
+				m_D3_Dpoly[CurPoly].startpnt=CurPnt;
+				for(unsigned long l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
+				{
+					if (m_RenderD3Smooth)
+					{
+						m_D3_Dnorm[CurPnt][0]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].x;
+						m_D3_Dnorm[CurPnt][1]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].y;
+						m_D3_Dnorm[CurPnt][2]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].z;
+					} else {
+						m_D3_Dnorm[CurPnt][0]=pDoc->m_D3_Model.Poly[j].Normal.x;
+						m_D3_Dnorm[CurPnt][1]=pDoc->m_D3_Model.Poly[j].Normal.y;
+						m_D3_Dnorm[CurPnt][2]=pDoc->m_D3_Model.Poly[j].Normal.z;
+					}
+
+					m_D3_Dvert[CurPnt][0]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].x;
+					m_D3_Dvert[CurPnt][1]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].y;
+					m_D3_Dvert[CurPnt][2]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].z;
+					CurPnt++;
+				}
+				m_D3_Dpoly[CurPoly].numpnt=CurPnt-m_D3_Dpoly[CurPoly].startpnt;
+				CurPoly++;
+			}
+		}
+
+		// start the type 3 stuff...
+		for(unsigned long k=0;k<pDoc->m_D3_TotalTexture;k++)
+		{
+			if(pDoc->m_D3_Display.TextureFlag[k])
+			{
+				for(j=0;j<pDoc->m_D3_Model.Pcount;j++)
+				{
+					// type 3 polygons
+					if((pDoc->m_D3_Model.Poly[j].Type==1)&(pDoc->m_D3_Model.Poly[j].Sobj==i)&
+					   (pDoc->m_D3_Model.Poly[j].Color==k)&(!pDoc->m_D3_OffTexture[pDoc->m_D3_Model.Poly[j].Color])&(!pDoc->m_D3_HiLiteSobj[i]))
+					{
+						m_D3_Dpoly[CurPoly].flag=1;
+						m_D3_Dpoly[CurPoly].red=(char)pDoc->m_D3_Model.Poly[j].Color;
+						m_D3_Dpoly[CurPoly].startpnt=CurPnt;
+						for(unsigned long l=0;l<pDoc->m_D3_Model.Poly[j].Corners;l++)
+						{
+							if(m_RenderD3Smooth)
+							{
+								m_D3_Dnorm[CurPnt][0]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].x;
+								m_D3_Dnorm[CurPnt][1]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].y;
+								m_D3_Dnorm[CurPnt][2]=pDoc->m_D3_Model.Vnormal[pDoc->m_D3_Model.Poly[j].Vp[l]].z;
+							} else {
+								m_D3_Dnorm[CurPnt][0]=pDoc->m_D3_Model.Poly[j].Normal.x;
+								m_D3_Dnorm[CurPnt][1]=pDoc->m_D3_Model.Poly[j].Normal.y;
+								m_D3_Dnorm[CurPnt][2]=pDoc->m_D3_Model.Poly[j].Normal.z;
+							}
+
+							m_D3_Dvert[CurPnt][0]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].x;
+							m_D3_Dvert[CurPnt][1]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].y;
+							m_D3_Dvert[CurPnt][2]=pDoc->m_D3_Model.Vpoint[pDoc->m_D3_Model.Poly[j].Vp[l]].z;
+							m_D3_Duv[CurPnt][0]=pDoc->m_D3_Model.Poly[j].U[l];
+							m_D3_Duv[CurPnt][1]=pDoc->m_D3_Model.Poly[j].V[l];
+							CurPnt++;
+						}
+						m_D3_Dpoly[CurPoly].numpnt=CurPnt-m_D3_Dpoly[CurPoly].startpnt;
+						CurPoly++;
+					}
+				}
+			}
+		}
+		m_D3_Dsobj[i].numpoly=CurPoly-m_D3_Dsobj[i].startpoly;
+	}
+}
+
+void CMODVIEW32View::D3_BuildPnts(unsigned long SubM)
+{
+	//unsigned long i;
+	CMODVIEW32Doc* pDoc=GetDocument();
+
+	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+
+	glBegin(GL_LINES);
+/*	
+	//HH TEMPORARY STUFF
+	BOOL bShowAllPnts=FALSE;
+	BOOL bShowPnt=FALSE;
+
+
+	for(i=0;i<pDoc->m_D3_Model.GPNTnum;i++) {
+		if (SubM==pDoc->m_D3_Model.GPNTsobj[i]) {
+			if ((bShowAllPnts)|(bShowPnt&(CurPwin==0)&(CurXpnt==i))) {
+				glRGB(255,0,0);
+				CrossPntN(pDoc->m_D3_Model.GPNTpos[i],pDoc->m_D3_Model.GPNTnorm[i]);
+			}
+		}
+	}
+	
+	for(i=0;i<pDoc->m_D3_Model.GRNDnum;i++) {
+		if (SubM==pDoc->m_D3_Model.GRNDsobj[i]) {
+			if ((bShowAllPnts)|(bShowPnt&(CurPwin==1)&(CurXpnt==i))) {
+				glRGB(0,255,0);
+				CrossPntN(pDoc->m_D3_Model.GRNDpos[i],pDoc->m_D3_Model.GRNDnorm[i]);
+			}
+		}
+	}
+	
+	
+	
+	for(i=0;i<pDoc->m_D3_Model.ATCHnum;i++) {
+		if (SubM==pDoc->m_D3_Model.ATCHsobj[i]) {
+			if ((bShowAllPnts)|(bShowPnt&(CurPwin==2)&(CurXpnt==i))) {
+				glRGB(255,0,255);
+				CrossPntN(pDoc->m_D3_Model.ATCHpos[i],pDoc->m_D3_Model.ATCHnorm[i]);
+			}
+		}
+	}
+
+	for(i=0;i<pDoc->m_D3_Model.NATHnum;i++) {
+		if (SubM==pDoc->m_D3_Model.NATHsobj[i]) {
+			if ((bShowAllPnts)|(bShowPnt&(CurPwin==3)&(CurXpnt==i))) {
+				glRGB(0,255,255);
+				CrossPntN(pDoc->m_D3_Model.NATHpos[i],pDoc->m_D3_Model.NATHnorm[i]);
+			}
+		}
+	}
+
+	if (SubM==0)
+	{
+		glRGB(255,255,0);
+		for(i=0;i<pDoc->m_D3_Model.SPCLnum;i++) {
+			if ((bShowAllPnts)|(bShowPnt&(CurPwin==4)&(CurSpcl==i))) {
+				CrossPnt(pDoc->m_D3_Model.SPCLpos[i]);
+			}
+		}
+	}
+	*/
+	glEnd();
+}
+
+
+void CMODVIEW32View::D3_CrossPnt(D3_VPNT xhair)
+{
+	glVertex3f((float)(xhair.x+2.0),xhair.y,xhair.z);
+	glVertex3f((float)(xhair.x-2.0),xhair.y,xhair.z);
+	glVertex3f(xhair.x,(float)(xhair.y+2.0),xhair.z);
+	glVertex3f(xhair.x,(float)(xhair.y-2.0),xhair.z);
+	glVertex3f(xhair.x,xhair.y,(float)(xhair.z+2.0));
+	glVertex3f(xhair.x,xhair.y,(float)(xhair.z-2.0));
+}
+
+void CMODVIEW32View::D3_CrossPntN(D3_VPNT xhair, D3_VPNT Dir)
+{
+	glVertex3f((float)(xhair.x+2.0),xhair.y,xhair.z);
+	glVertex3f((float)(xhair.x-2.0),xhair.y,xhair.z);
+	glVertex3f(xhair.x,(float)(xhair.y+2.0),xhair.z);
+	glVertex3f(xhair.x,(float)(xhair.y-2.0),xhair.z);
+	glVertex3f(xhair.x,xhair.y,(float)(xhair.z+2.0));
+	glVertex3f(xhair.x,xhair.y,(float)(xhair.z-2.0));
+	glRGB(255,255,255);
+	glVertex3f(xhair.x,xhair.y,xhair.z);
+	glVertex3f((float)(xhair.x+4*Dir.x),(float)(xhair.y+4*Dir.y),(float)(xhair.z+4*Dir.z));
+}
+
+
 
 GLint CMODVIEW32View::GetZbufferConst()
 {
@@ -1144,16 +1766,46 @@ void CMODVIEW32View::ChangeSize(int w, int h)
 	CMODVIEW32Doc *pDoc=(CMODVIEW32Doc *)GetDocument();
 	ASSERT_VALID(pDoc);
 
-	if(pDoc->m_ModelLoaded)	{
-		if (pDoc->m_Game == GAME_FS) {
+	if(pDoc->m_ModelLoaded)
+	{
+		switch(pDoc->m_Game)
+		{
+		case GAME_D2:
+			if(pDoc->bSize)
+			{
+				glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+				nRange=(float)(pDoc->m_D2_Model.MaxXYZ*1.1);
+			} else
+				nRange=150.0f;
+			break;
+
+		case GAME_D3:
+			if(pDoc->bSize) 
+			{
+				glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+				nRange=(float)(pDoc->m_D3_Display.MaxXYZ*2);
+			} else
+				nRange=150.0f;
+		
+			break;
+		case GAME_FS:
+			{
 			if(pDoc->bSize)
 			{
 				glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 				nRange=(float)(pDoc->m_FS_Model.MaxXYZ*1.0/*1.1*/);
 			} else
-				nRange=1500.0f;		
+				nRange=1500.0f;
+			break;
+
+		case GAME_RF:
+			//TODO
+			break;
+			
 		}
-		else ASSERT(FALSE);
+		default:
+			ASSERT(FALSE);
+		}
 	}
 
 
@@ -1444,526 +2096,524 @@ void CMODVIEW32View::RenderIndicator()
 }
 
 
-//int CMODVIEW32View::D2_BuildScene()
-//{
-//	CMODVIEW32Doc* pDoc=GetDocument();
-//
-//	int i,j,k;
-//	float v[35][3];
-//	float uv[35][2];
-//	float normal[3];
-//	BOOL data2type, data3type;
-//
-//	data2type=FALSE;
-//	data3type=FALSE;
-//
-//	// Build display list....
-//    glClearColor(m_ClearColorRed, m_ClearColorGreen, m_ClearColorBlue, 1.0f);
-//	glNewList(m_D2_TestModel=glGenLists(1), GL_COMPILE);
-//	//glEnable(GL_TEXTURE_2D);
-//	glScalef(-1.0,1.0,1.0);
-//	glDisable(GL_TEXTURE_GEN_S);
-//	glDisable(GL_TEXTURE_GEN_T);
-//	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//	//glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);
-//
-//	// Rotation time... Look out!
-//	for (i=0;i<pDoc->m_D2_Model.Vcount;i++)
-//	{
-//		pDoc->m_D2_Model.Vpoint[i].x=pDoc->m_D2_Model.Vbackup[i].x;
-//		pDoc->m_D2_Model.Vpoint[i].y=pDoc->m_D2_Model.Vbackup[i].y;
-//		pDoc->m_D2_Model.Vpoint[i].z=pDoc->m_D2_Model.Vbackup[i].z;
-//	}
-//	
-//	ASSERT(pDoc->m_D2_Model.PolyModel.n_models<MAX_D2_SUBMODELS+1);
-//	for (i=1;i<pDoc->m_D2_Model.PolyModel.n_models;i++)
-//	{
-//		CMathStuff cms;
-//		cms.Rotate_Object(i,i,m_D2_PosAngle_Current[i].p,m_D2_PosAngle_Current[i].h,m_D2_PosAngle_Current[i].b,&pDoc->m_D2_Model);
-//
-//		k=pDoc->m_D2_Model.PolyModel.submodel_parents[i];
-//		ASSERT(k<MAX_D2_SUBMODELS+1);
-//		while (k!=0)
-//		{
-//			ASSERT (k < 10);
-//			if (k >= 10) return NULL; //Sanity check
-//			cms.Rotate_Object(k,i,m_D2_PosAngle_Current[k].p,m_D2_PosAngle_Current[k].h,m_D2_PosAngle_Current[k].b,&pDoc->m_D2_Model);
-//			k=pDoc->m_D2_Model.PolyModel.submodel_parents[k];
-//		}
-//	}
-//
-//	//Gun stuff
-//	if(m_ShowGuns && pDoc->m_D2_Model.PolType==D2_POLYMODEL_TYPE_ROBOT)
-//	{
-//		for (i=0;i<pDoc->m_D2_Model.RobotInfo.n_guns;i++)
-//		{
-//			glDisable(GL_TEXTURE_2D);
-//			glRGB(255,255,0);
-//
-//			D2_VMS_VECTOR gunpnt =pDoc->m_D2_Model.RobotInfo.gun_points[i];
-//
-//			CMathStuff wc;
-//			int subm=pDoc->m_D2_Model.RobotInfo.gun_submodels[i];
-//			if (subm!=0)
-//			{
-//				wc.Rotate_G_Point(subm,m_D2_PosAngle_Current[subm].p,m_D2_PosAngle_Current[subm].h,m_D2_PosAngle_Current[subm].b,&pDoc->m_D2_Model,&gunpnt);
-//				k=pDoc->m_D2_Model.PolyModel.submodel_parents[subm];
-//				while(k!=0)
-//				{
-//					wc.Rotate_G_Point(k,m_D2_PosAngle_Current[k].p,m_D2_PosAngle_Current[k].h,m_D2_PosAngle_Current[k].b,&pDoc->m_D2_Model,&gunpnt);
-//					k=pDoc->m_D2_Model.PolyModel.submodel_parents[k];
-//				}
-//			}
-//
-//			gunpnt.x /= 0x1000;
-//			gunpnt.y /= 0x1000;
-//			gunpnt.z /= 0x1000;
-//
-//			if((m_DisplaySubmodel==-1) || (m_DisplaySubmodel==pDoc->m_Guns.InSubModel[i]))
-//			{
-//				glBegin(GL_LINES);
-//				glVertex3i(gunpnt.x+25,gunpnt.y,gunpnt.z);
-//				glVertex3i(gunpnt.x-25,gunpnt.y,gunpnt.z);
-//				glVertex3i(gunpnt.x,gunpnt.y+25,gunpnt.z);
-//				glVertex3i(gunpnt.x,gunpnt.y-25,gunpnt.z);
-//				glVertex3i(gunpnt.x,gunpnt.y,gunpnt.z+25);
-//				glVertex3i(gunpnt.x,gunpnt.y,gunpnt.z-25);
-//				glEnd();
-//			}
-//		}
-//	}
-//
-//
-//	//Segments stuff
-//	if(m_ShowSegments)
-//	{
-//		for (i=0;i<pDoc->m_D2_Model.PolyModel.n_models;i++)
-//		{
-//			if(m_DisplaySubmodel==-1 || m_DisplaySubmodel==i)
-//			{
-//				glDisable(GL_TEXTURE_2D);
-//				glRGB(255,0,0);
-//
-//				D2_VMS_VECTOR boxpnt1=pDoc->m_D2_Model.PolyModel.submodel_maxs[i];
-//				D2_VMS_VECTOR boxpnt2=pDoc->m_D2_Model.PolyModel.submodel_mins[i];
-//
-//				CMathStuff wc;
-//				wc.D2_BuildWireCube(boxpnt1,boxpnt2);
-//
-//				if(i!=0)
-//				{
-//					/*if (bShowMove[i] & (JointListData[JointPos][i].jointnum!=0 ))
-//					{
-//						Rotate_B_Point(i,
-//							JointListData[JointPos][i].angles.p,
-//							JointListData[JointPos][i].angles.h,
-//							JointListData[JointPos][i].angles.b);
-//					} else*/ {
-//						wc.Rotate_B_Point(i,m_D2_PosAngle_Current[i].p,m_D2_PosAngle_Current[i].h,m_D2_PosAngle_Current[i].b,&pDoc->m_D2_Model);
-//					}
-//					
-//					k=pDoc->m_D2_Model.PolyModel.submodel_parents[i];
-//					while (k!=0)
-//					{
-//						/*if (bShowMove[k] & (JointListData[JointPos][k].jointnum!=0 ))
-//						{
-//							Rotate_B_Point(k,
-//								JointListData[JointPos][k].angles.p,
-//								JointListData[JointPos][k].angles.h,
-//								JointListData[JointPos][k].angles.b);
-//						} else*/ {
-//							wc.Rotate_B_Point(k,m_D2_PosAngle_Current[k].p,m_D2_PosAngle_Current[k].h,m_D2_PosAngle_Current[k].b,&pDoc->m_D2_Model);
-//						}
-//						k=pDoc->m_D2_Model.PolyModel.submodel_parents[k];
-//					}
-//				}
-//
-//				glBegin(GL_LINES);
-//				for (j=0;j<24;j++)
-//				{
-//					wc.D2_WireCube[j][0]/=0x1000;
-//					wc.D2_WireCube[j][1]/=0x1000;
-//					wc.D2_WireCube[j][2]/=0x1000;
-//					glVertex3fv(wc.D2_WireCube[j]);
-//				}
-//
-//				glEnd();
-//			}
-//		}
-//	}
-//
-//
-//	// start of the type 2 stuff...
-//	if(m_DisplayTexture==-1)
-//	{
-//		for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
-//		{            // type 2 triangles
-//			if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
-//			{
-//				if ((pDoc->m_D2_Model.Poly[j].Polytype==2)&(pDoc->m_D2_Model.Poly[j].Corners==3)) 
-//				{
-//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//					if (data2type==FALSE)
-//					{
-//						glDisable(GL_TEXTURE_2D);
-//						data2type=TRUE;
-//						glBegin(GL_TRIANGLES);
-//					}
-//
-//					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED) {
-//						glRGB(((pDoc->m_D2_Model.Poly[j].Colors>>10)&0x1f) * 8,
-//								((pDoc->m_D2_Model.Poly[j].Colors>>5)&0x1f) * 8,
-//								((pDoc->m_D2_Model.Poly[j].Colors)&0x1f) * 8);
-//					} else {
-//						glRGB(192,192,192);
-//					}
-//
-//					normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
-//					normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
-//					normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
-//
-//					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//						v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
-//						v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
-//						v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
-//					}
-//					glNormal3fv(normal);
-//					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//						glVertex3fv(v[i]);
-//					}
-//				}
-//			}
-//		}
-//		if(data2type)
-//		{
-//			glEnd();
-//			data2type=FALSE;
-//		}
-//
-//		for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++) {            // type 2 quads
-//			if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
-//			{
-//				if((pDoc->m_D2_Model.Poly[j].Polytype==2)&(pDoc->m_D2_Model.Poly[j].Corners==4))
-//				{
-//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//					if(data2type==FALSE)
-//					{
-//						glDisable(GL_TEXTURE_2D);
-//						data2type=TRUE;
-//						glBegin(GL_QUADS);
-//					}
-//
-//					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED) {
-//						glRGB(((pDoc->m_D2_Model.Poly[j].Colors>>10)&0x1f) * 8,
-//								 ((pDoc->m_D2_Model.Poly[j].Colors>>5)&0x1f) * 8,
-//								 ((pDoc->m_D2_Model.Poly[j].Colors)&0x1f) * 8);
-//					} else {
-//						glRGB(192,192,192);
-//					}
-//
-//					normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
-//					normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
-//					normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
-//
-//					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
-//					{
-//						v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
-//						v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
-//						v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
-//					}
-//					glNormal3fv(normal);
-//					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
-//						glVertex3fv(v[i]);
-//				}
-//			}
-//		}
-//		if (data2type)
-//			glEnd();
-//
-//		for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
-//		{            // type 2 polygons
-//			if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
-//			{
-//				if((pDoc->m_D2_Model.Poly[j].Polytype==2)&(pDoc->m_D2_Model.Poly[j].Corners>4))
-//				{
-//					glDisable(GL_TEXTURE_2D);
-//					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
-//					{
-//						glRGB(((pDoc->m_D2_Model.Poly[j].Colors>>10)&0x1f) * 8,
-//								 ((pDoc->m_D2_Model.Poly[j].Colors>>5)&0x1f) * 8,
-//								 ((pDoc->m_D2_Model.Poly[j].Colors)&0x1f) * 8);
-//					} else
-//						glRGB(192,192,192);
-//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//
-//					glBegin(GL_POLYGON);
-//
-//					normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
-//					normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
-//					normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
-//
-//					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//						v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
-//						v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
-//						v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
-//					}
-//					glNormal3fv(normal);
-//					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
-//						glVertex3fv(v[i]);
-//					glEnd();
-//				}
-//			}
-//		}
-//	}
-//
-//	// start the type 3 stuff...
-//	if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
-//		glEnable(GL_TEXTURE_2D);
+int CMODVIEW32View::D2_BuildScene()
+{
+	CMODVIEW32Doc* pDoc=GetDocument();
+
+	int i,j,k;
+	float v[35][3];
+	float uv[35][2];
+	float normal[3];
+	BOOL data2type, data3type;
+
+	data2type=FALSE;
+	data3type=FALSE;
+
+	// Build display list....
+    glClearColor(m_ClearColorRed, m_ClearColorGreen, m_ClearColorBlue, 1.0f);
+	glNewList(m_D2_TestModel=glGenLists(1), GL_COMPILE);
+	//glEnable(GL_TEXTURE_2D);
+	glScalef(-1.0,1.0,1.0);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+	//glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_FASTEST);
+
+	// Rotation time... Look out!
+	for (i=0;i<pDoc->m_D2_Model.Vcount;i++)
+	{
+		pDoc->m_D2_Model.Vpoint[i].x=pDoc->m_D2_Model.Vbackup[i].x;
+		pDoc->m_D2_Model.Vpoint[i].y=pDoc->m_D2_Model.Vbackup[i].y;
+		pDoc->m_D2_Model.Vpoint[i].z=pDoc->m_D2_Model.Vbackup[i].z;
+	}
+	
+	ASSERT(pDoc->m_D2_Model.PolyModel.n_models<MAX_D2_SUBMODELS+1);
+	for (i=1;i<pDoc->m_D2_Model.PolyModel.n_models;i++)
+	{
+		CMathStuff cms;
+		cms.Rotate_Object(i,i,m_D2_PosAngle_Current[i].p,m_D2_PosAngle_Current[i].h,m_D2_PosAngle_Current[i].b,&pDoc->m_D2_Model);
+
+		k=pDoc->m_D2_Model.PolyModel.submodel_parents[i];
+		ASSERT(k<MAX_D2_SUBMODELS+1);
+		while (k!=0)
+		{
+			cms.Rotate_Object(k,i,m_D2_PosAngle_Current[k].p,m_D2_PosAngle_Current[k].h,m_D2_PosAngle_Current[k].b,&pDoc->m_D2_Model);
+			k=pDoc->m_D2_Model.PolyModel.submodel_parents[k];
+		}
+	}
+
+	//Gun stuff
+	if(m_ShowGuns && pDoc->m_D2_Model.PolType==D2_POLYMODEL_TYPE_ROBOT)
+	{
+		for (i=0;i<pDoc->m_D2_Model.RobotInfo.n_guns;i++)
+		{
+			glDisable(GL_TEXTURE_2D);
+			glRGB(255,255,0);
+
+			D2_VMS_VECTOR gunpnt =pDoc->m_D2_Model.RobotInfo.gun_points[i];
+
+			CMathStuff wc;
+			int subm=pDoc->m_D2_Model.RobotInfo.gun_submodels[i];
+			if (subm!=0)
+			{
+				wc.Rotate_G_Point(subm,m_D2_PosAngle_Current[subm].p,m_D2_PosAngle_Current[subm].h,m_D2_PosAngle_Current[subm].b,&pDoc->m_D2_Model,&gunpnt);
+				k=pDoc->m_D2_Model.PolyModel.submodel_parents[subm];
+				while(k!=0)
+				{
+					wc.Rotate_G_Point(k,m_D2_PosAngle_Current[k].p,m_D2_PosAngle_Current[k].h,m_D2_PosAngle_Current[k].b,&pDoc->m_D2_Model,&gunpnt);
+					k=pDoc->m_D2_Model.PolyModel.submodel_parents[k];
+				}
+			}
+
+			gunpnt.x /= 0x1000;
+			gunpnt.y /= 0x1000;
+			gunpnt.z /= 0x1000;
+
+			if((m_DisplaySubmodel==-1) || (m_DisplaySubmodel==pDoc->m_Guns.InSubModel[i]))
+			{
+				glBegin(GL_LINES);
+				glVertex3i(gunpnt.x+25,gunpnt.y,gunpnt.z);
+				glVertex3i(gunpnt.x-25,gunpnt.y,gunpnt.z);
+				glVertex3i(gunpnt.x,gunpnt.y+25,gunpnt.z);
+				glVertex3i(gunpnt.x,gunpnt.y-25,gunpnt.z);
+				glVertex3i(gunpnt.x,gunpnt.y,gunpnt.z+25);
+				glVertex3i(gunpnt.x,gunpnt.y,gunpnt.z-25);
+				glEnd();
+			}
+		}
+	}
+
+
+	//Segments stuff
+	if(m_ShowSegments)
+	{
+		for (i=0;i<pDoc->m_D2_Model.PolyModel.n_models;i++)
+		{
+			if(m_DisplaySubmodel==-1 || m_DisplaySubmodel==i)
+			{
+				glDisable(GL_TEXTURE_2D);
+				glRGB(255,0,0);
+
+				D2_VMS_VECTOR boxpnt1=pDoc->m_D2_Model.PolyModel.submodel_maxs[i];
+				D2_VMS_VECTOR boxpnt2=pDoc->m_D2_Model.PolyModel.submodel_mins[i];
+
+				CMathStuff wc;
+				wc.D2_BuildWireCube(boxpnt1,boxpnt2);
+
+				if(i!=0)
+				{
+					/*if (bShowMove[i] & (JointListData[JointPos][i].jointnum!=0 ))
+					{
+						Rotate_B_Point(i,
+							JointListData[JointPos][i].angles.p,
+							JointListData[JointPos][i].angles.h,
+							JointListData[JointPos][i].angles.b);
+					} else*/ {
+						wc.Rotate_B_Point(i,m_D2_PosAngle_Current[i].p,m_D2_PosAngle_Current[i].h,m_D2_PosAngle_Current[i].b,&pDoc->m_D2_Model);
+					}
+					
+					k=pDoc->m_D2_Model.PolyModel.submodel_parents[i];
+					while (k!=0)
+					{
+						/*if (bShowMove[k] & (JointListData[JointPos][k].jointnum!=0 ))
+						{
+							Rotate_B_Point(k,
+								JointListData[JointPos][k].angles.p,
+								JointListData[JointPos][k].angles.h,
+								JointListData[JointPos][k].angles.b);
+						} else*/ {
+							wc.Rotate_B_Point(k,m_D2_PosAngle_Current[k].p,m_D2_PosAngle_Current[k].h,m_D2_PosAngle_Current[k].b,&pDoc->m_D2_Model);
+						}
+						k=pDoc->m_D2_Model.PolyModel.submodel_parents[k];
+					}
+				}
+
+				glBegin(GL_LINES);
+				for (j=0;j<24;j++)
+				{
+					wc.D2_WireCube[j][0]/=0x1000;
+					wc.D2_WireCube[j][1]/=0x1000;
+					wc.D2_WireCube[j][2]/=0x1000;
+					glVertex3fv(wc.D2_WireCube[j]);
+				}
+
+				glEnd();
+			}
+		}
+	}
+
+
+	// start of the type 2 stuff...
+	if(m_DisplayTexture==-1)
+	{
+		for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
+		{            // type 2 triangles
+			if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
+			{
+				if ((pDoc->m_D2_Model.Poly[j].Polytype==2)&(pDoc->m_D2_Model.Poly[j].Corners==3)) 
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+					if (data2type==FALSE)
+					{
+						glDisable(GL_TEXTURE_2D);
+						data2type=TRUE;
+						glBegin(GL_TRIANGLES);
+					}
+
+					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED) {
+						glRGB(((pDoc->m_D2_Model.Poly[j].Colors>>10)&0x1f) * 8,
+								((pDoc->m_D2_Model.Poly[j].Colors>>5)&0x1f) * 8,
+								((pDoc->m_D2_Model.Poly[j].Colors)&0x1f) * 8);
+					} else {
+						glRGB(192,192,192);
+					}
+
+					normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
+					normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
+					normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
+
+					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+						v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
+						v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
+						v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
+					}
+					glNormal3fv(normal);
+					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+						glVertex3fv(v[i]);
+					}
+				}
+			}
+		}
+		if(data2type)
+		{
+			glEnd();
+			data2type=FALSE;
+		}
+
+		for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++) {            // type 2 quads
+			if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
+			{
+				if((pDoc->m_D2_Model.Poly[j].Polytype==2)&(pDoc->m_D2_Model.Poly[j].Corners==4))
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+					if(data2type==FALSE)
+					{
+						glDisable(GL_TEXTURE_2D);
+						data2type=TRUE;
+						glBegin(GL_QUADS);
+					}
+
+					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED) {
+						glRGB(((pDoc->m_D2_Model.Poly[j].Colors>>10)&0x1f) * 8,
+								 ((pDoc->m_D2_Model.Poly[j].Colors>>5)&0x1f) * 8,
+								 ((pDoc->m_D2_Model.Poly[j].Colors)&0x1f) * 8);
+					} else {
+						glRGB(192,192,192);
+					}
+
+					normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
+					normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
+					normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
+
+					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
+					{
+						v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
+						v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
+						v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
+					}
+					glNormal3fv(normal);
+					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
+						glVertex3fv(v[i]);
+				}
+			}
+		}
+		if (data2type)
+			glEnd();
+
+		for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
+		{            // type 2 polygons
+			if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
+			{
+				if((pDoc->m_D2_Model.Poly[j].Polytype==2)&(pDoc->m_D2_Model.Poly[j].Corners>4))
+				{
+					glDisable(GL_TEXTURE_2D);
+					if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
+					{
+						glRGB(((pDoc->m_D2_Model.Poly[j].Colors>>10)&0x1f) * 8,
+								 ((pDoc->m_D2_Model.Poly[j].Colors>>5)&0x1f) * 8,
+								 ((pDoc->m_D2_Model.Poly[j].Colors)&0x1f) * 8);
+					} else
+						glRGB(192,192,192);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+
+					glBegin(GL_POLYGON);
+
+					normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
+					normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
+					normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
+
+					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+						v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
+						v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
+						v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
+					}
+					glNormal3fv(normal);
+					for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
+						glVertex3fv(v[i]);
+					glEnd();
+				}
+			}
+		}
+	}
+
+	// start the type 3 stuff...
+	if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
+		glEnable(GL_TEXTURE_2D);
+	else
+		glDisable(GL_TEXTURE_2D);
+
+	//Preparation of the DisplayTexture stuff	
+	int m_DisplayTextureB=-1;
+	int m_DisplayTextureC=-1;
+	if(m_DisplayTexture!=-1)
+	{
+		for (i=0;i<pDoc->m_D2_PIGNumTextures;i++)
+		{
+			for (j=0;j<pDoc->m_D2_BitmapData.count;j++)
+			{
+				if (i==pDoc->m_D2_BitmapData.bitmap[j].number)
+				{
+					m_DisplayTextureC++;
+					if(m_DisplayTextureC==m_DisplayTexture)
+						m_DisplayTextureB=j;
+				}
+				
+			}
+		}
+	}
+	
+	//Render type 3 (polygons with textures)
+	for (k=0;k<pDoc->m_D2_BitmapData.count ;k++)
+	{
+		if(m_DisplayTexture==-1 || k==m_DisplayTextureB)
+		{
+
+			if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+				if (pDoc->m_D2_BitmapData.bitmap[k].transparent)
+				{
+					glRGB(0,0,0);
+					glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
+					glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+					glEnable(GL_BLEND);
+				} else {
+					glRGB(255,255,255);
+					glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+				}
+				glCallList(pDoc->m_D2_ModelTexture[k]);
+			} else
+				glRGB(192,192,192);
+
+			for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
+			{            // type 3 triangles
+				if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
+				{
+					if((pDoc->m_D2_Model.Poly[j].Polytype==3)&(pDoc->m_D2_Model.Poly[j].Corners==3)&(pDoc->m_D2_Model.Poly[j].Colors==k))
+					{
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+						if(data3type==FALSE)
+						{
+							data3type=TRUE;
+							glBegin(GL_TRIANGLES);
+						}
+						normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
+						normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
+						normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
+			
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
+							v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
+							v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
+						}
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							uv[i][0]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].x) / (0x10000);
+							uv[i][1]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].y) / (0x10000);
+						}
+						glNormal3fv(normal);
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							glTexCoord2fv(uv[i]);
+							glVertex3fv(v[i]);
+						}
+					}
+				}
+			}
+			if (data3type)
+			{
+				glEnd();
+				data3type=FALSE;
+			}
+			for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
+			{            // type 3 quads
+				if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
+				{
+					if ((pDoc->m_D2_Model.Poly[j].Polytype==3)&(pDoc->m_D2_Model.Poly[j].Corners==4)&(pDoc->m_D2_Model.Poly[j].Colors==k))
+					{
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+						if (data3type==FALSE)
+						{
+							data3type=TRUE;
+							glBegin(GL_QUADS);
+						}
+						normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
+						normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
+						normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
+			
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
+							v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
+							v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
+						}
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							uv[i][0]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].x) / (0x10000);
+							uv[i][1]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].y) / (0x10000);
+						}
+						glNormal3fv(normal);
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
+						{
+							glTexCoord2fv(uv[i]);
+							glVertex3fv(v[i]);
+						}
+					}
+				}
+			}
+			if (data3type)
+			{
+				glEnd();
+				data3type=FALSE;
+			}
+			for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
+			{
+				// type 3 polygons
+				if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
+				{
+					if ((pDoc->m_D2_Model.Poly[j].Polytype==3)&(pDoc->m_D2_Model.Poly[j].Corners>4)&(pDoc->m_D2_Model.Poly[j].Colors==k))
+					{
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
+						glBegin(GL_POLYGON);
+						normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
+						normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
+						normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
+							v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
+							v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
+						}
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							uv[i][0]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].x) / (0x10000);
+							uv[i][1]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].y) / (0x10000);
+						}
+						glNormal3fv(normal);
+						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
+							glTexCoord2fv(uv[i]);
+							glVertex3fv(v[i]);
+						}
+						glEnd();
+					}
+				}
+			}
+			if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
+			{
+				if (pDoc->m_D2_BitmapData.bitmap[k].transparent)
+					glDisable(GL_BLEND);
+			}
+		}
+	}
+
+	glEndList();
+	return 0;
+}
+
+int CMODVIEW32View::D2_RenderScene()
+{
+
+	// Turn culling on if flag is set
+	if(m_RenderCull)
+		glEnable(GL_CULL_FACE);
+	else
+		glDisable(GL_CULL_FACE);
+
+	// Enable Line or fill mode
+	if(SmartRenderEngine_RenderMode()!=RENDER_WIREFRAME)
+		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
+	// Enable depth testing if flag is set
+//	if(bDepth)
+//		glEnable(GL_DEPTH_TEST);
 //	else
-//		glDisable(GL_TEXTURE_2D);
-//
-//	//Preparation of the DisplayTexture stuff	
-//	int m_DisplayTextureB=-1;
-//	int m_DisplayTextureC=-1;
-//	if(m_DisplayTexture!=-1)
-//	{
-//		for (i=0;i<pDoc->m_D2_PIGNumTextures;i++)
-//		{
-//			for (j=0;j<pDoc->m_D2_BitmapData.count;j++)
-//			{
-//				if (i==pDoc->m_D2_BitmapData.bitmap[j].number)
-//				{
-//					m_DisplayTextureC++;
-//					if(m_DisplayTextureC==m_DisplayTexture)
-//						m_DisplayTextureB=j;
-//				}
-//				
-//			}
-//		}
-//	}
-//	
-//	//Render type 3 (polygons with textures)
-//	for (k=0;k<pDoc->m_D2_BitmapData.count ;k++)
-//	{
-//		if(m_DisplayTexture==-1 || k==m_DisplayTextureB)
-//		{
-//
-//			if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
-//			{
-//				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//				if (pDoc->m_D2_BitmapData.bitmap[k].transparent)
-//				{
-//					glRGB(0,0,0);
-//					glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
-//					glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-//					glEnable(GL_BLEND);
-//				} else {
-//					glRGB(255,255,255);
-//					glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-//				}
-//				glCallList(pDoc->m_D2_ModelTexture[k]);
-//			} else
-//				glRGB(192,192,192);
-//
-//			for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
-//			{            // type 3 triangles
-//				if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
-//				{
-//					if((pDoc->m_D2_Model.Poly[j].Polytype==3)&(pDoc->m_D2_Model.Poly[j].Corners==3)&(pDoc->m_D2_Model.Poly[j].Colors==k))
-//					{
-//						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//						if(data3type==FALSE)
-//						{
-//							data3type=TRUE;
-//							glBegin(GL_TRIANGLES);
-//						}
-//						normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
-//						normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
-//						normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
-//			
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
-//							v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
-//							v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
-//						}
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							uv[i][0]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].x) / (0x10000);
-//							uv[i][1]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].y) / (0x10000);
-//						}
-//						glNormal3fv(normal);
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							glTexCoord2fv(uv[i]);
-//							glVertex3fv(v[i]);
-//						}
-//					}
-//				}
-//			}
-//			if (data3type)
-//			{
-//				glEnd();
-//				data3type=FALSE;
-//			}
-//			for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
-//			{            // type 3 quads
-//				if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
-//				{
-//					if ((pDoc->m_D2_Model.Poly[j].Polytype==3)&(pDoc->m_D2_Model.Poly[j].Corners==4)&(pDoc->m_D2_Model.Poly[j].Colors==k))
-//					{
-//						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//						if (data3type==FALSE)
-//						{
-//							data3type=TRUE;
-//							glBegin(GL_QUADS);
-//						}
-//						normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
-//						normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
-//						normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
-//			
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
-//							v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
-//							v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
-//						}
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							uv[i][0]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].x) / (0x10000);
-//							uv[i][1]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].y) / (0x10000);
-//						}
-//						glNormal3fv(normal);
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++)
-//						{
-//							glTexCoord2fv(uv[i]);
-//							glVertex3fv(v[i]);
-//						}
-//					}
-//				}
-//			}
-//			if (data3type)
-//			{
-//				glEnd();
-//				data3type=FALSE;
-//			}
-//			for (j=1;j<(pDoc->m_D2_Model.Pcount+1);j++)
-//			{
-//				// type 3 polygons
-//				if((m_DisplaySubmodel==-1) | (m_DisplaySubmodel==pDoc->m_D2_Model.Poly[j].Segment))
-//				{
-//					if ((pDoc->m_D2_Model.Poly[j].Polytype==3)&(pDoc->m_D2_Model.Poly[j].Corners>4)&(pDoc->m_D2_Model.Poly[j].Colors==k))
-//					{
-//						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetZbufferConst());
-//						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetZbufferConst());
-//						glBegin(GL_POLYGON);
-//						normal[0]=((float)pDoc->m_D2_Model.Poly[j].Normal.x) / 0x10000;
-//						normal[1]=((float)pDoc->m_D2_Model.Poly[j].Normal.y) / 0x10000;
-//						normal[2]=((float)pDoc->m_D2_Model.Poly[j].Normal.z) / 0x10000;
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							v[i][0]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].x) / 0x1000;
-//							v[i][1]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].y) / 0x1000;
-//							v[i][2]=((float)pDoc->m_D2_Model.Vpoint[pDoc->m_D2_Model.Poly[j].Pointindex[i]].z) / 0x1000;
-//						}
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							uv[i][0]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].x) / (0x10000);
-//							uv[i][1]=((float)pDoc->m_D2_Model.Poly[j].Bitmap[i].y) / (0x10000);
-//						}
-//						glNormal3fv(normal);
-//						for (i=0;i<pDoc->m_D2_Model.Poly[j].Corners;i++) {
-//							glTexCoord2fv(uv[i]);
-//							glVertex3fv(v[i]);
-//						}
-//						glEnd();
-//					}
-//				}
-//			}
-//			if(SmartRenderEngine_RenderMode()==RENDER_TEXTURED)
-//			{
-//				if (pDoc->m_D2_BitmapData.bitmap[k].transparent)
-//					glDisable(GL_BLEND);
-//			}
-//		}
-//	}
-//
-//	glEndList();
-//	return 0;
-//}
-//
-//int CMODVIEW32View::D2_RenderScene()
-//{
-//
-//	// Turn culling on if flag is set
-//	if(m_RenderCull)
-//		glEnable(GL_CULL_FACE);
-//	else
-//		glDisable(GL_CULL_FACE);
-//
-//	// Enable Line or fill mode
-//	if(SmartRenderEngine_RenderMode()!=RENDER_WIREFRAME)
-//		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-//	else
-//		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-//
-//	// Enable depth testing if flag is set
-////	if(bDepth)
-////		glEnable(GL_DEPTH_TEST);
-////	else
-//		//glDisable(GL_DEPTH_TEST);
-//
-//	// Clear the window with current clearing color
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//
-//	// Save the matrix state and do the rotations
-//	glPushMatrix();
-//	glScalef(-1.0,1.0,1.0); //HHADD
-//
-//	// Display polymodel
-//	glCallList(m_D2_TestModel);
-//	glPopMatrix();
-//	glMatrixMode(GL_MODELVIEW);
-//
-//	// Flush drawing commands
-//	glFlush();
-//	return 0;
-//}
-//
-//void CMODVIEW32View::D2_BuildWireCube(D2_VMS_VECTOR min, D2_VMS_VECTOR max)
-//{
-///*	D2_WireCube[0][0]=max.x; D2_WireCube[0][1]=max.y; D2_WireCube[0][2]=max.z;
-//	D2_WireCube[1][0]=min.x; D2_WireCube[1][1]=max.y; D2_WireCube[1][2]=max.z;
-//	D2_WireCube[2][0]=max.x; D2_WireCube[2][1]=max.y; D2_WireCube[2][2]=max.z;
-//	D2_WireCube[3][0]=max.x; D2_WireCube[3][1]=min.y; D2_WireCube[3][2]=max.z;
-//	D2_WireCube[4][0]=max.x; D2_WireCube[4][1]=max.y; D2_WireCube[4][2]=max.z;
-//	D2_WireCube[5][0]=max.x; D2_WireCube[5][1]=max.y; D2_WireCube[5][2]=min.z;
-//
-//	D2_WireCube[6][0]=min.x; D2_WireCube[6][1]=max.y; D2_WireCube[6][2]=max.z;
-//	D2_WireCube[7][0]=min.x; D2_WireCube[7][1]=min.y; D2_WireCube[7][2]=max.z;
-//	D2_WireCube[8][0]=min.x; D2_WireCube[8][1]=max.y; D2_WireCube[8][2]=max.z;
-//	D2_WireCube[9][0]=min.x; D2_WireCube[9][1]=max.y; D2_WireCube[9][2]=min.z;
-//
-//	D2_WireCube[10][0]=max.x; D2_WireCube[10][1]=min.y; D2_WireCube[10][2]=max.z;
-//	D2_WireCube[11][0]=min.x; D2_WireCube[11][1]=min.y; D2_WireCube[11][2]=max.z;
-//	D2_WireCube[12][0]=max.x; D2_WireCube[12][1]=min.y; D2_WireCube[12][2]=max.z;
-//	D2_WireCube[13][0]=max.x; D2_WireCube[13][1]=min.y; D2_WireCube[13][2]=min.z;
-//
-//	D2_WireCube[14][0]=max.x; D2_WireCube[14][1]=max.y; D2_WireCube[14][2]=min.z;
-//	D2_WireCube[15][0]=min.x; D2_WireCube[15][1]=max.y; D2_WireCube[15][2]=min.z;
-//	D2_WireCube[16][0]=max.x; D2_WireCube[16][1]=max.y; D2_WireCube[16][2]=min.z;
-//	D2_WireCube[17][0]=max.x; D2_WireCube[17][1]=min.y; D2_WireCube[17][2]=min.z;
-//
-//	D2_WireCube[18][0]=max.x; D2_WireCube[18][1]=min.y; D2_WireCube[18][2]=min.z;
-//	D2_WireCube[19][0]=min.x; D2_WireCube[19][1]=min.y; D2_WireCube[19][2]=min.z;
-//	D2_WireCube[20][0]=min.x; D2_WireCube[20][1]=max.y; D2_WireCube[20][2]=min.z;
-//	D2_WireCube[21][0]=min.x; D2_WireCube[21][1]=min.y; D2_WireCube[21][2]=min.z;
-//	D2_WireCube[22][0]=min.x; D2_WireCube[22][1]=min.y; D2_WireCube[22][2]=max.z;
-//	D2_WireCube[23][0]=min.x; D2_WireCube[23][1]=min.y; D2_WireCube[23][2]=min.z;*/
-//}
+		//glDisable(GL_DEPTH_TEST);
+
+	// Clear the window with current clearing color
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Save the matrix state and do the rotations
+	glPushMatrix();
+	glScalef(-1.0,1.0,1.0); //HHADD
+
+	// Display polymodel
+	glCallList(m_D2_TestModel);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+
+	// Flush drawing commands
+	glFlush();
+	return 0;
+}
+
+void CMODVIEW32View::D2_BuildWireCube(D2_VMS_VECTOR min, D2_VMS_VECTOR max)
+{
+/*	D2_WireCube[0][0]=max.x; D2_WireCube[0][1]=max.y; D2_WireCube[0][2]=max.z;
+	D2_WireCube[1][0]=min.x; D2_WireCube[1][1]=max.y; D2_WireCube[1][2]=max.z;
+	D2_WireCube[2][0]=max.x; D2_WireCube[2][1]=max.y; D2_WireCube[2][2]=max.z;
+	D2_WireCube[3][0]=max.x; D2_WireCube[3][1]=min.y; D2_WireCube[3][2]=max.z;
+	D2_WireCube[4][0]=max.x; D2_WireCube[4][1]=max.y; D2_WireCube[4][2]=max.z;
+	D2_WireCube[5][0]=max.x; D2_WireCube[5][1]=max.y; D2_WireCube[5][2]=min.z;
+
+	D2_WireCube[6][0]=min.x; D2_WireCube[6][1]=max.y; D2_WireCube[6][2]=max.z;
+	D2_WireCube[7][0]=min.x; D2_WireCube[7][1]=min.y; D2_WireCube[7][2]=max.z;
+	D2_WireCube[8][0]=min.x; D2_WireCube[8][1]=max.y; D2_WireCube[8][2]=max.z;
+	D2_WireCube[9][0]=min.x; D2_WireCube[9][1]=max.y; D2_WireCube[9][2]=min.z;
+
+	D2_WireCube[10][0]=max.x; D2_WireCube[10][1]=min.y; D2_WireCube[10][2]=max.z;
+	D2_WireCube[11][0]=min.x; D2_WireCube[11][1]=min.y; D2_WireCube[11][2]=max.z;
+	D2_WireCube[12][0]=max.x; D2_WireCube[12][1]=min.y; D2_WireCube[12][2]=max.z;
+	D2_WireCube[13][0]=max.x; D2_WireCube[13][1]=min.y; D2_WireCube[13][2]=min.z;
+
+	D2_WireCube[14][0]=max.x; D2_WireCube[14][1]=max.y; D2_WireCube[14][2]=min.z;
+	D2_WireCube[15][0]=min.x; D2_WireCube[15][1]=max.y; D2_WireCube[15][2]=min.z;
+	D2_WireCube[16][0]=max.x; D2_WireCube[16][1]=max.y; D2_WireCube[16][2]=min.z;
+	D2_WireCube[17][0]=max.x; D2_WireCube[17][1]=min.y; D2_WireCube[17][2]=min.z;
+
+	D2_WireCube[18][0]=max.x; D2_WireCube[18][1]=min.y; D2_WireCube[18][2]=min.z;
+	D2_WireCube[19][0]=min.x; D2_WireCube[19][1]=min.y; D2_WireCube[19][2]=min.z;
+	D2_WireCube[20][0]=min.x; D2_WireCube[20][1]=max.y; D2_WireCube[20][2]=min.z;
+	D2_WireCube[21][0]=min.x; D2_WireCube[21][1]=min.y; D2_WireCube[21][2]=min.z;
+	D2_WireCube[22][0]=min.x; D2_WireCube[22][1]=min.y; D2_WireCube[22][2]=max.z;
+	D2_WireCube[23][0]=min.x; D2_WireCube[23][1]=min.y; D2_WireCube[23][2]=min.z;*/
+}
 
 void CMODVIEW32View::FS_BuildWireCube(FS_VPNT min, FS_VPNT max)
 {
@@ -1995,6 +2645,201 @@ void CMODVIEW32View::FS_BuildWireCube(FS_VPNT min, FS_VPNT max)
 	FS_WireCube[21][0]=min.x; FS_WireCube[21][1]=min.y; FS_WireCube[21][2]=min.z;
 	FS_WireCube[22][0]=min.x; FS_WireCube[22][1]=min.y; FS_WireCube[22][2]=max.z;
 	FS_WireCube[23][0]=min.x; FS_WireCube[23][1]=min.y; FS_WireCube[23][2]=min.z;
+}
+
+
+
+
+
+void CMODVIEW32View::D2_PreparePosition()
+{
+	CMODVIEW32Doc *pDoc=GetDocument();
+
+	//Reset data
+	D2_ResetPosAngleData_ShallBe();
+	D2_ResetPosAngleData_StepBit();
+
+	//Prepare joint data
+	int JointList[9];
+	D2_JOINTPOS JointListData[5][9];
+	for(int i=0;i<9;i++)
+	{
+		JointList[i]=0;
+		for(int j=0;j<5;j++)
+			JointListData[j][i].jointnum=0;
+	}
+	for (i=0;i<9;i++)
+	{
+		for (int j=0;j<5;j++)
+		{
+			if (pDoc->m_D2_Model.Joints.Anim_states[i][j].n_joints>0)
+			{
+				for (int k=0;k<pDoc->m_D2_Model.Joints.Anim_states[i][j].n_joints;k++)
+				{   
+					D2_JOINTPOS JointTemp=pDoc->m_D2_JointPos[pDoc->m_D2_Model.Joints.Anim_states[i][j].offset+k];
+					JointList[JointTemp.jointnum-1]=i;
+					JointListData[j][JointTemp.jointnum]=JointTemp;
+				}
+			}
+		}
+	}
+
+	//Calculate ShallBe position angles
+	for (i=1;i<pDoc->m_D2_Model.PolyModel.n_models;i++)
+	{
+		if ((m_D2_Position!=0) && (JointListData[m_D2_Position-1][i].jointnum!=0))
+		{
+			m_D2_PosAngle_ShallBe[i].p=JointListData[m_D2_Position-1][i].angles.p;
+			m_D2_PosAngle_ShallBe[i].h=JointListData[m_D2_Position-1][i].angles.h;
+			m_D2_PosAngle_ShallBe[i].b=JointListData[m_D2_Position-1][i].angles.b;
+		}
+	}
+
+	//Calculate the step each 1/20 second to change
+	for (i=0;i<pDoc->m_D2_Model.PolyModel.n_models;i++)
+	{
+		m_D2_PosAngle_StepBit[i].p=(m_D2_PosAngle_ShallBe[i].p-m_D2_PosAngle_Current[i].p)/10;
+		m_D2_PosAngle_StepBit[i].h=(m_D2_PosAngle_ShallBe[i].h-m_D2_PosAngle_Current[i].h)/10;
+		m_D2_PosAngle_StepBit[i].b=(m_D2_PosAngle_ShallBe[i].b-m_D2_PosAngle_Current[i].b)/10;
+	}
+
+	//If the user disabled smooth position change, set the angles directly
+	if(!m_D2_SmoothPositionChange)
+	{
+		for (i=0;i<pDoc->m_D2_Model.PolyModel.n_models;i++)
+		{
+			m_D2_PosAngle_Current[i].p=m_D2_PosAngle_ShallBe[i].p;
+			m_D2_PosAngle_Current[i].h=m_D2_PosAngle_ShallBe[i].h;
+			m_D2_PosAngle_Current[i].b=m_D2_PosAngle_ShallBe[i].b;
+		}
+	}
+}
+
+BOOL CMODVIEW32View::D2_ParsePosAngle(short *cur, short *sha, short *stp)
+{
+	short old_cur=*cur;
+	if(*cur!=*sha)
+	{
+		*cur+=*stp;
+		if(*stp>0)
+		{
+			if(*cur>*sha)
+				*cur=*sha;
+			if(old_cur>*cur) //Overflow protection
+				*cur=*sha; 
+		}
+		else if(*stp<0)
+		{
+			if(*cur<*sha)
+				*cur=*sha;
+			if(old_cur<*cur) //Overflow protection
+				*cur=*sha; 
+		}
+		else if(*stp==0)
+			*cur=*sha;
+		return TRUE; //Position has changed: Need to redraw
+	}
+	return FALSE; //Position has not changed: Don't need to redraw
+}
+
+void CMODVIEW32View::D2_ResetPosAngleData_Current()
+{
+	for(int i=0;i<MAX_D2_SUBMODELS;i++)
+	{
+		m_D2_PosAngle_Current[i].p=0;
+		m_D2_PosAngle_Current[i].h=0;
+		m_D2_PosAngle_Current[i].b=0;
+	}
+}
+
+void CMODVIEW32View::D2_ResetPosAngleData_ShallBe()
+{
+	for(int i=0;i<MAX_D2_SUBMODELS;i++)
+	{
+		m_D2_PosAngle_ShallBe[i].p=0;
+		m_D2_PosAngle_ShallBe[i].h=0;
+		m_D2_PosAngle_ShallBe[i].b=0;
+	}
+}
+
+void CMODVIEW32View::D2_ResetPosAngleData_StepBit()
+{
+	for(int i=0;i<MAX_D2_SUBMODELS;i++)
+	{
+		m_D2_PosAngle_StepBit[i].p=0;
+		m_D2_PosAngle_StepBit[i].h=0;
+		m_D2_PosAngle_StepBit[i].b=0;
+	}
+}
+
+void CMODVIEW32View::D3_PreparePosition()
+{
+	if(m_D3_Position==0)
+		return;
+
+	CMODVIEW32Doc* pDoc=GetDocument();
+	for(unsigned long k=0; k<pDoc->m_D3_Model.Scount; k++)
+	{
+		//Get Rotation information
+		unsigned long Rat=-1;
+		unsigned long m,n,pkey;
+		if (pDoc->m_D3_Model.rknum[k]>0)
+		{
+			m=pDoc->m_D3_Model.rindex[k];
+			n=m+pDoc->m_D3_Model.rknum[k]-1;
+			unsigned long rkey=0;
+			while ((pDoc->m_D3_Model.rkey[m]!=pDoc->m_D3_Display.pr_active[m_D3_Position-1])&(m<n))
+			{
+				if (pDoc->m_D3_Model.rkey[m]<=pDoc->m_D3_Display.pr_active[m_D3_Position-1])
+				{
+					if(pDoc->m_D3_Model.rkey[m]>rkey)
+					{
+						rkey=pDoc->m_D3_Model.rkey[m];
+						Rat=m;
+					}
+				}
+				m++;
+			}
+			if (pDoc->m_D3_Model.rkey[m]==pDoc->m_D3_Display.pr_active[m_D3_Position-1])
+				Rat=m;
+		}
+		m_D3_PosAngle_ShallBe[k].angle=(float)(pDoc->m_D3_Model.rangle[Rat]/182.0);
+		m_D3_PosAngle_ShallBe[k].pnt.x=pDoc->m_D3_Model.rani[Rat].x;
+		m_D3_PosAngle_ShallBe[k].pnt.y=pDoc->m_D3_Model.rani[Rat].y;
+		m_D3_PosAngle_ShallBe[k].pnt.z=pDoc->m_D3_Model.rani[Rat].z;
+
+		//Calculate Pat
+		unsigned long Pat=-1;
+		if (pDoc->m_D3_Model.pknum[k]>0)
+		{
+			m=pDoc->m_D3_Model.pindex[k];
+			n=m + pDoc->m_D3_Model.pknum[k];
+			pkey=0;
+			while ((pDoc->m_D3_Model.pkey[m]!=pDoc->m_D3_Display.pr_active[m_D3_Position-1])&(m<n))
+			{
+				if (pDoc->m_D3_Model.pkey[m]<=pDoc->m_D3_Display.pr_active[m_D3_Position-1])
+				{
+					if(pDoc->m_D3_Model.pkey[m]>pkey)
+					{
+						pkey=pDoc->m_D3_Model.pkey[m];
+						Pat=m;
+					}
+				}
+				m++;
+			}
+			if (pDoc->m_D3_Model.pkey[m]==pDoc->m_D3_Display.pr_active[m_D3_Position-1])
+				Pat=m;
+		}
+		if ((pDoc->m_D3_Model.pknum[k]>0)&((Pat!=-1)))
+		{
+			m_D3_PosAngle_ShallBe[k].patav=TRUE;
+			m_D3_PosAngle_ShallBe[k].pat.x=pDoc->m_D3_Model.pani[Pat].x;
+			m_D3_PosAngle_ShallBe[k].pat.y=pDoc->m_D3_Model.pani[Pat].y;
+			m_D3_PosAngle_ShallBe[k].pat.z=pDoc->m_D3_Model.pani[Pat].z;
+		}
+		else
+			m_D3_PosAngle_ShallBe[k].patav=FALSE;
+	}
 }
 
 int CMODVIEW32View::FS_CalcRealSubmodelNumber(int subm)
@@ -2131,18 +2976,16 @@ void CMODVIEW32View::CopyToClipboard()
 		// Lock handle 
 		char *pData=(char *)::GlobalLock((HGLOBAL)handle); 
 		// Copy header and data 
-		if ( pData != NULL) {
-			memcpy(pData,&header,sizeof(BITMAPINFOHEADER)); 
-			memcpy(pData+sizeof(BITMAPINFOHEADER),pPixelData,NbBytes); 
-			// Unlock 
-			::GlobalUnlock((HGLOBAL)handle); 
+		memcpy(pData,&header,sizeof(BITMAPINFOHEADER)); 
+		memcpy(pData+sizeof(BITMAPINFOHEADER),pPixelData,NbBytes); 
+		// Unlock 
+		::GlobalUnlock((HGLOBAL)handle); 
 
-			// Push DIB in clipboard 
-			OpenClipboard(); 
-			EmptyClipboard(); 
-			SetClipboardData(CF_DIB,handle); 
-			CloseClipboard(); 
-		}
+		// Push DIB in clipboard 
+		OpenClipboard(); 
+		EmptyClipboard(); 
+		SetClipboardData(CF_DIB,handle); 
+		CloseClipboard(); 
 	}
 
 	// Cleanup 
@@ -2172,4 +3015,190 @@ void CMODVIEW32View::FS_RotateParts(int subm)
 		}
 		glTranslatef(-pDoc->m_FS_SOBJ[subm].offset.x,-pDoc->m_FS_SOBJ[subm].offset.y,-pDoc->m_FS_SOBJ[subm].offset.z);
 	}
+}
+
+void CMODVIEW32View::RF_BuildScene()
+{
+	// Set up States
+	glEnable(GL_DEPTH_TEST);
+	//glClearColor(.0f, .5f, 1.f, 1.f);
+
+	// Set up Matrizes
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glFrustum(-.04, .04, -.03, .03, .1, 256.0); // xaspect,yaspect
+	//glFrustum(-0.8, 0.8, -0.8, 0.8, .1, 256.0); // xaspect,yaspect
+
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	// Set Up Lights
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_NORMALIZE);
+
+	/*glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+
+	glEnable(GL_LIGHT1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1_position);*/
+
+	RF_MODEL *mo=&GetDocument()->m_RF_Model;
+	RF_GEOUNIT *gu=mo->geounit;
+	RF_MODELDATA *md=mo->modeldata;
+
+			m_xTranslation=0;
+			m_yTranslation=0;
+			m_zTranslation=-GetDocument()->m_RF_Model.radius*6;
+
+	// generate the max amount of textures
+	glEnable(GL_TEXTURE_2D);
+	GLuint texturedata[MAX_TEXTURES];
+	//for(int t=0;t<MAX_TEXTURES;t++)
+	//	glGenTextures(1,(GLuint*)&mo->texture[t].texturedata);
+	if(m_RenderMode==RENDER_TEXTURED)
+	{
+		glGenTextures(MAX_TEXTURES,(GLuint *)texturedata);
+		for(int t=0;t<mo->num_textures;t++)
+		{
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+			//glTexImage2D(GL_TEXTURE_2D,0,4,xsize>>XScale,ysize>>YScale,0,GL_RGBA,GL_UNSIGNED_BYTE,m_FS_RGBAtexture2);
+			glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,mo->texture[t].width,mo->texture[t].height,0,GL_RGBA,GL_UNSIGNED_BYTE,mo->texture[t].buffer);
+			gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGBA,mo->texture[t].width,mo->texture[t].height,GL_RGBA,GL_UNSIGNED_BYTE,mo->texture[t].buffer);
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+		}
+	}
+
+	glNewList(mo->model=glGenLists(1), GL_COMPILE);
+
+	glEnable(GL_TEXTURE_2D);
+	if(m_RenderMode==RENDER_WIREFRAME)
+		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+	else
+		glPolygonMode(GL_FRONT,GL_FILL);
+	glRGB(192,192,192);
+
+	int i1,i2,i3,s2,s3;
+	BOOL error;
+	for(int i=0;i<mo->num_geounits;i++)
+	{
+		s2=gu[i].size_2float/(2*sizeof(float));
+		s3=gu[i].size_3float/(3*sizeof(float));
+TRACE("\nBuilding geounit %i with %i triangles\n",i,gu[i].mNumTris);
+		for(int j=0;j<gu[i].mNumTris;j++)
+		{
+/*{
+CString x;
+x.Format("%i: %i %i %i -- %i\n",j,md->triangles[j].indicies[0],md->triangles[j].indicies[1],md->triangles[j].indicies[2],gu[i].size_3float/(3*sizeof(float)));
+OutputDebugString(x);
+}*/
+			i1=md[i].triangles[j].indicies[0];
+			i2=md[i].triangles[j].indicies[1];
+			i3=md[i].triangles[j].indicies[2];
+
+			//Error check
+			error=FALSE;
+			if(i1<0 || i2<0 || i3<0) error=TRUE;
+			if(i1>=s2 || i2>=s2 || i3>=s2) error=TRUE;
+			if(i1>=s3 || i2>=s3 || i3>=s3) error=TRUE;
+
+			if(!error)
+			{
+				if(m_RenderMode==RENDER_TEXTURED)
+					glBindTexture(GL_TEXTURE_2D, texturedata[i]);
+				glBegin(GL_TRIANGLES);
+			
+				glNormal3fv(md[i].normals[i1].xyz);
+				glTexCoord2fv(md[i].uvs[i1].uv);
+				glVertex3fv(md[i].vertices[i1].xyz);
+					
+				glNormal3fv(md[i].normals[i2].xyz);
+				glTexCoord2fv(md[i].uvs[i2].uv);
+				glVertex3fv(md[i].vertices[i2].xyz);
+					
+				glNormal3fv(md[i].normals[i3].xyz);
+				glTexCoord2fv(md[i].uvs[i3].uv);
+				glVertex3fv(md[i].vertices[i3].xyz);
+
+				glEnd();
+			}
+			else
+			{
+				TRACE("Error in geounit %i, triangle %i\n",i,j);
+			}
+		}
+	}
+
+	// Draw BBoxes
+	glBegin(GL_LINE_STRIP);
+	glVertex3fv(mo->mins);
+	glVertex3f(mo->maxs[0], mo->mins[1], mo->mins[2]);
+	glVertex3f(mo->maxs[0], mo->mins[1], mo->maxs[2]);
+	glVertex3f(mo->mins[0], mo->mins[1], mo->maxs[2]);
+	glVertex3f(mo->mins[0], mo->mins[1], mo->maxs[2]);
+
+	glVertex3f(mo->mins[0], mo->maxs[1], mo->maxs[2]);
+	glVertex3f(mo->mins[0], mo->maxs[1], mo->mins[2]);
+	glVertex3f(mo->maxs[0], mo->maxs[1], mo->mins[2]);
+	glVertex3fv(mo->maxs);
+	glEnd();
+
+	glBegin(GL_LINE_STRIP);
+	glVertex3f(mo->mins[0], mo->maxs[1], mo->maxs[2]);
+	glVertex3f(mo->maxs[0], mo->maxs[1], mo->maxs[2]);
+	glVertex3f(mo->maxs[0], mo->mins[1], mo->maxs[2]);
+	glEnd();
+
+	glBegin(GL_LINE_STRIP);
+	glVertex3f(mo->mins[0], mo->maxs[1], mo->mins[2]);
+	glVertex3f(mo->mins[0], mo->mins[1], mo->mins[2]);
+	glVertex3f(mo->mins[0], mo->mins[1], mo->maxs[2]);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glVertex3f(mo->maxs[0], mo->maxs[1], mo->mins[2]);
+	glVertex3f(mo->maxs[0], mo->mins[1], mo->mins[2]);
+	glEnd();
+
+	glEndList();
+}
+
+void CMODVIEW32View::RF_RenderScene()
+{
+	RF_MODEL *mo=&GetDocument()->m_RF_Model;
+
+	// Setup Camera
+	//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	//glLoadIdentity();
+
+	//glTranslatef( 0 , 0, mo->radius*3 );
+	/*glRotatef( g_Rotation[0], 1, 0, 0 );
+	glRotatef( g_Rotation[1], 0, 1, 0 );
+	glRotatef( g_Rotation[2], 0, 0, 1 );*/
+	
+	//glEnable( GL_BLEND);
+	//glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+	//glPointSize( 5 );
+	//glPushMatrix();
+	//glScalef(-1.0,1.0,1.0); //HHADD
+
+	// Display polymodel
+	glCallList(mo->model);
+	//glPopMatrix();
+	//glMatrixMode(GL_MODELVIEW);
+
+	// Flush drawing commands
+	//glFlush();
+
+
+	//
+	// Finalize
+	//glFinish( );
 }

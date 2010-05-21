@@ -101,17 +101,17 @@ void CGamePaneFS::Init()
 	int vert,poly,txtr,sobj;
 	char tstr[256];
 
-	for(unsigned int i=0; i<6; i++)
+	for(i=0;i<6;i++)
 	{
 		if(pDoc->m_FS_PMinfo.n_detail >= i+1)
 		{
 			sprintf(tstr,"Lvl %i",i+1);
 			ct->InsertItem(i,tstr);
 			GetPolyInfo(i,&vert,&poly,&txtr,&sobj);
-			ct->SetItemText(i,1,_itoa(vert,tstr,10));
-			ct->SetItemText(i,2,_itoa(poly,tstr,10));
-			ct->SetItemText(i,3,_itoa(txtr,tstr,10));
-			ct->SetItemText(i,4,_itoa(sobj,tstr,10));
+			ct->SetItemText(i,1,itoa(vert,tstr,10));
+			ct->SetItemText(i,2,itoa(poly,tstr,10));
+			ct->SetItemText(i,3,itoa(txtr,tstr,10));
+			ct->SetItemText(i,4,itoa(sobj,tstr,10));
 		}
 	}
 	if(pDoc->m_FS_PMinfo.n_detail > 0)
@@ -122,19 +122,19 @@ void CGamePaneFS::Init()
 		{
 			pDoc->m_FS_ModelHasDebris=TRUE;
 			ct->InsertItem(6,"Debris");
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,1,_itoa(vert,tstr,10));
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,2,_itoa(poly,tstr,10));
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,3,_itoa(txtr,tstr,10));
-			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,4,_itoa(sobj,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,1,itoa(vert,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,2,itoa(poly,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,3,itoa(txtr,tstr,10));
+			ct->SetItemText(pDoc->m_FS_PMinfo.n_detail,4,itoa(sobj,tstr,10));
 		}
 	}
 
 	CStatic *cs=(CStatic *)GetDlgItem(IDC_GUNS);
-	sprintf_s(tstr,"%i / %i",pDoc->m_FS_RealGuns[0].Num+pDoc->m_FS_RealGuns[1].Num,pDoc->m_FS_Turrets[0].Num+pDoc->m_FS_Turrets[1].Num);
+	sprintf(tstr,"%i / %i",pDoc->m_FS_RealGuns[0].Num+pDoc->m_FS_RealGuns[1].Num,pDoc->m_FS_Turrets[0].Num+pDoc->m_FS_Turrets[1].Num);
 	cs->SetWindowText(tstr);
 
 	cs=(CStatic *)GetDlgItem(IDC_SHIPSIZE);
-	sprintf_s(tstr,"%.0f|%.0f|%.0f",pDoc->m_FS_Model._maxbox.x-pDoc->m_FS_Model._minbox.x,pDoc->m_FS_Model._maxbox.y-pDoc->m_FS_Model._minbox.y,pDoc->m_FS_Model._maxbox.z-pDoc->m_FS_Model._minbox.z);
+	sprintf(tstr,"%.0f|%.0f|%.0f",pDoc->m_FS_Model._maxbox.x-pDoc->m_FS_Model._minbox.x,pDoc->m_FS_Model._maxbox.y-pDoc->m_FS_Model._minbox.y,pDoc->m_FS_Model._maxbox.z-pDoc->m_FS_Model._minbox.z);
 	cs->SetWindowText(tstr);
 
 	CTabCtrl *ts=(CTabCtrl *)GetDlgItem(IDC_FS_DISPLAY);
@@ -151,6 +151,7 @@ void CGamePaneFS::Init()
 
 void CGamePaneFS::FillTab()
 {
+	unsigned int m;
 	int i;
 	CMODVIEW32Doc *pDoc=GetDocument();
 	CMODVIEW32View *view=GetMainView();
@@ -173,7 +174,7 @@ void CGamePaneFS::FillTab()
 		lbox->AddString("<All textures>");
 		if(pDoc->m_FS_BitmapData.count > 0)
 		{
-			for(unsigned int m=pDoc->m_FS_PofDataL[0];(m<pDoc->m_FS_PofDataH[0]+1) && (m < 60);m++)
+			for(m=pDoc->m_FS_PofDataL[0];m<pDoc->m_FS_PofDataH[0]+1;m++)
 				lbox->AddString(pDoc->m_FS_BitmapData.pic[m].name);
 			lbox->SetCurSel(0);
 		}
@@ -183,9 +184,9 @@ void CGamePaneFS::FillTab()
 		lbox->ResetContent();
 		lbox->AddString("<All submodels>");
 		
-		for(int m=0;m<pDoc->m_FS_NumSOBJ;m++)
+		for(m=0;m<pDoc->m_FS_NumSOBJ;m++)
 		{
-			if(pDoc->m_FS_SOBJ[m].detail==view->m_Detaillevel)
+			if(pDoc->m_FS_SOBJ[m].detail==(long)view->m_Detaillevel)
 			{
 				CString tstr;
 				tstr.Format("#%i: %s",num_sobj,pDoc->m_FS_SOBJ[m].submodel_name);
@@ -254,30 +255,31 @@ void CGamePaneFS::FillTab()
 void CGamePaneFS::GetPolyInfo(int detaillevel, int *vert, int *poly, int *txtr, int *sobj)
 {
 	CMODVIEW32Doc *pDoc=GetDocument();
+	unsigned int m;
 
 	int num_vert=0;
-	for(unsigned int m=0;m<pDoc->m_FS_Model.Vcount;m++)
+	for(m=0;m<pDoc->m_FS_Model.Vcount;m++)
 	{
 		if(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.VSobj[m]].detail==(long)detaillevel)
 			num_vert++;
 	}
 
 	int num_poly=0;
-	for(unsigned int m=0;m<pDoc->m_FS_Model.Pcount;m++)
+	for(m=0;m<pDoc->m_FS_Model.Pcount;m++)
 	{
 		if(pDoc->m_FS_SOBJ[pDoc->m_FS_Model.Poly[m].Sobj].detail==(long)detaillevel)
 			num_poly++;
 	}
 
 	int num_txtr=0;
-	for(unsigned int m=0;m<pDoc->m_FS_BitmapData.count;m++)
+	for(m=0;m<pDoc->m_FS_BitmapData.count;m++)
 	{
 		if(pDoc->m_FS_BitmapData.pic[m].valid==1)
 			num_txtr++;
 	}
 
 	int num_sobj=0;
-	for(int m=0;m<pDoc->m_FS_NumSOBJ;m++)
+	for(m=0;m<pDoc->m_FS_NumSOBJ;m++)
 	{
 		if(pDoc->m_FS_SOBJ[m].detail==(long)detaillevel)
 			num_sobj++;

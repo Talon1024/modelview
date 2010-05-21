@@ -392,19 +392,19 @@ void CEditorFS_FUEL::OnChangeData()
 		{
 			int f=GetCurrentGlowListSelection();
 			m_PositionX.GetWindowText(t);
-			GetDocument()->m_EditorFS_FUEL.glow_pos[f].x=(float)atof(t);
+			GetDocument()->m_EditorFS_FUEL.glow_pos[f].x=atof(t);
 			m_PositionY.GetWindowText(t);
-			GetDocument()->m_EditorFS_FUEL.glow_pos[f].y=(float)atof(t);
+			GetDocument()->m_EditorFS_FUEL.glow_pos[f].y=atof(t);
 			m_PositionZ.GetWindowText(t);
-			GetDocument()->m_EditorFS_FUEL.glow_pos[f].z=(float)atof(t);
+			GetDocument()->m_EditorFS_FUEL.glow_pos[f].z=atof(t);
 			m_NormalX.GetWindowText(t);
-			GetDocument()->m_EditorFS_FUEL.glow_norm[f].x=(float)atof(t);
+			GetDocument()->m_EditorFS_FUEL.glow_norm[f].x=atof(t);
 			m_NormalY.GetWindowText(t);
-			GetDocument()->m_EditorFS_FUEL.glow_norm[f].y=(float)atof(t);
+			GetDocument()->m_EditorFS_FUEL.glow_norm[f].y=atof(t);
 			m_NormalZ.GetWindowText(t);
-			GetDocument()->m_EditorFS_FUEL.glow_norm[f].z=(float)atof(t);
+			GetDocument()->m_EditorFS_FUEL.glow_norm[f].z=atof(t);
 			m_Radius.GetWindowText(t);
-			GetDocument()->m_EditorFS_FUEL.glow_radius[f]=(float)atof(t);
+			GetDocument()->m_EditorFS_FUEL.glow_radius[f]=atof(t);
 			//Update listview right away
 			t.Format("%.4f",GetDocument()->m_EditorFS_FUEL.glow_pos[f].x);
 			m_GlowList.SetItemText(f,1,t);

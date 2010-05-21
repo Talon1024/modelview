@@ -10,6 +10,8 @@
 #include "MODVIEW32Doc.h"
 #include "MODVIEW32View.h"
 #include "Explorer.h"
+#include "CoolControlsManager.h"
+#include "dm_tools.h"
 #include "SplashNew.h"
 #include "welcome.h"
 #include "DM_Reg.h"
@@ -60,6 +62,12 @@ BOOL CMODVIEW32App::InitInstance()
 	//  of your final executable, you should remove from the following
 	//  the specific initialization routines you do not need.
 
+#ifdef _AFXDLL
+	Enable3dControls();			// Call this when using MFC in a shared DLL
+#else
+	Enable3dControlsStatic();	// Call this when linking to MFC statically
+#endif
+
 	// Change the registry key under which our settings are stored.
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization.
@@ -89,6 +97,8 @@ CATCH( CFileException, e )
     #endif
 }
 END_CATCH
+	
+	GetCtrlManager().InstallHook();
 
 	//OpenGL warning message
 	if(DMReg_ReadHKCUint("OpenGL_WarningMessage",0)==0)
@@ -141,6 +151,16 @@ END_CATCH
 	}
 #endif
 
+	//Initialize BCMenu (menus with icons)
+	CMenu* pMenu = m_pMainWnd->GetMenu();
+	if (pMenu)pMenu->DestroyMenu();
+	HMENU hMenu = ((CMainFrame*) m_pMainWnd)->NewMenu();
+	pMenu = CMenu::FromHandle( hMenu );
+	m_pMainWnd->SetMenu(pMenu);
+	((CMainFrame*)m_pMainWnd)->m_hMenuDefault = hMenu;
+	
+	// The one and only window has been initialized, so show and update it.
+	::SendMessage(m_pMainWnd->m_hWnd,WM_SYSCOMMAND,SC_MAXIMIZE,0); //Maximize main window
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
 
@@ -204,7 +224,7 @@ END_MESSAGE_MAP()
 // App command to run the dialog
 void CMODVIEW32App::OnAppAbout()
 {
-	//DoAbout();
+	DoAbout();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -238,7 +258,7 @@ void CMODVIEW32App::DisplayProgressWnd(char *action)
 void CMODVIEW32App::UpdateProgressWnd(int now, int all)
 {
 	char x[256];
-	sprintf_s(x,"Model #%i of %i (%i%%)",now,all,(now*100/all));
+	sprintf(x,"Model #%i of %i (%i%%)",now,all,(now*100/all));
 	progWnd.m_Frame.SetWindowText(x);
 	progWnd.m_Progress1.SetRange32(0,all);
 	progWnd.m_Progress1.SetPos(now);
@@ -272,7 +292,7 @@ BOOL CMODVIEW32App::Check1stStartup()
 	{
 		//CWelcome dlg;
 		//dlg.DoModal();
-		//DoGamesConfig();
+		DoGamesConfig();
 		return TRUE;
 	}
 	return FALSE;
@@ -280,7 +300,7 @@ BOOL CMODVIEW32App::Check1stStartup()
 
 void CMODVIEW32App::OnHelpCheckfornewversion() 
 {
-	//DoDMVC();
+	DoDMVC();
 }
 
 void CMODVIEW32App::ReloadFile(CString fname)

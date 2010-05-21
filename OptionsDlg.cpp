@@ -8,6 +8,7 @@
 #include "FolderDlg.h"
 #include "MainFrm.h"
 #include "DM_Reg.h"
+#include "DM_Tools.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,6 +42,7 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(COptionsDlg)
 	DDX_Control(pDX, IDC_MENU_STYLE, c_MenuStyle);
 	DDX_Control(pDX, IDC_QUICKRENDERING, m_QuickRendering);
+	DDX_Control(pDX, IDC_D2_SMOOTHPOSITIONCHANGE, m_D2_SmoothPositionChange);
 	DDX_Control(pDX, IDC_EXPLORERINDEX, m_ExplorerIndex);
 	DDX_Control(pDX, IDC_SWAPMOUSEBUTTONS, m_SwapMouseButtons);
 	DDX_Control(pDX, IDC_TOOLBAR_TEXT, m_ToolBar_Text);
@@ -53,9 +55,6 @@ BEGIN_MESSAGE_MAP(COptionsDlg, CDialog)
 	//{{AFX_MSG_MAP(COptionsDlg)
 	ON_BN_CLICKED(IDC_CONFIGURE, OnConfigure)
 	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_MENU_STYLE, &COptionsDlg::OnBnClickedMenuStyle)
-//	ON_BN_CLICKED(IDC_QUICKRENDERING, &COptionsDlg::OnBnClickedQuickrendering)
-ON_BN_CLICKED(IDC_QUICKRENDERING, &COptionsDlg::OnBnClickedQuickrendering)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -96,17 +95,33 @@ BOOL COptionsDlg::OnInitDialog()
 	if(*(options+3)==1)
 		m_ExplorerIndex.SetCheck(1);
 	if(*(options+4)==1)
+		m_D2_SmoothPositionChange.SetCheck(1);
+	if(*(options+5)==1)
 		m_QuickRendering.SetCheck(1);
 
 	if(DMReg_ReadHKCUint("DisableXPMenuStyle",0)==0)
 		c_MenuStyle.SetCheck(TRUE);
 
-	delete[] options;
+	delete(options);
 	
 	return TRUE;	// return TRUE unless you set the focus to a control
 					// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+CString COptionsDlg::GetD1Path()
+{
+	return DMReg_GetGameDir(DMREG_GAMETYPE_DESCENT1,DMREG_DISTRIBUTIONTYPE_FULL);
+}
+
+CString COptionsDlg::GetD2Path()
+{
+	return DMReg_GetGameDir(DMREG_GAMETYPE_DESCENT2,DMREG_DISTRIBUTIONTYPE_FULL);
+}
+
+CString COptionsDlg::GetD3Path()
+{
+	return DMReg_GetGameDir(DMREG_GAMETYPE_DESCENT3,DMREG_DISTRIBUTIONTYPE_FULL);
+}
 
 CString COptionsDlg::GetF1Path()
 {
@@ -118,12 +133,28 @@ CString COptionsDlg::GetF2Path()
 	return DMReg_GetGameDir(DMREG_GAMETYPE_FREESPACE2,DMREG_DISTRIBUTIONTYPE_FULL);
 }
 
+
+char * COptionsDlg::GetDescentINI(char *ini)
+{
+	GetPrivateProfileString("Directories","StIf3","$",ini,8191,"c:\\stif.cfg");
+	
+	if(strcmp(ini,"$")==0)
+	{
+		AfxMessageBox("StIf not installed. Reinstall the tool.\n\nCannot continue. MODVIEW32 will close.");
+		AfxAbort();
+	}
+
+	strcat(ini,"\\descent.ini");
+	return ini;
+}
+
 void COptionsDlg::OnOK() 
 {
 	CString ininame=GetINIfile();
 
 	DMReg_WriteHKCU("SwapMouseButtons",m_SwapMouseButtons.GetCheck());
 	DMReg_WriteHKCU("ExplorerGroupModels",m_ExplorerIndex.GetCheck());
+	DMReg_WriteHKCU("D2_SmoothPositionChange",m_D2_SmoothPositionChange.GetCheck());
 	DMReg_WriteHKCU("QuickRendering",m_QuickRendering.GetCheck());
 	DMReg_WriteHKCU("ToolbarButtonText",m_ToolBar_Text.GetCurSel());
 	DMReg_WriteHKCU("ToolbarButtonSize",m_ToolBar_Size.GetCheck()); //Important: Invert!!
@@ -181,6 +212,8 @@ void COptionsDlg::LoadOptions(char *options)
 		DMReg_WriteHKCU("ToolbarButtonSize",1-GetPrivateProfileInt("Toolbar","ButtonSize",1,ininame));
 		DMReg_WriteHKCU("SwapMouseButtons",GetPrivateProfileInt("Controls","SwapMouseButtons",0,ininame));
 		DMReg_WriteHKCU("ExplorerGroupModels",GetPrivateProfileInt("Display","ExplorerIndex",1,ininame));
+		DMReg_WriteHKCU("D2_SmoothPositionChange",GetPrivateProfileInt("Display","D2_SmoothPositionChange",1,ininame));
+		DMReg_WriteHKCU("D2_SmoothPositionChange",GetPrivateProfileInt("Display","QuickRendering",1,ininame));
 		DMReg_WriteHKLM("OpenGL_WarningMessage",GetPrivateProfileInt("General","OpenGL_WarningMessage",0,ininame));
 		DMReg_WriteHKCU("TipOfTheDay",GetPrivateProfileInt("General","TipOfTheDay",0,ininame));
 		TRY
@@ -198,7 +231,8 @@ void COptionsDlg::LoadOptions(char *options)
 	*(options+1)=DMReg_ReadHKCUint("ToolbarButtonSize",TOOLBAR_SIZE_LARGE);
 	*(options+2)=DMReg_ReadHKCUint("SwapMouseButtons",0);
 	*(options+3)=DMReg_ReadHKCUint("ExplorerGroupModels",1);
-	*(options+4)=DMReg_ReadHKCUint("QuickRendering",1);
+	*(options+4)=DMReg_ReadHKCUint("D2_SmoothPositionChange",1);
+	*(options+5)=DMReg_ReadHKCUint("QuickRendering",1);
 }
 
 CString COptionsDlg::GetINIfile()
@@ -212,17 +246,6 @@ CString COptionsDlg::GetINIfile()
 
 void COptionsDlg::OnConfigure() 
 {
-	//DoGamesConfig();
+	DoGamesConfig();
 	m_GameConfigChanged=TRUE;
-}
-
-
-void COptionsDlg::OnBnClickedMenuStyle()
-{
-	// TODO: Add your control notification handler code here
-}
-
-void COptionsDlg::OnBnClickedQuickrendering()
-{
-	// TODO: Add your control notification handler code here
 }

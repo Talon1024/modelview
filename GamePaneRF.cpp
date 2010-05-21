@@ -85,7 +85,7 @@ void CGamePaneRF::Init()
 		num_vertices+=pDoc->m_RF_Model.geounit[i].mNumVerts;
 
 	int num_polygons=0;
-	for(int i=0;i<pDoc->m_RF_Model.num_geounits;i++)
+	for(i=0;i<pDoc->m_RF_Model.num_geounits;i++)
 		num_polygons+=pDoc->m_RF_Model.geounit[i].mNumTris;
 	
 
@@ -93,14 +93,14 @@ void CGamePaneRF::Init()
 	char *temp=new char[256];
 	CString sep=" ";
 	ctrl=(CStatic *)GetDlgItem(IDC_RF_VERTICIES);
-	ctrl->SetWindowText(sep+_itoa(num_vertices,temp,10));
+	ctrl->SetWindowText(sep+itoa(num_vertices,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_RF_POLYGONS);
-	ctrl->SetWindowText(sep+_itoa(num_polygons,temp,10));
+	ctrl->SetWindowText(sep+itoa(num_polygons,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_RF_TEXTURES);
-	ctrl->SetWindowText(sep+_itoa(pDoc->m_RF_Model.num_textures,temp,10));
+	ctrl->SetWindowText(sep+itoa(pDoc->m_RF_Model.num_textures,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_RF_SOBJ);
-	ctrl->SetWindowText(sep+_itoa(pDoc->m_RF_Model.num_geounits,temp,10));
+	ctrl->SetWindowText(sep+itoa(pDoc->m_RF_Model.num_geounits,temp,10));
 
-	delete[] temp;
+	delete(temp);
 }
 

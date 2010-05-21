@@ -31,12 +31,12 @@ private:
 	void ohdr();
 	void txtr();
 	void Dump0Data();
-	void Dump1Data(unsigned int Segment);
+	void Dump1Data(unsigned long Segment);
 	void Dump23Data(int Polygon);
 	void Dump4Data(FS_VPNT Normal, FS_VPNT Point, FS_VPNT Min, FS_VPNT Max);
 	void Dump5Data(FS_VPNT Min, FS_VPNT Max);
-	void split(FS_VPNT Min, FS_VPNT Max,unsigned int SobjNum);
-	void sobj(int SobjNum);
+	void split(FS_VPNT Min, FS_VPNT Max,unsigned long SobjNum);
+	void sobj(unsigned long SobjNum);
 	void shld();
 	void pinf();
 
@@ -81,12 +81,12 @@ typedef struct cob_header {
 } COB_HEADER;
 
 typedef struct chunk_header {
-	unsigned int Type;
+	unsigned long Type;
 	unsigned short Major;
 	unsigned short Minor;
-	unsigned int Chunkid;
-	unsigned int Parentid;
-	unsigned int Size;
+	unsigned long Chunkid;
+	unsigned long Parentid;
+	unsigned long Size;
 } CHUNK_HEADER;
 
 typedef struct grou_data {
@@ -124,33 +124,33 @@ typedef struct cindex {
 } CINDEX;
 
 typedef struct cface {
-	unsigned int n_index;
-	unsigned int segment;
-	unsigned int chunk;
-	unsigned int chunkmatl;
+	unsigned long n_index;
+	unsigned long segment;
+	unsigned long chunk;
+	unsigned long chunkmatl;
 	char facet;
-	unsigned int material;
-	unsigned int polytype;
-	unsigned int matlindex;
+	unsigned long material;
+	unsigned long polytype;
+	unsigned long matlindex;
 	CINDEX index[25];
 } CFACE;
 
 typedef struct cmodel
 {
-	unsigned int Vcount;
+	unsigned long Vcount;
 	CVPNT Vpoint[VEC_MAX];
-	unsigned int Vpntseg[VEC_MAX];
-	unsigned int Vpntchunk[VEC_MAX];
-	unsigned int Vpntreal[VEC_MAX];
+	unsigned long Vpntseg[VEC_MAX];
+	unsigned long Vpntchunk[VEC_MAX];
+	unsigned long Vpntreal[VEC_MAX];
 	unsigned short Vpntfinal[VEC_MAX];
-	unsigned int UVcount;
+	unsigned long UVcount;
 	CUV UVpoint[VEC_MAX*2];
-	unsigned int Pcount;
+	unsigned long Pcount;
 	CFACE Poly[POLY_MAX];
-	unsigned int Scount;
+	unsigned long Scount;
 	char Sname[SOBJ_MAX][30];
 	CVPNT Soffset[SOBJ_MAX];
-	unsigned int parent[SOBJ_MAX];
+	unsigned long parent[SOBJ_MAX];
 } CMODEL;
 
 
@@ -189,14 +189,14 @@ typedef struct bbinfo {
 } BBINFO;
 
 typedef struct pinfo {
-	unsigned int Corners;
-	unsigned int Colors;
-	unsigned int facet;
-	unsigned int Segment;
-	unsigned int Chunk;
-	unsigned int Sobj;
-	unsigned int Ptype;
-	unsigned int detail;
+	unsigned long Corners;
+	unsigned long Colors;
+	unsigned long facet;
+	unsigned long Segment;
+	unsigned long Chunk;
+	unsigned long Sobj;
+	unsigned long Ptype;
+	unsigned long detail;
 	FS_VPNT Center;
 	FS_VPNT Normal;
 	float Radius;
@@ -214,46 +214,46 @@ typedef struct fsmodel {
 
 	unsigned short Vcount;
 	FS_VPNT Vpoint[VEC_MAX];
-	unsigned int Vpntseg[VEC_MAX];
-	unsigned int Vpntchunk[VEC_MAX];
+	unsigned long Vpntseg[VEC_MAX];
+	unsigned long Vpntchunk[VEC_MAX];
 	unsigned char n_vn[VEC_MAX];
 	unsigned short Ncount;
 	FS_VPNT Npoint[VEC_MAX*2];
-	unsigned int BBcount;
+	unsigned long BBcount;
 	BBINFO Bbox[POLY_MAX];
-	unsigned int Pcount;
+	unsigned long Pcount;
 	PINFO Poly[POLY_MAX];
-	unsigned int Scount;
-	char Sname[MAX_FS_SOBJ][30];
-	long Sparent[MAX_FS_SOBJ];
-	FS_VPNT Soffset[MAX_FS_SOBJ];
-	unsigned int Debriscount;
-	unsigned int Sdebris[MAX_FS_SOBJ];
-	unsigned int Detailcount;
-	unsigned int Sdetail[MAX_FS_SOBJ];
+	unsigned long Scount;
+	char Sname[SOBJ_MAX][30];
+	long Sparent[SOBJ_MAX];
+	FS_VPNT Soffset[SOBJ_MAX];
+	unsigned long Debriscount;
+	unsigned long Sdebris[SOBJ_MAX];
+	unsigned long Detailcount;
+	unsigned long Sdetail[SOBJ_MAX];
 	long shield;
 } FSMODEL;
 
 typedef struct sinfo {
-	unsigned int VScount;
-	unsigned int VSlist[SHIELD_MAX];
-	unsigned int PScount;
-	unsigned int PSlist[SHIELD_MAX];
-	unsigned int PSnext[SHIELD_MAX][3];
+	unsigned long VScount;
+	unsigned long VSlist[SHIELD_MAX];
+	unsigned long PScount;
+	unsigned long PSlist[SHIELD_MAX];
+	unsigned long PSnext[SHIELD_MAX][3];
 } SINFO;
 
 MATL_DATA Matldata[MATL_MAX];
 MATLT_DATA Matltdata[MATL_MAX];
 char Matlname[MATL_MAX][100];
-unsigned int Matlcount,numtextures;
+unsigned long Matlcount,numtextures;
 
 // Place to hold the model data...
 FSMODEL FSModel;
 CMODEL Cmodel;
-unsigned int chunknum;
+unsigned long chunknum;
 
 unsigned char *OutputData;
-unsigned int OutputLength;
+unsigned long OutputLength;
 
 };
 //

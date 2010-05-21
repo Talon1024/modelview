@@ -89,15 +89,15 @@ void CGamePaneD2::Init()
 	char *temp=new char[256];
 	CString sep=" ";
 	ctrl=(CStatic *)GetDlgItem(IDC_D2_VERTICIES);
-	ctrl->SetWindowText(sep+_itoa(pDoc->m_D2_Model.Vcount,temp,10));
+	ctrl->SetWindowText(sep+itoa(pDoc->m_D2_Model.Vcount,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D2_POLYGONS);
-	ctrl->SetWindowText(sep+_itoa(pDoc->m_D2_Model.Pcount,temp,10));
+	ctrl->SetWindowText(sep+itoa(pDoc->m_D2_Model.Pcount,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D2_TEXTURES);
-	ctrl->SetWindowText(sep+_itoa(pDoc->m_D2_Model.PolyModel.n_textures,temp,10));
+	ctrl->SetWindowText(sep+itoa(pDoc->m_D2_Model.PolyModel.n_textures,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D2_SOBJ);
-	ctrl->SetWindowText(sep+_itoa(pDoc->m_D2_Model.Scount,temp,10));
+	ctrl->SetWindowText(sep+itoa(pDoc->m_D2_Model.Scount,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D2_GUNS);
-	ctrl->SetWindowText(sep+_itoa(pDoc->m_Guns.Num,temp,10));
+	ctrl->SetWindowText(sep+itoa(pDoc->m_Guns.Num,temp,10));
 	ctrl=(CStatic *)GetDlgItem(IDC_D2_TYPEDESC);
 	ctrl->SetWindowText(sep+pDoc->m_ModelType_Desc);
 
@@ -123,7 +123,7 @@ void CGamePaneD2::Init()
 	}
 	lbox->SetCurSel(0);
 
-	delete[] temp;
+	delete(temp);
 }
 
 void CGamePaneD2::FillTab()

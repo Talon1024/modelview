@@ -138,11 +138,11 @@ void CEditorFS_SHLD::OnEditorfsShldModifyApply()
 {
 	CString t;
 	m_Modify_MultX.GetWindowText(t);
-	float mx=(float)atof(t);
+	float mx=atof(t);
 	m_Modify_MultY.GetWindowText(t);
-	float my=(float)atof(t);
+	float my=atof(t);
 	m_Modify_MultZ.GetWindowText(t);
-	float mz=(float)atof(t);
+	float mz=atof(t);
 
 	if(mx==0 || my==0 || mz==0)
 	{
@@ -150,7 +150,7 @@ void CEditorFS_SHLD::OnEditorfsShldModifyApply()
 		return;
 	}
 
-	for(unsigned int i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
+	for(int i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
 	{
 		GetDocument()->m_FS_Model.shields.Vpoint[i][0]*=mx;
 		GetDocument()->m_FS_Model.shields.Vpoint[i][1]*=my;
@@ -242,7 +242,7 @@ int CEditorFS_SHLD::ReadShieldData(CString fn, FS_SHIELDS *sh)
 		return -1;
 
 	f.Seek(0L, SEEK_END);
-	ULONGLONG filesize=f.GetPosition();
+	int filesize=f.GetPosition();
 	f.Seek(0L, SEEK_SET);
 
 	int ri;
@@ -253,7 +253,7 @@ int CEditorFS_SHLD::ReadShieldData(CString fn, FS_SHIELDS *sh)
 
 	int chunktype;
 	int chunksize;
-	ULONGLONG chunkposi;
+	int chunkposi;
 	while(f.GetPosition()<filesize)
 	{
 		f.Read(&chunktype,4);
@@ -265,7 +265,7 @@ int CEditorFS_SHLD::ReadShieldData(CString fn, FS_SHIELDS *sh)
 			f.Read(&sh->Vcount,4);
 			if(sh->Vcount>MAX_FS_SHIELDVERTICES)
 				return -2;
-			for( unsigned int i=0;i<sh->Vcount;i++)
+			for(int i=0;i<sh->Vcount;i++)
 			{
 				f.Read(&sh->Vpoint[i][0],4);
 				f.Read(&sh->Vpoint[i][1],4);
@@ -275,7 +275,7 @@ int CEditorFS_SHLD::ReadShieldData(CString fn, FS_SHIELDS *sh)
 			f.Read(&sh->Fcount,4);
 			if(sh->Fcount>MAX_FS_SHIELDFACES)
 				return -2;
-			for(unsigned int i=0; i<sh->Fcount; i++)
+			for(i=0;i<sh->Fcount;i++)
 			{
 				f.Read(&sh->Face[i].Normal.x,4);
 				f.Read(&sh->Face[i].Normal.y,4);
@@ -375,17 +375,17 @@ void CEditorFS_SHLD::OnChangeData()
 	{
 		CString t;
 		m_Modify_MultX.GetWindowText(t);
-		float mx=(float)atof(t);
+		float mx=atof(t);
 		m_Modify_MultY.GetWindowText(t);
-		float my=(float)atof(t);
+		float my=atof(t);
 		m_Modify_MultZ.GetWindowText(t);
-		float mz=(float)atof(t);
+		float mz=atof(t);
 
 		if(mx==0) mx=1;
 		if(my==0) my=1;
 		if(mz==0) mz=1;
 
-		for(unsigned int i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
+		for(int i=0;i<GetDocument()->m_FS_Model.shields.Vcount;i++)
 		{
 			GetDocument()->m_FS_Model.shields.Vpoint[i][0]=m_OwnShieldsBackup.Vpoint[i][0]*mx;
 			GetDocument()->m_FS_Model.shields.Vpoint[i][1]=m_OwnShieldsBackup.Vpoint[i][1]*my;

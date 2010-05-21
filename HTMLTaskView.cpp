@@ -220,7 +220,7 @@ void CHTMLTaskView::GenerateHTMLHeader(CStdioFile *ft)
 	char path_main[MAX_FILENAMELEN];
 	COptionsDlg dlg;
 	dlg.GetMainPath((char *)&path_main);
-	strcat_s(path_main,"ht_logo.jpg");
+	strcat(path_main,"ht_logo.jpg");
 	CString x=path_main;
 	
 	ft->WriteString("<html>");

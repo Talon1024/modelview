@@ -15,7 +15,7 @@ class CSplash : public CDialog
 // Construction
 public:
 	CSplash(CWnd* pParent = NULL);   // standard constructor
-	int Create(CWnd* pParent);
+	Create(CWnd* pParent);
 
 // Dialog Data
 	//{{AFX_DATA(CSplash)

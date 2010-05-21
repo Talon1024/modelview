@@ -30,9 +30,10 @@
 #include <conio.h>
 #include <stdlib.h>
 
-#include "tga.h"
+#include			"tga.h"
 
-void ConvertUncompressedTGA(byte BitDepth,int width,int height,void *source,RGBA32_t *dest)
+void	 
+ConvertUncompressedTGA(byte BitDepth,int width,int height,void *source,RGBA32_t *dest)
 {
 	int i,j;
 	RGBA32_t	*d = dest;
@@ -77,7 +78,8 @@ void ConvertUncompressedTGA(byte BitDepth,int width,int height,void *source,RGBA
 	};
 };
 
-void TGA_LoadRGBA( char const* inName,RGBA32_t*& outData, int& outWidth, int& outHeight )
+void		
+TGA_LoadRGBA( char const* inName,RGBA32_t*& outData, int& outWidth, int& outHeight )
 {
 	TGAHeader_t		*Header;
 	void			*Buffer;
@@ -111,7 +113,7 @@ void TGA_LoadRGBA( char const* inName,RGBA32_t*& outData, int& outWidth, int& ou
 		fclose(fp);
 	}	
 	{
-		if(!_stricmp(((char *)Buffer+FileSize-16),"TRUEVISION-XFILE."))
+		if(!stricmp(((char *)Buffer+FileSize-16),"TRUEVISION-XFILE."))
 		{
 			if(Buffer)
 				delete[]Buffer;

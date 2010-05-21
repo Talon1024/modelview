@@ -88,16 +88,14 @@ int CFolderDialog::DoModal()
 	piid = ::SHBrowseForFolder(&m_bi);
 
 	// process the result
-	if (piid) {
-		if ( ::SHGetPathFromIDList(piid, m_szPath))
-		{
-			m_strFinalFolderName = m_szPath;
-			nReturn = IDOK;
-		}
-		else
-		{
-			nReturn = IDCANCEL;
-		}
+	if (piid && ::SHGetPathFromIDList(piid, m_szPath))
+	{
+		m_strFinalFolderName = m_szPath;
+		nReturn = IDOK;
+	}
+	else
+	{
+		nReturn = IDCANCEL;
 	}
 
 	// Release the ITEMIDLIST if we got one
