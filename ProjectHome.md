@@ -1,0 +1,3 @@
+ModelView32 was one of the primary tools for Descent, FreeSpace, and FreeSpace 2 modders. While it hasn't been maintained for a long time, there is still potential to forge a new model importing tool out of the existant code that could be used as an enhancement for the currently used modelling toolchain.
+
+Note: This project will focus on getting ModelView in line with new features as requested by the FreeSpace community. If you wish to bring the Descent code up to spec with whatever is needed, feel free to contribute.
